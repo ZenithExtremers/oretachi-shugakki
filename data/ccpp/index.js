@@ -7,11 +7,13 @@ import l3 from './l3.js';
 import l4 from './l4.js';
 import l5 from './l5.js';
 import l6 from './l6.js';
+import lessons from './lessons.js';
 
 export default {
   id: 'ccpp',
   name: 'C/C++プログラミング',
   lang: 'cpp', // tools/verify.mjs が g++ で実行チェックする
+  yen: true,   // 講義資料と同じく \ を ¥ で表示する
   lectures: {
     1: '第1回 コンパイラ言語・Hello World',
     2: '第2回 変数と型・cin・if',
@@ -47,5 +49,6 @@ export default {
       { lecture: 6, n: 3 },
     ],
   },
+  lessons,
   groups: [...l1, ...l2, ...l3, ...l4, ...l5, ...l6, ...midterm2026],
 };

@@ -12,7 +12,8 @@ function readJSON(k, fallback) {
 function writeJSON(k, v) {
   try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch { /* 保存できない環境 */ }
 }
-const store = Object.assign({ settings: { shufflePast: false, shuffleOriginal: true }, stats: {}, history: [] }, readJSON(KEY, {}));
+const store = Object.assign({ settings: { shufflePast: false, shuffleOriginal: true }, stats: {}, history: [], lessons: {} }, readJSON(KEY, {}));
+store.lessons ||= {};
 const save = () => writeJSON(KEY, store);
 let session = readJSON(SKEY, null);
 const saveSession = () => writeJSON(SKEY, session);
@@ -55,6 +56,9 @@ async function getSubject(id) {
     s.groupById[g.id] = g;
     for (const q of g.questions) { s.qById[q.id] = q; q.group = g; }
   }
+  s.lessons = s.lessons || [];
+  s.lessonById = {};
+  s.lessons.forEach((l, i) => { l.index = i; s.lessonById[l.id] = l; });
   return (loaded[id] = s);
 }
 const isPast = (g) => g.source !== 'original';
@@ -65,6 +69,7 @@ const reviewIds = (s) => s.groups.flatMap((g) => g.questions).filter((q) => stor
 
 /* ---------- ルーター ---------- */
 let timer = null;
+let cur = null; // 表示中の科目
 window.addEventListener('hashchange', route);
 async function route() {
   clearInterval(timer);
@@ -73,7 +78,10 @@ async function route() {
   if (parts[0] === 's' && parts[1]) {
     const s = await getSubject(parts[1]);
     if (!s) return go('');
+    cur = s;
     const page = parts[2] || '';
+    if (page === 'lessons') return viewLessons(s);
+    if (page === 'lesson' && s.lessonById[parts[3]]) return viewLesson(s, s.lessonById[parts[3]]);
     if (page === 'field') return viewField(s);
     if (page === 'past') return viewPast(s);
     if (page === 'history') return viewHistory(s);
@@ -135,6 +143,7 @@ function viewSubject(s) {
       ${resume ? `<h3 class="sec">続きから</h3><div class="menu"><button class="menu-btn resume" data-act="resume"><span class="ic">▶</span><div><b>${esc(session.title)}</b><small>回答 ${Object.keys(session.answers).length}/${session.qids.length}</small></div></button></div>` : ''}
       <h3 class="sec">解く</h3>
       <div class="menu">
+        ${s.lessons.length ? `<button class="menu-btn" data-act="nav" data-to="s/${s.id}/lessons"><span class="ic">基</span><div><b>基礎コース</b><small>説明を読んで確認問題 ・ クリア ${s.lessons.filter((l) => store.lessons?.[l.id]).length}/${s.lessons.length}</small></div></button>` : ''}
         ${s.mock ? `<button class="menu-btn" data-act="mock"><span class="ic">模</span><div><b>${esc(s.mock.name)}</b><small>本番と同じ配分 ・ 最後にまとめて採点${s.mock.minutes ? ` ・ ${s.mock.minutes}分` : ''}</small></div></button>` : ''}
         <button class="menu-btn" data-act="nav" data-to="s/${s.id}/past"><span class="ic">本</span><div><b>本番の問題</b><small>${esc((s.pastExams || []).map((p) => p.name).join('・') || 'まだありません')}</small></div></button>
         <button class="menu-btn" data-act="nav" data-to="s/${s.id}/field"><span class="ic">分</span><div><b>分野別</b><small>回・問題の型を選んで、1問ずつ解説つき</small></div></button>
@@ -261,6 +270,18 @@ function startReview(s, qids, title = '間違えた問題の復習') {
 /* ---------- 問題画面 ---------- */
 function qNumber(qid) { return session.qids.indexOf(qid) + 1; }
 
+const SQL_KW = /\b(SELECT|FROM|WHERE|AND|OR|NOT|IN|BETWEEN|LIKE|IS|NULL|ORDER|BY|ASC|DESC|LIMIT|OFFSET|GROUP|HAVING|AS|DISTINCT|INSERT|INTO|VALUES|UPDATE|SET|DELETE|CREATE|TABLE|DROP|ALTER|CASE|WHEN|THEN|ELSE|END|JOIN|INNER|LEFT|RIGHT|OUTER|ON|UNION|ALL|EXISTS|ANY|COUNT|SUM|AVG|MAX|MIN|PRIMARY|KEY|INTEGER|INT|VARCHAR|CHAR|DATE|DECIMAL)\b/i;
+function highlightSQL(line) {
+  const re = new RegExp(String.raw`(--.*$)|('(?:''|[^'])*')|(\?{3,})|` + SQL_KW.source, 'gi');
+  let out = '', last = 0, m;
+  while ((m = re.exec(line))) {
+    out += esc(line.slice(last, m.index));
+    const cls = m[1] ? 'cm' : m[2] ? 'str' : m[3] ? 'hole' : 'kw';
+    out += `<span class="${cls}">${esc(m[0])}</span>`;
+    last = m.index + m[0].length;
+  }
+  return out + esc(line.slice(last));
+}
 function highlight(line) {
   const re = /(\/\/.*$)|("(?:\\.|[^"\\])*")|('(?:\\.|[^'\\])*')|(\?{8})|\b(int|double|float|char|string|void|return|if|else|for|while|do|switch|case|default|break|continue|goto|const|using|namespace|new|delete|unsigned|bool|true|false|sizeof)\b/g;
   let out = '', last = 0, m;
@@ -272,14 +293,42 @@ function highlight(line) {
   }
   return out + esc(line.slice(last));
 }
-function renderCode(code, gid) {
-  const rows = code.split('\n').map((l, i) => `<tr data-line="${i + 1}"><td class="n">${i + 1}</td><td class="l">${highlight(l) || ' '}</td></tr>`).join('');
-  return `<div class="code" id="code-${gid}"><table>${rows}</table></div>`;
+const yen = (h) => (cur && cur.yen ? h.replace(/\\/g, '¥') : h);
+function renderCode(code, gid, lang = 'cpp', numbers = true) {
+  const hl = lang === 'sql' ? highlightSQL : lang === 'text' ? esc : highlight;
+  const rows = code.split('\n').map((l, i) => `<tr data-line="${i + 1}">${numbers ? `<td class="n">${i + 1}</td>` : ''}<td class="l">${yen(hl(l)) || ' '}</td></tr>`).join('');
+  return `<div class="code${numbers ? '' : ' nonum'}" id="code-${gid}"><table>${rows}</table></div>`;
+}
+function renderTable(t) {
+  return `<div class="dtable">${t.name ? `<div class="tname">${esc(t.name)}</div>` : ''}<div class="tscroll"><table>
+    <thead><tr>${t.cols.map((c) => `<th>${esc(c)}</th>`).join('')}</tr></thead>
+    <tbody>${t.rows.map((r) => `<tr>${r.map((c) => `<td>${c === null ? '<span class="null">NULL</span>' : esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+}
+// "列1|列2\n値|値" 形式の文字列を小さな表に
+function miniTable(txt) {
+  const lines = txt.split('\n');
+  if (lines.length === 1 && !lines[0].includes('|')) return esc(txt);
+  const [h, ...rows] = lines.map((l) => l.split('|').map((c) => c.trim()));
+  return `<table class="mini"><thead><tr>${h.map((c) => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.length ? rows.map((r) => `<tr>${r.map((c) => `<td>${c === 'NULL' ? '<span class="null">NULL</span>' : esc(c)}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${h.length}" class="null">（0行）</td></tr>`}</tbody></table>`;
+}
+function renderDiagram(svg) { return `<div class="diagram">${svg}</div>`; }
+function renderGroupBody(g) {
+  return `${g.intro ? `<p class="intro">${inline(g.intro)}</p>` : ''}
+      ${g.passage ? renderPassage(g.passage) : ''}
+      ${g.diagram ? renderDiagram(g.diagram) : ''}
+      ${(g.tables || []).map(renderTable).join('')}
+      ${g.code ? renderCode(g.code, g.id, g.lang || cur.lang) : ''}`;
+}
+// 説明文中の **太字** と `コード`
+function inline(t) {
+  return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, (m, c) => `<code>${yen(c)}</code>`);
 }
 function renderPassage(text) {
   return `<div class="passage">${esc(text).replace(/［[^］]+］/g, (m) => `<span class="blank">${m}</span>`)}</div>`;
 }
 function choiceHTML(q, mono, txt) {
+  if (q.tableChoices || q.group?.tableChoices) return miniTable(txt);
+  if (mono) txt = cur && cur.yen ? txt.replace(/\\/g, '¥') : txt;
   if (mono) return txt.includes('\n') ? `<pre>${esc(txt)}</pre>` : `<code>${esc(txt)}</code>`;
   return esc(txt).replace(/\(改行\)/g, '<span class="nl">(改行)</span>');
 }
@@ -299,7 +348,7 @@ function renderQuestion(q) {
   let exp = '';
   if (reveal) {
     const ok = ans === q.answer;
-    exp = `<div class="exp ${ok ? 'ok' : 'ng'}"><span class="verdict">${ok ? '正解' : '不正解'}</span>正解は ${NUMS[perm.indexOf(q.answer)]}。${esc(q.exp)}</div>`;
+    exp = `<div class="exp ${ok ? 'ok' : 'ng'}"><span class="verdict">${ok ? '正解' : '不正解'}</span>正解は ${NUMS[perm.indexOf(q.answer)]}。${inline(q.exp)}</div>`;
   }
   return `<div class="q" id="q-${q.id}"><div class="q-text"><span class="qn">問${qNumber(q.id)}</span>${text}</div><div class="choices">${btns}</div>${exp}</div>`;
 }
@@ -321,9 +370,7 @@ function viewQuiz(s) {
         <span class="no">${label}</span><span class="tag">${esc(s.lectures[g.lecture] || '')} ・ ${esc(sourceTag)}</span>
         <h2>${esc(g.title)}</h2>
       </div>
-      ${g.intro ? `<p class="intro">${esc(g.intro)}</p>` : ''}
-      ${g.passage ? renderPassage(g.passage) : ''}
-      ${g.code ? renderCode(g.code, g.id) : ''}
+      ${renderGroupBody(g)}
       ${qs.map(renderQuestion).join('')}
     </main>
     <div class="bottom"><div class="bottom-in">
@@ -428,7 +475,7 @@ function viewResult(s) {
     const perm = session.order[q.group.sharedChoices ? q.group.id : q.id];
     const ch = choicesOf(q);
     return `<details class="res-item-wrap"><summary class="res-item"><span class="mark ${ok ? 'ok' : 'ng'}">${ok ? '○' : '×'}</span><span>問${qNumber(id)} ${esc(q.q.length > 46 ? q.q.slice(0, 46) + '…' : q.q)}<small>あなた：${a === undefined ? '未回答' : NUMS[perm.indexOf(a)] + ' ' + esc(ch[a].replace(/\n/g, ' / '))} ／ 正解：${NUMS[perm.indexOf(q.answer)]} ${esc(ch[q.answer].replace(/\n/g, ' / '))}</small></span></summary>
-      <div class="exp ${ok ? 'ok' : 'ng'}">${esc(q.exp)}</div></details>`;
+      <div class="exp ${ok ? 'ok' : 'ng'}">${inline(q.exp)}</div></details>`;
   }).join('');
   const m = Math.floor((session.seconds || 0) / 60);
   $app.innerHTML = `
@@ -444,6 +491,79 @@ function viewResult(s) {
       <button class="btn sub wide mt" data-act="nav" data-to="s/${s.id}">${esc(s.name)} のトップへ</button>
     </main>`;
   session.wrong = wrong;
+}
+
+/* ---------- 基礎コース ---------- */
+const lessonOpen = (s, l) => l.index === 0 || !!store.lessons[s.lessons[l.index - 1].id];
+function viewLessons(s) {
+  const byL = {};
+  for (const l of s.lessons) (byL[l.lecture] ||= []).push(l);
+  const done = s.lessons.filter((l) => store.lessons[l.id]).length;
+  $app.innerHTML = `
+    ${top('基礎コース', { back: 's/' + s.id, sub: `${done}/${s.lessons.length}` })}
+    <main class="wrap">
+      <p class="muted small mt">説明を読んで確認問題に全問正解するとクリア。クリアすると次のレッスンが開きます。</p>
+      ${Object.entries(byL).map(([k, ls]) => `
+        <h3 class="sec">${esc(s.lectures[k] || k)}</h3>
+        <div class="menu">${ls.map((l) => {
+          const open = lessonOpen(s, l), clear = !!store.lessons[l.id];
+          return `<button class="menu-btn" ${open ? `data-act="nav" data-to="s/${s.id}/lesson/${l.id}"` : 'disabled'}>
+            <span class="ic ${clear ? 'clear' : ''}">${clear ? '✓' : open ? l.index + 1 : '🔒'}</span>
+            <div><b>${esc(l.title)}</b><small>${clear ? 'クリア' : open ? `確認問題 ${l.questions.length}問` : '前のレッスンをクリアすると開きます'}</small></div></button>`;
+        }).join('')}</div>`).join('')}
+    </main>`;
+}
+let lessonState = null;
+function renderBlock(b) {
+  if (typeof b === 'string') return `<p>${inline(b)}</p>`;
+  if (b.code) return renderCode(b.code, 'lb' + Math.random().toString(36).slice(2, 8), b.lang || cur.lang, b.numbers !== false);
+  if (b.table) return renderTable(b.table);
+  if (b.svg) return renderDiagram(b.svg);
+  if (b.list) return `<ul>${b.list.map((x) => `<li>${inline(x)}</li>`).join('')}</ul>`;
+  if (b.note) return `<div class="note">${inline(b.note)}</div>`;
+  if (b.h) return `<h4>${inline(b.h)}</h4>`;
+  return '';
+}
+function lessonQ(l, q, i) {
+  const st = lessonState;
+  const perm = st.order[i];
+  const ans = st.answers[i];
+  const done = ans !== undefined;
+  const btns = perm.map((oi, di) => {
+    let cls = 'choice';
+    if (done) { if (oi === q.answer) cls += ' ok'; else if (oi === ans) cls += ' ng'; }
+    return `<button class="${cls}" data-act="lans" data-i="${i}" data-o="${oi}" ${done ? 'disabled' : ''}><span class="num">${NUMS[di]}</span><span class="txt">${choiceHTML(q, q.mono, q.choices[oi])}</span></button>`;
+  }).join('');
+  const exp = done ? `<div class="exp ${ans === q.answer ? 'ok' : 'ng'}"><span class="verdict">${ans === q.answer ? '正解' : '不正解'}</span>${inline(q.exp)}</div>` : '';
+  return `<div class="q" id="lq-${i}"><div class="q-text"><span class="qn">Q${i + 1}</span>${inline(q.q)}</div>${q.code ? renderCode(q.code, 'lq' + i, q.lang || cur.lang) : ''}${q.table ? renderTable(q.table) : ''}<div class="choices">${btns}</div>${exp}</div>`;
+}
+function viewLesson(s, l) {
+  if (!lessonOpen(s, l)) return go(`s/${s.id}/lessons`);
+  if (!lessonState || lessonState.id !== l.id) lessonState = { id: l.id, answers: {}, order: l.questions.map((q) => shuffle(q.choices.map((_, i) => i))) };
+  const next = s.lessons[l.index + 1];
+  $app.innerHTML = `
+    ${top(l.title, { back: `s/${s.id}/lessons`, sub: `${l.index + 1}/${s.lessons.length}` })}
+    <main class="wrap lesson">
+      <div class="group-head"><span class="no">レッスン ${l.index + 1}</span><span class="tag">${esc(s.lectures[l.lecture] || '')}</span><h2>${esc(l.title)}</h2></div>
+      <div class="lesson-body">${l.blocks.map(renderBlock).join('')}</div>
+      <h3 class="sec">確認問題</h3>
+      ${l.questions.map((q, i) => lessonQ(l, q, i)).join('')}
+      <div id="lresult"></div>
+    </main>
+    ${next ? '' : ''}`;
+  lessonFinishCheck(s, l);
+}
+function lessonFinishCheck(s, l) {
+  const st = lessonState;
+  const box = document.getElementById('lresult');
+  if (!box || Object.keys(st.answers).length < l.questions.length) return;
+  const ok = l.questions.every((q, i) => st.answers[i] === q.answer);
+  const next = s.lessons[l.index + 1];
+  if (ok && !store.lessons[l.id]) { store.lessons[l.id] = Date.now(); save(); }
+  box.innerHTML = ok
+    ? `<div class="card mt center"><b style="font-size:20px">🎉 クリア！</b><div class="row mt">${next ? `<button class="btn" data-act="lnext" data-to="s/${s.id}/lesson/${next.id}">次のレッスンへ</button>` : `<button class="btn" data-act="nav" data-to="s/${s.id}">${esc(s.name)} のトップへ</button>`}</div></div>`
+    : `<div class="card mt center"><b>${l.questions.filter((q, i) => st.answers[i] === q.answer).length}/${l.questions.length} 問正解</b><p class="muted small">全問正解でクリアです。説明を読み直してもう一度。</p><button class="btn wide" data-act="lretry">もう一度</button></div>`;
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 /* ---------- 設定 ---------- */
@@ -499,6 +619,16 @@ document.addEventListener('click', async (e) => {
     case 'next': session.page++; saveSession(); window.scrollTo(0, 0); return viewQuiz(s);
     case 'palette': return openPalette(s);
     case 'finish': return finish(s);
+    case 'lans': {
+      const l = s.lessonById[lessonState.id];
+      const i = +el.dataset.i;
+      if (lessonState.answers[i] !== undefined) return;
+      lessonState.answers[i] = +el.dataset.o;
+      document.getElementById('lq-' + i).outerHTML = lessonQ(l, l.questions[i], i);
+      return lessonFinishCheck(s, l);
+    }
+    case 'lretry': { const l = s.lessonById[lessonState.id]; lessonState = null; viewLesson(s, l); window.scrollTo(0, 0); return; }
+    case 'lnext': lessonState = null; return go(el.dataset.to);
     case 'line': {
       const tr = document.querySelector(`#code-${el.dataset.g} tr[data-line="${el.dataset.line}"]`);
       if (!tr) return;

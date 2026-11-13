@@ -1,159 +1,244 @@
-// 第5回 関数・関数宣言・void・再帰・デフォルト実引数・ビット演算・シフト（オリジナル問題）
+// 第5回 関数・関数宣言・値渡し・void・再帰・デフォルト実引数・ビット演算（講義資料 ccpp_05 の List をもとにしたオリジナル問題）
 import { code } from '../lib.js';
 
 export default [
   {
-    id: 'ccpp-l5-g01', lecture: 5, type: 'behavior',
-    title: '値渡しでは交換できない',
+    id: 'ccpp-l5-g01', lecture: 5, type: 'meaning',
+    title: '関数の定義と呼び出し（List 6-3）',
     code: code`
-// 2つの値を交換したい
+// 三つの整数の最大値を求めて表示
 #include <iostream>
 using namespace std;
-
-void koukan(int x, int y)
+// a, b, cの最大値を返す
+int calc_max(int a, int b, int c)
 {
-    int t = x;
-    x = y;
-    y = t;
+    int max_val = a;
+    if (b > max_val) max_val = b;
+    if (c > max_val) max_val = c;
+    return max_val;
 }
-
 int main()
 {
-    int a = 1, b = 2;
-    koukan(a, b);
-    cout << "a=" << a << ", b=" << b << "\n";
-    return 0;
+    int a, b, c;
+    cout << "整数a: "; cin >> a;
+    cout << "整数b: "; cin >> b;
+    cout << "整数c: "; cin >> c;
+    cout << "最大値は " << calc_max(a, b, c) << " です。\n";
 }`,
-    run: [{ stdin: '', contains: ['a=1, b=2\n'] }],
+    run: [{ stdin: '4\n9\n2\n', contains: ['最大値は 9 です。'] }],
     questions: [
       {
-        id: 'ccpp-l5-q01', q: 'このプログラムを実行したとき、表示されるものはどれか。',
-        choices: ['a=2, b=1', 'a=1, b=2', 'a=1, b=1', 'a=2, b=2', 'a=0, b=0'],
-        answer: 1, exp: '値渡しなので x, y は a, b のコピー。関数の中で交換しても main の a, b は変わらない。',
+        id: 'ccpp-l5-q01', q: '5行目 int calc_max(int a, int b, int c) の int a, int b, int c を何というか。', line: 5, lineHas: 'calc_max',
+        choices: ['実引数', '仮引数（仮引数宣言）', '返却値の型', '関数本体', 'ローカル定数'],
+        answer: 1, exp: '関数頭部は「返却値の型」「関数名」「仮引数宣言」から成る。a, b, c は実引数の値を受け取る仮引数。',
       },
       {
-        id: 'ccpp-l5-q02', q: '5行目の void の説明として適切なものはどれか。', line: 5, lineHas: 'void koukan',
-        choices: ['関数の戻り値（返却値）が無い', '関数の引数が無い', '関数の戻り値が整数型', '関数を呼び出せない', '関数の名前が無い'],
-        answer: 0, exp: 'void は「値を返さない」関数。引数は ( ) の中に int x, int y とある。',
+        id: 'ccpp-l5-q02', q: '18行目 calc_max(a, b, c) の a, b, c を何というか。', line: 18, lineHas: 'calc_max(a, b, c)',
+        choices: ['実引数', '仮引数', '返却値', '関数頭部', 'グローバル変数'],
+        answer: 0, exp: '関数呼び出し時に関数に渡される値が実引数。その値が仮引数にコピーされる（値渡し）。',
+      },
+      {
+        id: 'ccpp-l5-q03', q: '7行目の max_val の説明として適切なものはどれか。', line: 7, lineHas: 'max_val',
+        choices: ['main 関数からも使える変数', 'calc_max 関数の中でのみアクセスできるローカル変数', '関数の名前', '仮引数', '定数'],
+        answer: 1, exp: '関数本体内で宣言された変数はローカル変数で、その関数内でのみアクセス可能。',
+      },
+      {
+        id: 'ccpp-l5-q04', q: '10行目 return max_val; の説明として適切なものはどれか。', line: 10, lineHas: 'return max_val;',
+        choices: ['max_val を画面に表示する', '関数を即座に終了し、max_val の値を呼び出し元に返す', '5行目に戻る', 'OS に max_val を返してプログラムを終了する', 'max_val を 0 にする'],
+        answer: 1, exp: 'return 文が実行されると関数は即座に終了し、指定された値が呼び出し元に返される。',
       },
     ],
   },
   {
-    id: 'ccpp-l5-g02', lecture: 5, type: 'output',
-    title: 'デフォルト実引数と関数宣言',
+    id: 'ccpp-l5-g02', lecture: 5, type: 'behavior',
+    title: '関数宣言（List 6-5）',
     code: code`
-// デフォルト実引数
+// 関数宣言の追加）三つの整数の最大値を求める
 #include <iostream>
 using namespace std;
-
-int add(int a, int b = 10);
-
+// 関数宣言（関数プロトタイプ）
+int calc_max(int a, int b, int c);
 int main()
 {
-    cout << add(3) << "\n";
-    cout << add(3, 4) << "\n";
-    return 0;
+    int a, b, c;
+    cout << "整数a: "; cin >> a;
+    cout << "整数b: "; cin >> b;
+    cout << "整数c: "; cin >> c;
+    cout << "最大値は " << calc_max(a, b, c) << " です。\n";
 }
-
-int add(int a, int b)
+// 関数定義
+int calc_max(int a, int b, int c)
 {
-    return a + b;
+    int max_val = a;
+    if (b > max_val) max_val = b;
+    if (c > max_val) max_val = c;
+    return max_val;
 }`,
-    run: [{ stdin: '', contains: ['13\n7\n'] }],
+    run: [{ stdin: '-1\n-5\n-3\n', contains: ['最大値は -1 です。'] }],
     questions: [
       {
-        id: 'ccpp-l5-q03', q: '9行目で表示されるものはどれか。', line: 9, lineHas: 'add(3)',
-        choices: ['3', '10', '13', '7', 'エラーになり何も表示されない'],
-        answer: 2, exp: '実引数を省略した b にはデフォルト値 10 が入る。3 + 10 = 13。',
+        id: 'ccpp-l5-q05', q: '5行目が無いとどうなるか。', line: 5, lineHas: 'int calc_max',
+        choices: ['問題なく動く', '12行目で calc_max が宣言されていないというコンパイルエラーになる', '実行時に最大値が 0 になる', '15行目の関数定義が無視される', 'main 関数が2つあるというエラーになる'],
+        answer: 1, exp: 'コンパイラは上から下に処理する。定義より前で呼び出すには関数宣言（関数プロトタイプ）が必要。',
       },
       {
-        id: 'ccpp-l5-q04', q: '10行目で表示されるものはどれか。', line: 10, lineHas: 'add(3, 4)',
-        choices: ['7', '13', '14', '17', '34'],
-        answer: 0, exp: '実引数を書いたときはその値が使われる。3 + 4 = 7。',
-      },
-      {
-        id: 'ccpp-l5-q05', q: '5行目 int add(int a, int b = 10); の役割として適切なものはどれか。', line: 5, lineHas: 'int add',
-        choices: ['関数 add を呼び出す', '関数宣言。main より後ろに定義した add を main の中で使えるようにする', '変数 add を宣言する', '関数 add の処理内容を定義する', 'add の戻り値を 10 にする'],
-        answer: 1, exp: '関数は使う前に宣言が必要。本体（定義）は14行目以降にある。; で終わるのが宣言。',
+        id: 'ccpp-l5-q06', q: '5行目の代わりに書いても同じ意味になるものはどれか。', line: 5, lineHas: 'int calc_max', mono: true,
+        choices: ['int calc_max(int, int, int);', 'int calc_max(int a, int b, int c)', 'calc_max(int a, int b, int c);', 'int calc_max();', 'int calc_max(a, b, c);'],
+        answer: 0, exp: '関数宣言では仮引数名を省略できる。末尾のセミコロンが必要。',
       },
     ],
   },
   {
-    id: 'ccpp-l5-g03', lecture: 5, type: 'output',
-    title: 'ビット演算とシフト',
+    id: 'ccpp-l5-g03', lecture: 5, type: 'shape',
+    title: 'void 関数（List 6-8, 6-9）',
     code: code`
-// ビット演算
+// 文字cをn個連続表示
 #include <iostream>
 using namespace std;
-
+void put_nchar(char c, int n)
+{
+    while (n-- > 0)
+        cout << c;
+}
 int main()
 {
-    unsigned a = 12, b = 10;
-
-    cout << (a & b) << "\n";
-    cout << (a | b) << "\n";
-    cout << (a ^ b) << "\n";
-    cout << (a << 2) << "\n";
-    cout << (a >> 2) << "\n";
-    return 0;
+    int n;
+    cout << "何段の三角形ですか：";
+    cin >> n;
+    for (int i = 1; i <= n; i++) {
+        put_nchar(' ', n - i);  // 空白を印字
+        put_nchar('*', i);      // アスタリスクを印字
+        cout << '\n';
+    }
 }`,
-    run: [{ stdin: '', contains: ['8\n14\n6\n48\n3\n'] }],
+    run: [{ stdin: '3\n', contains: ['  *\n **\n***\n'] }],
     questions: [
       {
-        id: 'ccpp-l5-q06', q: '9行目 a & b で表示されるものはどれか（12 は 2進数で 1100、10 は 1010）。', line: 9, lineHas: 'a & b',
-        choices: ['8', '14', '6', '22', '2'],
-        answer: 0, exp: '& は両方 1 のビットだけ 1。1100 & 1010 = 1000 = 8。',
+        id: 'ccpp-l5-q07', q: 'n に 3 を入力したとき表示されるもの（催促は除く）はどれか。', mono: true,
+        choices: ['*\n**\n***', '  *\n **\n***', '***\n **\n  *', '***\n**\n*', ' *\n**\n***'],
+        answer: 1, exp: 'i 段目は空白 n-i 個と * i 個。右下が直角の二等辺三角形になる。',
       },
       {
-        id: 'ccpp-l5-q07', q: '10行目 a | b で表示されるものはどれか。', line: 10, lineHas: 'a | b',
-        choices: ['8', '14', '6', '22', '1'],
-        answer: 1, exp: '| はどちらかが 1 なら 1。1100 | 1010 = 1110 = 14。',
-      },
-      {
-        id: 'ccpp-l5-q08', q: '11行目 a ^ b で表示されるものはどれか。', line: 11, lineHas: 'a ^ b',
-        choices: ['8', '14', '6', '144', '2'],
-        answer: 2, exp: '^ は排他的論理和（ビットが違えば 1）。1100 ^ 1010 = 0110 = 6。べき乗ではない。',
-      },
-      {
-        id: 'ccpp-l5-q09', q: '12行目 a << 2 と 13行目 a >> 2 で表示されるものの組はどれか。', line: 12, lineHas: 'a << 2',
-        choices: ['24 と 6', '48 と 3', '14 と 10', '3 と 48', '144 と 1'],
-        answer: 1, exp: '左に1ビットずらすと2倍。2ビットで ×4 → 48。右に2ビットで ÷4 → 3。',
+        id: 'ccpp-l5-q08', q: '4行目 void put_nchar の void の説明として適切なものはどれか。', line: 4, lineHas: 'void',
+        choices: ['引数を受け取らない', '値を返さない（返却値が無い）関数', '何もしない関数', '整数を返す関数', 'main 関数からは呼び出せない関数'],
+        answer: 1, exp: 'void は「何もない」「空」。値を返さない関数の返却値の型。cout << put_nchar(…) のような使い方はできない。',
       },
     ],
   },
   {
-    id: 'ccpp-l5-g04', lecture: 5, type: 'fill',
-    title: '再帰で 1〜n の和',
-    intro: '関数 sum(n) は 1 から n までの和を再帰で求める（n は 0 以上）。',
+    id: 'ccpp-l5-g04', lecture: 5, type: 'output',
+    title: 'デフォルト実引数（List 6-12）',
     code: code`
-// 1からnまでの和を再帰で求める
+// 文字を指定回数表示する（デフォルト実引数）
 #include <iostream>
 using namespace std;
-
-int sum(int n)
+// n回 c を表示する
+void marks(int n = 3, char c = '#')
 {
-    if (n == 0)
-        return 0;
+    while (n-- > 0)
+        cout << c;
+    cout << '\n';
+}
+int main()
+{
+    marks();
+    marks(5);
+    marks(2, '*');
+}`,
+    run: [{ stdin: '', contains: ['###\n#####\n**\n'] }],
+    questions: [
+      {
+        id: 'ccpp-l5-q09', q: 'このプログラムの実行結果はどれか。', mono: true,
+        choices: ['###\n#####\n**', '\n#####\n**', '###\n###\n**', '###\n*****\n**', '#\n#####\n##'],
+        answer: 0, exp: '実引数を省略した仮引数にはデフォルト値（n=3, c=\'#\'）が使われる。marks(5) は n=5, c=\'#\'。',
+      },
+      {
+        id: 'ccpp-l5-q10', q: 'デフォルト実引数の指定として正しくない（エラーになる）ものはどれか。', mono: true,
+        choices: ['void f(int a, int b = 5, int c = 10);', 'void f(int a = 1, int b, int c = 10);', 'void f(int a = 1, int b = 5, int c = 10);', 'void f(int a, int b, int c = 10);', 'void f(int a, int b, int c);'],
+        answer: 1, exp: 'デフォルト実引数は仮引数リストの右側から指定する必要がある。b にデフォルトが無いのに a にあるのは誤り。',
+      },
+    ],
+  },
+  {
+    id: 'ccpp-l5-g05', lecture: 5, type: 'fill',
+    title: '再帰でフィボナッチ数（課題(3)）',
+    intro: 'フィボナッチ数列 F(1)=1, F(2)=1, F(k)=F(k-1)+F(k-2) (k≥3) の第 n 項を再帰関数で求める。',
+    code: code`
+// フィボナッチ数を再帰で求める
+#include <iostream>
+using namespace std;
+int fib(int n)
+{
+    if (n <= 2)
+        return 1;
     ????????
 }
-
 int main()
 {
-    cout << sum(4) << "\n";
-    return 0;
+    int n;
+    cin >> n;
+    if (n <= 0)
+        cout << "無効な値\n";
+    else if (n > 30)
+        cout << "数値が大きすぎます\n";
+    else
+        cout << "F(" << n << ")=" << fib(n) << "\n";
 }`,
-    fill: ['return n + sum(n - 1);'],
-    run: [{ stdin: '', contains: ['10\n'] }],
+    fill: ['return fib(n - 1) + fib(n - 2);'],
+    run: [{ stdin: '10\n', contains: ['F(10)=55'] }, { stdin: '6\n', contains: ['F(6)=8'] }, { stdin: '-2\n', contains: ['無効な値'] }],
     questions: [
       {
-        id: 'ccpp-l5-q10', q: '9行目の ???????? に入るものはどれか。', line: 9, lineHas: '????????', mono: true,
-        choices: ['return n + sum(n);', 'n + sum(n - 1);', 'return n + sum(n - 1);', 'return n * sum(n - 1);', 'return sum(n - 1);'],
-        answer: 2, exp: '1〜n の和 = n + (1〜n-1 の和)。return が無いと値が返らない。* にすると積（しかも sum(0)=0 なので常に 0）。',
+        id: 'ccpp-l5-q11', q: '8行目の ???????? に入るものはどれか。', line: 8, lineHas: '????????', mono: true,
+        choices: ['return fib(n) + fib(n - 1);', 'fib(n - 1) + fib(n - 2);', 'return fib(n - 1) + fib(n - 2);', 'return fib(n - 1) * fib(n - 2);', 'return n + fib(n - 1);'],
+        answer: 2, exp: 'F(n) = F(n-1) + F(n-2) を return で返す。6〜7行目が再帰を終了させる基底部。',
       },
       {
-        id: 'ccpp-l5-q11', q: '正しく完成させたとき、14行目で表示されるものはどれか。', line: 14, lineHas: 'sum(4)',
-        choices: ['4', '6', '10', '24', '0'],
-        answer: 2, exp: 'sum(4) = 4 + 3 + 2 + 1 + 0 = 10。',
+        id: 'ccpp-l5-q12', q: '正しく完成させて n に 6 を入力したとき表示されるものはどれか。',
+        choices: ['F(6)=5', 'F(6)=6', 'F(6)=8', 'F(6)=13', 'F(6)=21'],
+        answer: 2, exp: '1, 1, 2, 3, 5, 8 なので F(6) = 8。',
+      },
+      {
+        id: 'ccpp-l5-q13', q: '6〜7行目のように再帰を終了させるための部分を何というか。', line: 6, lineHas: 'n <= 2',
+        choices: ['基底部', '関数頭部', '仮引数', 'デフォルト実引数', '関数プロトタイプ'],
+        answer: 0, exp: '無限再帰を防ぐためには再帰を終了させるための基底部 (Base Case) が必要。',
+      },
+    ],
+  },
+  {
+    id: 'ccpp-l5-g06', lecture: 5, type: 'output',
+    title: 'ビット単位の演算（List 6-13）',
+    intro: 'a に 13（2進数 1101）、b に 6（2進数 0110）を入力する。表示は10進数とする。',
+    code: code`
+// 符号無し整数の論理積・論理和・排他的論理和・シフト
+#include <iostream>
+using namespace std;
+int main()
+{
+    unsigned a, b;
+    cout << "a: "; cin >> a;
+    cout << "b: "; cin >> b;
+    cout << "a & b = " << (a & b) << '\n';
+    cout << "a | b = " << (a | b) << '\n';
+    cout << "a ^ b = " << (a ^ b) << '\n';
+    cout << "a << 2 = " << (a << 2) << '\n';
+    cout << "a >> 2 = " << (a >> 2) << '\n';
+}`,
+    run: [{ stdin: '13\n6\n', contains: ['a & b = 4\n', 'a | b = 15\n', 'a ^ b = 11\n', 'a << 2 = 52\n', 'a >> 2 = 3\n'] }],
+    questions: [
+      {
+        id: 'ccpp-l5-q14', q: '9行目で表示される値はどれか。', line: 9, lineHas: 'a & b',
+        choices: ['4', '15', '11', '19', '1'],
+        answer: 0, exp: '& (ビット積) は両方が 1 のビットだけ 1。1101 & 0110 = 0100 = 4。',
+      },
+      {
+        id: 'ccpp-l5-q15', q: '11行目で表示される値はどれか。', line: 11, lineHas: 'a ^ b',
+        choices: ['4', '15', '11', '169', '7'],
+        answer: 2, exp: '^ (排他的論理和) はビットが異なるとき 1。1101 ^ 0110 = 1011 = 11。べき乗ではない。',
+      },
+      {
+        id: 'ccpp-l5-q16', q: '12行目と13行目で表示される値の組はどれか。', line: 12, lineHas: 'a << 2',
+        choices: ['26 と 6', '52 と 3', '15 と 11', '3 と 52', '169 と 1'],
+        answer: 1, exp: 'n ビットの左シフトは 2のn乗を掛けるのと同じ（13×4=52）。右シフト 2ビットは 4 で割る（13÷4=3）。',
       },
     ],
   },
