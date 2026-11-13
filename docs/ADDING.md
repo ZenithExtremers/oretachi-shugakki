@@ -51,3 +51,15 @@ node tools/verify.mjs ccpp   # 科目を指定
 1. `data/<id>/index.js` を作る（ccpp をまねる。`lang` は C++ なら `'cpp'`、それ以外は書かない）
 2. `data/subjects.js` に1行足す
 3. `sw.js` の `CACHE` の番号を上げる（任意。network-first なので無くても更新される）
+
+## レッスン（基礎コース）
+`data/<id>/lessons.js` に `{ id, lecture, title, blocks: [...], questions: [...] }` を並べる。
+blocks は 文字列（**太字** と `コード` が使える）／ `{ code, lang, numbers }` ／ `{ table: { cols, rows } }` ／ `{ svg }` ／ `{ list: [...] }` ／ `{ note }` ／ `{ h }`。
+レッスンの問題は選択肢 2〜5 個。全問正解でクリアし、次のレッスンが開く。
+
+## データベース（SQL）の問題
+- 表は `data/db/tables.js` に書く。大問に `tables: [表]` を付けると画面に表が出て、verify.mjs が MariaDB に同じ表を作る。
+- 実行結果を選ぶ問題は `lang: 'sql', tableChoices: true` にして、選択肢を `"列|列\n値|値"` の形で書く。`code`（または `sql`）を実行した結果と正解の選択肢を照らし合わせる。
+
+## UML の図
+`data/uml.js` の `usecase` / `classDiagram` / `sequence` / `communication` で SVG を作り、大問の `diagram` やレッスンの `{ svg }` に入れる（例：`data/sd/diagrams.js`）。
