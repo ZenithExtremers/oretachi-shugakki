@@ -1,5 +1,8 @@
 // 俺たち秋学期 — 本番形式の5択問題アプリ
 import SUBJECTS from './data/subjects.js';
+import NOTES from './data/patchnotes.js';
+
+const VERSION = NOTES[0].version;
 
 const KEY = 'oretachi:v1';
 const SKEY = 'oretachi:session';
@@ -90,6 +93,7 @@ async function route() {
     return viewSubject(s);
   }
   if (parts[0] === 'settings') return viewSettings();
+  if (parts[0] === 'notes') return viewNotes();
   return viewHome();
 }
 function go(path) {
@@ -120,6 +124,13 @@ function viewHome() {
           <span class="chev">${ICON.next}</span>
         </button>`).join('')}
       <p class="muted small mt">ほかの科目は資料がそろいしだい追加します。</p>
+      <h3 class="sec">お知らせ</h3>
+      <button class="card subject" data-act="nav" data-to="notes">
+        <div class="dot" style="background:var(--brand-soft);color:var(--brand)">📝</div>
+        <div><b>パッチノート</b><small>v${VERSION} ・ ${fmtDate(NOTES[0].date)} 更新</small></div>
+        <span class="chev">${ICON.next}</span>
+      </button>
+      <p class="muted small center mt">俺たち秋学期 v${VERSION}</p>
     </main>`;
 }
 
@@ -567,6 +578,20 @@ function lessonFinishCheck(s, l) {
   box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
+/* ---------- パッチノート ---------- */
+function fmtDate(d) { const [y, m, dd] = d.split('-').map(Number); return `${y}/${m}/${dd}`; }
+function viewNotes() {
+  $app.innerHTML = `
+    ${top('パッチノート', { back: '', sub: `v${VERSION}` })}
+    <main class="wrap">
+      ${NOTES.map((n, i) => `
+        <div class="card mt">
+          <div class="note-head"><b>v${esc(n.version)}</b>${i === 0 ? '<span class="cur">現在のバージョン</span>' : ''}<span class="muted small">${fmtDate(n.date)}</span></div>
+          <ul class="note-list">${n.items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
+        </div>`).join('')}
+    </main>`;
+}
+
 /* ---------- 設定 ---------- */
 function viewSettings() {
   $app.innerHTML = `
@@ -582,7 +607,7 @@ function viewSettings() {
         <p class="small muted" style="margin-top:0">成績と間違えた問題の記録は、この端末のブラウザの中だけに保存されます。</p>
         <button class="btn sub wide" data-act="reset">記録をすべて消す</button>
       </div>
-      <p class="muted small mt center">俺たち秋学期 ・ 解答は公式のものではありません</p>
+      <p class="muted small mt center">俺たち秋学期 v${VERSION} ・ 解答は公式のものではありません</p>
     </main>`;
 }
 

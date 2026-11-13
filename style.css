@@ -279,3 +279,10 @@ table.mini { font-size: 13px; }
 .choices { grid-template-columns: minmax(0, 1fr); }
 .choice { min-width: 0; }
 .diagram svg { max-width: none; width: max(100%, 560px); }
+/* パッチノート */
+.note-head { display: flex; align-items: center; gap: 8px; }
+.note-head b { font-size: 17px; }
+.note-head .muted { margin-left: auto; }
+.note-head .cur { font-size: 12px; font-weight: 700; color: var(--brand); background: var(--brand-soft); border-radius: 6px; padding: 1px 8px; }
+.note-list { margin: 8px 0 0; padding-left: 20px; font-size: 15px; }
+.note-list li { margin: 4px 0; }

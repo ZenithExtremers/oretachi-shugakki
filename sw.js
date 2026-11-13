@@ -1,9 +1,9 @@
 // オフライン用。オンラインのときは常に最新を取りに行き（network-first）、つながらないときはキャッシュを使う。
-const CACHE = 'oretachi-v6';
+const CACHE = 'oretachi-v7';
 const SHELL = [
   './', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png',
-  'data/lib.js', 'data/subjects.js',
+  'data/lib.js', 'data/subjects.js', 'data/patchnotes.js',
 ];
 
 self.addEventListener('install', (e) => {

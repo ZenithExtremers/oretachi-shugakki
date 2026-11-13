@@ -63,3 +63,7 @@ blocks は 文字列（**太字** と `コード` が使える）／ `{ code, la
 
 ## UML の図
 `data/uml.js` の `usecase` / `classDiagram` / `sequence` / `communication` で SVG を作り、大問の `diagram` やレッスンの `{ svg }` に入れる（例：`data/sd/diagrams.js`）。
+
+## パッチノートとバージョン
+更新したら `data/patchnotes.js` の先頭に `{ version, date, items }` を足す。先頭のバージョンがアプリのバージョンとしてホームと設定に表示される。
+番号：科目や大きな機能の追加 → 真ん中を上げる（1.4.0）、問題の追加・修正や小さな変更 → 右端を上げる（1.3.2）。あわせて `sw.js` の `CACHE` の番号も上げる。
