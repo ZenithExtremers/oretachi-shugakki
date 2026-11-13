@@ -8,4 +8,12 @@ export default [
     color: '#2563eb',
     module: './ccpp/index.js',
   },
+  {
+    id: 'db',
+    name: 'データベース',
+    mark: 'DB',
+    sub: '期末確認テスト 1/6 ・ SQL（MySQL）',
+    color: '#0f766e',
+    module: './db/index.js',
+  },
 ];

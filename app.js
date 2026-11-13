@@ -350,7 +350,8 @@ function renderQuestion(q) {
     const ok = ans === q.answer;
     exp = `<div class="exp ${ok ? 'ok' : 'ng'}"><span class="verdict">${ok ? '正解' : '不正解'}</span>正解は ${NUMS[perm.indexOf(q.answer)]}。${inline(q.exp)}</div>`;
   }
-  return `<div class="q" id="q-${q.id}"><div class="q-text"><span class="qn">問${qNumber(q.id)}</span>${text}</div><div class="choices">${btns}</div>${exp}</div>`;
+  const qcode = q.code ? renderCode(q.code, 'q-' + q.id, q.lang || g.lang || cur.lang, q.code.includes('\n')) : '';
+  return `<div class="q" id="q-${q.id}"><div class="q-text"><span class="qn">問${qNumber(q.id)}</span>${text}</div>${qcode}<div class="choices">${btns}</div>${exp}</div>`;
 }
 
 function viewQuiz(s) {

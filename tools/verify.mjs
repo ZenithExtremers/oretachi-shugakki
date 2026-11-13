@@ -39,6 +39,7 @@ function checkSQL(where, tables, sql, expect) {
   runs++;
   let got;
   try { got = runSQL(tables, sql); } catch (e) { err(where, `SQLエラー: ${sql}\n${e.stderr}`); return; }
+  if (got === '' && norm(expect).split('\n').length === 1) return norm(expect); // 0行（MariaDB は見出しも出さない）
   if (norm(got) !== norm(expect)) err(where, `SQLの結果が違う\n${sql}\n--- 実際 ---\n${got}\n--- 正解の選択肢 ---\n${expect}`);
   return got;
 }
@@ -62,8 +63,9 @@ for (const meta of subjects) {
       const ch = q.choices || g.sharedChoices;
       if (!ch || ch.length !== 5) err(w, '選択肢が5つでない');
       else if (new Set(ch.map((c) => (q.tableChoices || g.tableChoices ? norm(c) : c))).size !== 5) err(w, '選択肢に同じものがある');
-      if (q.sql && g.tables) {
-        const got = checkSQL(w, g.tables, q.sql, ch[q.answer]);
+      const qsql = q.sql || ((q.lang || g.lang) === 'sql' && (q.tableChoices || g.tableChoices) ? q.code : null);
+      if (qsql && g.tables) {
+        const got = checkSQL(w, g.tables, qsql, ch[q.answer]);
         if (got !== undefined) ch.forEach((c, i) => { if (i !== q.answer && norm(c) === norm(got)) err(w, `不正解の選択肢(${i})も実際の結果と同じ`); });
       }
       if (!(q.answer >= 0 && q.answer < 5)) err(w, 'answer が範囲外');
@@ -105,7 +107,7 @@ for (const meta of subjects) {
     if (!l.blocks?.length) err(where, '説明(blocks)が無い');
     l.questions.forEach((q, i) => {
       const w = `${where}/Q${i + 1}`;
-      if (!q.choices || q.choices.length < 3 || q.choices.length > 5) err(w, '選択肢が3〜5つでない');
+      if (!q.choices || q.choices.length < 2 || q.choices.length > 5) err(w, '選択肢が2〜5つでない');
       else if (new Set(q.choices).size !== q.choices.length) err(w, '選択肢に同じものがある');
       if (!(q.answer >= 0 && q.answer < (q.choices || []).length)) err(w, 'answer が範囲外');
       if (!q.exp) err(w, '解説が無い');
