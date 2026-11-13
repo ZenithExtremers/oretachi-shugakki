@@ -1,5 +1,5 @@
 // オフライン用。オンラインのときは常に最新を取りに行き（network-first）、つながらないときはキャッシュを使う。
-const CACHE = 'oretachi-v5';
+const CACHE = 'oretachi-v6';
 const SHELL = [
   './', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png',

@@ -16,4 +16,12 @@ export default [
     color: '#0f766e',
     module: './db/index.js',
   },
+  {
+    id: 'sd',
+    name: 'ソフトウェア設計',
+    mark: 'UML',
+    sub: '期末確認テスト 1/7 ・ UML の図',
+    color: '#7c3aed',
+    module: './sd/index.js',
+  },
 ];
