@@ -1,6 +1,7 @@
-// 俺たち秋学期 — 本番形式の5択問題アプリ
+// 俺たちの秋学期 — 本番形式の5択問題アプリ
 import SUBJECTS from './data/subjects.js';
 import NOTES from './data/patchnotes.js';
+import { sfx } from './sfx.js';
 
 const VERSION = NOTES[0].version;
 
@@ -15,8 +16,10 @@ function readJSON(k, fallback) {
 function writeJSON(k, v) {
   try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch { /* 保存できない環境 */ }
 }
-const store = Object.assign({ settings: { shufflePast: false, shuffleOriginal: true }, stats: {}, history: [], lessons: {} }, readJSON(KEY, {}));
+const store = Object.assign({ settings: { shufflePast: false, shuffleOriginal: true, sound: true }, stats: {}, history: [], lessons: {} }, readJSON(KEY, {}));
 store.lessons ||= {};
+if (store.settings.sound === undefined) store.settings.sound = true;
+sfx.enabled = store.settings.sound;
 const save = () => writeJSON(KEY, store);
 let session = readJSON(SKEY, null);
 const saveSession = () => writeJSON(SKEY, session);
@@ -106,9 +109,9 @@ function viewHome() {
   const resume = session && !session.finished ? session : null;
   const resumeMeta = resume && SUBJECTS.find((s) => s.id === resume.subject);
   $app.innerHTML = `
-    ${top('俺たち秋学期', { right: `<button class="icon-btn" data-act="share" aria-label="共有">${ICON.share}</button><button class="icon-btn" data-act="nav" data-to="settings" aria-label="設定">${ICON.gear}</button>` })}
+    ${top('俺たちの秋学期', { right: `<button class="icon-btn" data-act="share" aria-label="共有">${ICON.share}</button><button class="icon-btn" data-act="nav" data-to="settings" aria-label="設定">${ICON.gear}</button>` })}
     <main class="wrap">
-      <div class="hero"><img src="icons/icon-192.png" alt=""><div><h2>俺たち秋学期</h2><p>本番と同じ形式で、テスト対策。</p></div></div>
+      <div class="hero"><img src="icons/icon-192.png" alt=""><div><h2>俺たちの秋学期</h2><p>本番と同じ形式で、テスト対策。</p></div></div>
       ${resume && resumeMeta ? `
         <h3 class="sec">続きから</h3>
         <button class="card subject resume" data-act="resume">
@@ -130,7 +133,7 @@ function viewHome() {
         <div><b>パッチノート</b><small>v${VERSION} ・ ${fmtDate(NOTES[0].date)} 更新</small></div>
         <span class="chev">${ICON.next}</span>
       </button>
-      <p class="muted small center mt">俺たち秋学期 v${VERSION}</p>
+      <p class="muted small center mt">俺たちの秋学期 v${VERSION}</p>
     </main>`;
 }
 
@@ -411,6 +414,7 @@ function answer(s, qid, oi) {
     if (session.answers[qid] !== undefined) return;
     session.answers[qid] = oi;
     record(q, oi === q.answer);
+    oi === q.answer ? sfx.ok() : sfx.ng();
   } else {
     session.answers[qid] = oi;
   }
@@ -471,6 +475,10 @@ function finish(s) {
   store.history.push({ subject: s.id, kind: session.kind, title: session.title, score: res.score, total: res.total, date: Date.now() });
   if (store.history.length > 200) store.history = store.history.slice(-200);
   save(); saveSession();
+  if (session.mode === 'exam') {
+    const pct = res.total ? res.score / res.total : 0;
+    if (pct >= 0.8) sfx.fanfare(); else if (pct >= 0.6) sfx.ok(); else sfx.ng();
+  }
   go(`s/${s.id}/result`);
 }
 
@@ -572,6 +580,7 @@ function lessonFinishCheck(s, l) {
   const ok = l.questions.every((q, i) => st.answers[i] === q.answer);
   const next = s.lessons[l.index + 1];
   if (ok && !store.lessons[l.id]) { store.lessons[l.id] = Date.now(); save(); }
+  if (ok) setTimeout(() => sfx.fanfare(), 650);
   box.innerHTML = ok
     ? `<div class="card mt center"><b style="font-size:20px">🎉 クリア！</b><div class="row mt">${next ? `<button class="btn" data-act="lnext" data-to="s/${s.id}/lesson/${next.id}">次のレッスンへ</button>` : `<button class="btn" data-act="nav" data-to="s/${s.id}">${esc(s.name)} のトップへ</button>`}</div></div>`
     : `<div class="card mt center"><b>${l.questions.filter((q, i) => st.answers[i] === q.answer).length}/${l.questions.length} 問正解</b><p class="muted small">全問正解でクリアです。説明を読み直してもう一度。</p><button class="btn wide" data-act="lretry">もう一度</button></div>`;
@@ -597,6 +606,10 @@ function viewSettings() {
   $app.innerHTML = `
     ${top('設定', { back: '' })}
     <main class="wrap">
+      <h3 class="sec">効果音</h3>
+      <div class="card">
+        <label class="switch"><span>正解・不正解の効果音<br><small class="muted">分野別・復習・基礎コースで1問ごと、模試は採点時に鳴る</small></span><input type="checkbox" data-act="set" data-k="sound" ${store.settings.sound ? 'checked' : ''}></label>
+      </div>
       <h3 class="sec">選択肢の順番</h3>
       <div class="card">
         <label class="switch"><span>オリジナル問題の選択肢をシャッフル</span><input type="checkbox" data-act="set" data-k="shuffleOriginal" ${store.settings.shuffleOriginal ? 'checked' : ''}></label>
@@ -607,7 +620,7 @@ function viewSettings() {
         <p class="small muted" style="margin-top:0">成績と間違えた問題の記録は、この端末のブラウザの中だけに保存されます。</p>
         <button class="btn sub wide" data-act="reset">記録をすべて消す</button>
       </div>
-      <p class="muted small mt center">俺たち秋学期 v${VERSION} ・ 解答は公式のものではありません</p>
+      <p class="muted small mt center">俺たちの秋学期 v${VERSION} ・ 解答は公式のものではありません</p>
     </main>`;
 }
 
@@ -624,7 +637,7 @@ document.addEventListener('click', async (e) => {
     case 'resume': return session && go(`s/${session.subject}/quiz`);
     case 'share': {
       const url = location.origin + location.pathname;
-      if (navigator.share) return navigator.share({ title: '俺たち秋学期', url }).catch(() => {});
+      if (navigator.share) return navigator.share({ title: '俺たちの秋学期', url }).catch(() => {});
       try { await navigator.clipboard.writeText(url); toast('リンクをコピーしました'); } catch { prompt('このリンクを共有してください', url); }
       return;
     }
@@ -650,6 +663,7 @@ document.addEventListener('click', async (e) => {
       const i = +el.dataset.i;
       if (lessonState.answers[i] !== undefined) return;
       lessonState.answers[i] = +el.dataset.o;
+      (+el.dataset.o === l.questions[i].answer) ? sfx.ok() : sfx.ng();
       document.getElementById('lq-' + i).outerHTML = lessonQ(l, l.questions[i], i);
       return lessonFinishCheck(s, l);
     }
@@ -662,7 +676,10 @@ document.addEventListener('click', async (e) => {
       tr.classList.add('flash'); setTimeout(() => tr.classList.remove('flash'), 1600);
       return;
     }
-    case 'set': store.settings[el.dataset.k] = el.checked; save(); return;
+    case 'set':
+      store.settings[el.dataset.k] = el.checked; save();
+      if (el.dataset.k === 'sound') { sfx.enabled = el.checked; if (el.checked) sfx.ok(); }
+      return;
     case 'reset':
       if (confirm('成績と間違えた問題の記録をすべて消しますか？')) { store.stats = {}; store.history = []; save(); toast('消しました'); }
       return;
