@@ -362,3 +362,19 @@ body.hk-lock { overflow: hidden; }
 .hk-mine div.boom { background: #e53935; }
 .hk-mtool { display: flex; gap: 8px; margin-top: 12px; width: min(94vw, 400px); }
 .hk-mtool .btn { flex: 1; }
+/* ヒマコロシ：単語帳 */
+.hk-decks { display: grid; gap: 8px; width: 100%; max-width: 420px; }
+.hk-deck { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; color: var(--text); cursor: pointer; box-shadow: var(--shadow); }
+.hk-deck.last { border-color: var(--brand-2); }
+.hk-deck[disabled] { opacity: .45; cursor: default; }
+.hk-deck .m, .hk-deckview .m { width: 40px; height: 40px; border-radius: 10px; color: #fff; font-weight: 800; font-size: 13px; display: grid; place-items: center; flex: none; }
+.hk-deck .nm { flex: 1; font-weight: 700; }
+.hk-deck .nm small { display: block; color: var(--muted); font-weight: 400; font-size: 12px; }
+.hk-deck .go { color: var(--muted); font-size: 22px; }
+.hk-deckview { border-top: 1px solid var(--line); padding: 8px 0; }
+.hk-deckview summary { display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 700; list-style: none; }
+.hk-deckview summary::-webkit-details-marker { display: none; }
+.hk-deckview .m { width: 30px; height: 30px; font-size: 11px; border-radius: 8px; }
+.hk-deckview summary small { margin-left: auto; color: var(--muted); font-weight: 400; }
+.hk-q.long { font-size: 18px !important; font-weight: 700; line-height: 1.5; }
+.hk-flash.long { font-size: 18px; font-weight: 700; line-height: 1.6; }

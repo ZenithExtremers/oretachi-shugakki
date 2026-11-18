@@ -2,6 +2,8 @@
 // 参考：himakoroshi-ref.html を移植。保存は別キー oretachi:hima（本編の oretachi:v1 には触らない）。
 // 音は鳴らさない（講義中に使うため）。
 
+import DECKS from './data/hima-words.js';
+
 const KEY = 'oretachi:hima';
 const DEF = {
   food: 3, xp: 0, level: 1, correct: 0, fed: 0, plays: 0, best: {},
@@ -10,6 +12,7 @@ const DEF = {
     ['hazard', '危険要因'], ['negotiate', '交渉する'], ['sovereignty', '主権'], ['infrastructure', '社会基盤'],
   ],
   daily: { d: '', ids: {} }, // 本編の正解でもらったエサ（1問1日1回）
+  deck: 'all', // 単語クイズ・単語カードで最後に選んだ単語帳
 };
 let S;
 try { S = Object.assign(structuredClone(DEF), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { S = structuredClone(DEF); }
@@ -30,6 +33,30 @@ function toast(m) {
 }
 function addFood(n) { if (n <= 0) return; S.food += n; save(); renderTop(); }
 function setBest(k, v, low) { const o = S.best[k]; if (o == null || (low ? v < o : v > o)) { S.best[k] = v; save(); return true; } return false; }
+
+/* ---------- 単語帳（秋学期の科目の用語＋自分の単語） ---------- */
+function deckCards(id) {
+  if (id === 'mine') return S.cards;
+  if (id === 'all') return [...DECKS.flatMap((d) => d.words), ...S.cards];
+  return DECKS.find((d) => d.id === id)?.words || [];
+}
+function deckName(id) { return id === 'mine' ? '自分の単語' : id === 'all' ? '全部まぜる' : DECKS.find((d) => d.id === id)?.name || ''; }
+// 単語帳を選ぶ画面（単語クイズ・単語カード共通）
+function pickDeck(title, min, start) {
+  openOv(title);
+  const rows = [
+    ...DECKS.map((d) => ({ id: d.id, mark: d.mark, color: d.color, name: d.name, n: d.words.length })),
+    { id: 'mine', mark: '★', color: '#f59e0b', name: '自分の単語', n: S.cards.length },
+    { id: 'all', mark: '全', color: '#64748b', name: '全部まぜる', n: deckCards('all').length },
+  ];
+  body().innerHTML = `<p class="muted small" style="align-self:stretch;margin:0 0 10px">どの単語帳で${title === '単語クイズ' ? '解く' : '覚える'}？</p>
+    <div class="hk-decks">${rows.map((r) => `<button class="hk-deck${r.id === S.deck ? ' last' : ''}" data-deck="${r.id}" ${r.n < min ? 'disabled' : ''}>
+      <span class="m" style="background:${r.color}">${esc(r.mark)}</span><span class="nm">${esc(r.name)}<small>${r.n}語${r.n < min ? `（${min}語以上必要）` : ''}</small></span><span class="go">›</span></button>`).join('')}</div>`;
+  body().querySelector('.hk-decks').onclick = (e) => {
+    const b = e.target.closest('[data-deck]'); if (!b || b.disabled) return;
+    S.deck = b.dataset.deck; save(); start(S.deck);
+  };
+}
 
 /* ---------- 本編との連携 ---------- */
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
@@ -139,8 +166,8 @@ function renderTab() {
     m.innerHTML = `
       <div class="hk-grid2 mt">
         <button class="hk-tile" data-open="calc"><span class="e">➗</span>計算アタック<small>60秒・1問🐛1</small></button>
-        <button class="hk-tile" data-open="quiz"><span class="e">📝</span>単語クイズ<small>4択・1問🐛1</small></button>
-        <button class="hk-tile" data-open="flash"><span class="e">🃏</span>単語カード<small>めくって覚える</small></button>
+        <button class="hk-tile" data-open="quiz"><span class="e">📝</span>単語クイズ<small>4択・1問🐛1・科目の用語も</small></button>
+        <button class="hk-tile" data-open="flash"><span class="e">🃏</span>単語カード<small>めくって覚える・科目の用語も</small></button>
         <button class="hk-tile" data-open="brain"><span class="e">🧠</span>大小くらべ<small>30秒・脳トレ</small></button>
       </div>
       <div class="card mt"><b>ベスト記録</b><div class="muted small" id="hk-studybest" style="margin-top:6px"></div></div>`;
@@ -166,6 +193,12 @@ function renderTab() {
       <div class="card mt">
         <div class="hk-wordhead"><b id="hk-wordcount">登録済み</b><button class="btn sub" data-hk="clearwords">全部消す</button></div>
         <ul class="hk-list" id="hk-wordlist"></ul>
+      </div>
+      <div class="card mt">
+        <b>秋学期の単語帳</b>
+        <p class="muted small" style="margin:4px 0 4px">単語クイズ・単語カードで選べる（中身は変えられない）</p>
+        ${DECKS.map((d) => `<details class="hk-deckview"><summary><span class="m" style="background:${d.color}">${esc(d.mark)}</span>${esc(d.name)}<small>${d.words.length}語</small></summary>
+          <ul class="hk-list">${d.words.map((w) => `<li><span><b>${esc(w[0])}</b>　${esc(w[1])}</span></li>`).join('')}</ul></details>`).join('')}
       </div>`;
     renderWords();
   }
@@ -274,37 +307,42 @@ OPEN.brain = () => {
   timerLoop(30, (t) => info(`残り${t}秒`), () => { save(); const nb = setBest('brain', score); resultView('大小くらべ', `${score}問`, `🐛${Math.floor(score / 2)}ゲット${nb ? '　ベスト更新！' : ''}`, OPEN.brain); });
 };
 /* ===== 単語クイズ ===== */
-OPEN.quiz = () => {
-  if (S.cards.length < 4) { toast('単語を4語以上登録してね'); return; }
+OPEN.quiz = (deck) => (deck ? quiz(deck) : pickDeck('単語クイズ', 4, quiz));
+function quiz(deck) {
+  const cards = deckCards(deck);
+  if (cards.length < 4) { toast('単語を4語以上登録してね'); return; }
   openOv('単語クイズ'); let streak = 0, total = 0;
   function show() {
     if (!body()) return;
-    const pool = shuffle([...S.cards]); const c = pool[0]; const flip = rnd(2) === 1;
+    const pool = shuffle([...cards]); const c = pool[0]; const flip = rnd(2) === 1;
     const q = flip ? c[1] : c[0], a = flip ? c[0] : c[1];
-    const opts = shuffle([a, ...[...new Set(pool.slice(1).map((x) => (flip ? x[0] : x[1])).filter((x) => x !== a))].slice(0, 3)]);
+    // 同じ問題文の別の単語（別の単語帳の同じ用語など）は選択肢に入れない
+    const opts = shuffle([a, ...[...new Set(pool.slice(1).filter((x) => (flip ? x[1] : x[0]) !== q).map((x) => (flip ? x[0] : x[1])).filter((x) => x !== a))].slice(0, 3)]);
     info(`連続${streak}`);
-    body().innerHTML = `<div class="hk-q" style="font-size:28px">${esc(q)}</div><div class="hk-choices word">${opts.map((o) => `<button>${esc(o)}</button>`).join('')}</div><p class="muted small">正解 ${total}問</p>`;
+    body().innerHTML = `<p class="muted small" style="margin:0">${esc(deckName(deck))}</p><div class="hk-q${q.length > 14 ? ' long' : ''}" style="font-size:28px">${esc(q)}</div><div class="hk-choices word">${opts.map((o) => `<button>${esc(o)}</button>`).join('')}</div><p class="muted small">正解 ${total}問</p>`;
     body().querySelectorAll('.hk-choices button').forEach((b, i) => (b.onclick = () => {
       if (opts[i] === a) { streak++; total++; study(); setBest('quiz', streak); b.classList.add('ok'); setTimeout(show, 250); }
-      else { streak = 0; b.classList.add('ng'); body().querySelectorAll('.hk-choices button').forEach((x, j) => { if (opts[j] === a) x.classList.add('ok'); }); setTimeout(show, 1100); }
+      else { streak = 0; b.classList.add('ng'); body().querySelectorAll('.hk-choices button').forEach((x, j) => { if (opts[j] === a) x.classList.add('ok'); }); setTimeout(show, 1600); }
     }));
   }
   show();
-};
+}
 /* ===== 単語カード ===== */
-OPEN.flash = () => {
-  if (!S.cards.length) { toast('単語を登録してね'); return; }
-  openOv('単語カード'); const deck = shuffle([...S.cards]); let i = 0, open = false, known = 0;
+OPEN.flash = (id) => (id ? flash(id) : pickDeck('単語カード', 1, flash));
+function flash(id) {
+  const cards = deckCards(id);
+  if (!cards.length) { toast('単語を登録してね'); return; }
+  openOv('単語カード'); const deck = shuffle([...cards]); let i = 0, open = false, known = 0;
   function show() {
-    if (i >= deck.length) { resultView('単語カード', `${known}/${deck.length}`, '覚えた数', OPEN.flash); return; }
+    if (i >= deck.length) { resultView('単語カード', `${known}/${deck.length}`, '覚えた数', () => OPEN.flash(id)); return; }
     const c = deck[i]; info(`${i + 1}/${deck.length}`);
-    body().innerHTML = `<div class="hk-flash" id="hk-fc">${esc(open ? c[1] : c[0])}</div><p class="muted small">タップでめくる</p><div class="row" style="width:100%;max-width:420px"><button class="btn sub" id="hk-no">まだ</button><button class="btn" id="hk-yes">覚えた</button></div>`;
+    body().innerHTML = `<p class="muted small" style="margin:0">${esc(deckName(id))}</p><div class="hk-flash${(open ? c[1] : c[0]).length > 14 ? ' long' : ''}" id="hk-fc">${esc(open ? c[1] : c[0])}</div><p class="muted small">タップでめくる</p><div class="row" style="width:100%;max-width:420px"><button class="btn sub" id="hk-no">まだ</button><button class="btn" id="hk-yes">覚えた</button></div>`;
     $('#hk-fc').onclick = () => { open = !open; show(); };
     $('#hk-no').onclick = () => { open = false; i++; show(); };
     $('#hk-yes').onclick = () => { open = false; i++; known++; show(); };
   }
   show();
-};
+}
 
 /* ===== 2048 ===== */
 OPEN.g2048 = () => {
