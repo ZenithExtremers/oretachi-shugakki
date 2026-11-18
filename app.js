@@ -2,6 +2,7 @@
 import SUBJECTS from './data/subjects.js';
 import NOTES from './data/patchnotes.js';
 import { sfx } from './sfx.js';
+import { viewHima, leaveHima, rewardCorrect, himaFood, owlSVG } from './himakoroshi.js';
 
 const VERSION = NOTES[0].version;
 
@@ -79,6 +80,7 @@ let cur = null; // 表示中の科目
 window.addEventListener('hashchange', route);
 async function route() {
   clearInterval(timer);
+  leaveHima();
   const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
   window.scrollTo(0, 0);
   if (parts[0] === 's' && parts[1]) {
@@ -97,6 +99,7 @@ async function route() {
   }
   if (parts[0] === 'settings') return viewSettings();
   if (parts[0] === 'notes') return viewNotes();
+  if (parts[0] === 'hima') return viewHima($app, top);
   return viewHome();
 }
 function go(path) {
@@ -127,6 +130,12 @@ function viewHome() {
           <span class="chev">${ICON.next}</span>
         </button>`).join('')}
       <p class="muted small mt">ほかの科目は資料がそろいしだい追加します。</p>
+      <h3 class="sec">ひと休み</h3>
+      <button class="card subject" data-act="nav" data-to="hima">
+        <div class="dot hk-homeowl">${owlSVG()}</div>
+        <div><b>ヒマコロシ</b><small>フクロウ育成・勉強ミニ・ミニゲーム ・ 🐛 ${himaFood()}</small></div>
+        <span class="chev">${ICON.next}</span>
+      </button>
       <h3 class="sec">お知らせ</h3>
       <button class="card subject" data-act="nav" data-to="notes">
         <div class="dot" style="background:var(--brand-soft);color:var(--brand)">📝</div>
@@ -426,6 +435,7 @@ function answer(s, qid, oi) {
 }
 
 function record(q, ok) {
+  if (ok) rewardCorrect(q.id); // ヒマコロシのエサ（1問1日1回）
   const st = stat(q.id);
   if (ok) { st.c++; st.r = false; } else { st.w++; st.r = true; }
   st.t = Date.now();
@@ -663,7 +673,7 @@ document.addEventListener('click', async (e) => {
       const i = +el.dataset.i;
       if (lessonState.answers[i] !== undefined) return;
       lessonState.answers[i] = +el.dataset.o;
-      (+el.dataset.o === l.questions[i].answer) ? sfx.ok() : sfx.ng();
+      if (+el.dataset.o === l.questions[i].answer) { sfx.ok(); rewardCorrect(`${l.id}#${i}`); } else sfx.ng();
       document.getElementById('lq-' + i).outerHTML = lessonQ(l, l.questions[i], i);
       return lessonFinishCheck(s, l);
     }

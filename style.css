@@ -286,3 +286,79 @@ table.mini { font-size: 13px; }
 .note-head .cur { font-size: 12px; font-weight: 700; color: var(--brand); background: var(--brand-soft); border-radius: 6px; padding: 1px 8px; }
 .note-list { margin: 8px 0 0; padding-left: 20px; font-size: 15px; }
 .note-list li { margin: 4px 0; }
+
+/* ===== ヒマコロシ（クラスは hk- で始める） ===== */
+.hima { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+.hk-pill { background: var(--brand-soft); color: var(--brand); border-radius: 99px; padding: 3px 12px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+.hk-homeowl { background: var(--brand-soft) !important; padding: 2px; }
+.hk-homeowl svg { width: 40px; height: 40px; }
+.hk-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: flex; background: var(--card); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
+.hk-nav button { flex: 1; border: 0; background: none; padding: 9px 0 8px; font-size: 11px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+.hk-nav button .i { font-size: 21px; line-height: 1; }
+.hk-nav button.on { color: var(--brand); font-weight: 700; }
+.hk-owlwrap { text-align: center; }
+.hk-owl svg { width: 180px; height: 180px; }
+.hk-bubble { background: var(--card); border: 2px solid var(--brand); border-radius: 14px; padding: 8px 12px; display: inline-block; font-size: 14px; margin-bottom: 6px; min-height: 20px; }
+.hk-bar { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 6px 0; }
+.hk-bar > i { display: block; height: 100%; background: #ffb300; transition: width .3s; }
+.hk-stats { display: flex; justify-content: space-around; text-align: center; font-size: 12px; color: var(--muted); }
+.hk-stats b { display: block; font-size: 18px; color: var(--text); }
+.hk-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.hk-tile { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 10px; text-align: center; font-size: 15px; font-weight: 700; color: var(--text); box-shadow: var(--shadow); cursor: pointer; }
+.hk-tile .e { font-size: 30px; display: block; margin-bottom: 4px; }
+.hk-tile small { display: block; color: var(--muted); font-weight: 400; font-size: 12px; margin-top: 3px; }
+.hk-input { width: 100%; min-height: 110px; font: inherit; font-size: 16px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; background: var(--bg); color: var(--text); }
+.hk-wordhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.hk-wordhead .btn { min-height: 0; padding: 8px 12px; font-size: 13px; }
+.hk-list { list-style: none; padding: 0; margin: 8px 0 0; }
+.hk-list li { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 2px; border-bottom: 1px solid var(--line); font-size: 14px; overflow-wrap: anywhere; }
+.hk-list li button { border: 0; background: none; color: var(--ng); font-size: 13px; flex: none; cursor: pointer; }
+.btn.hk-red { background: var(--ng); color: #fff; }
+/* オーバーレイ */
+body.hk-lock { overflow: hidden; }
+.hk-ov { position: fixed; inset: 0; background: var(--bg); z-index: 30; display: flex; flex-direction: column; }
+.hk-ohead { background: var(--card); border-bottom: 1px solid var(--line); padding: calc(env(safe-area-inset-top) + 10px) 12px 10px; display: flex; align-items: center; gap: 10px; }
+.hk-ohead button { background: var(--brand-soft); color: var(--brand); border: 0; border-radius: 10px; padding: 6px 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.hk-ohead .t { flex: 1; font-weight: 700; }
+.hk-timer { font-size: 15px; font-weight: 700; color: var(--brand); white-space: nowrap; }
+.hk-obody { flex: 1; overflow-y: auto; padding: 14px 16px calc(14px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; }
+.hk-q { font-size: 34px; font-weight: 800; text-align: center; margin: 18px 0; overflow-wrap: anywhere; }
+.hk-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 420px; }
+.hk-choices button { border: 1px solid var(--line); border-radius: 14px; background: var(--card); padding: 18px 8px; font-size: 20px; font-weight: 700; box-shadow: var(--shadow); color: var(--text); cursor: pointer; overflow-wrap: anywhere; }
+.hk-choices.word button { font-size: 15px; padding: 14px 8px; }
+.hk-choices button.ok { background: #4caf50; border-color: #4caf50; color: #fff; }
+.hk-choices button.ng { background: #e53935; border-color: #e53935; color: #fff; }
+.hk-flash { width: 100%; max-width: 420px; min-height: 180px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; text-align: center; padding: 16px; margin: 14px 0; cursor: pointer; overflow-wrap: anywhere; }
+.hk-result { text-align: center; width: 100%; max-width: 420px; margin-top: 30px; }
+.hk-result .big { font-size: 44px; font-weight: 800; color: var(--brand); }
+/* 2048 */
+.hk-2048 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #bbada0; padding: 8px; border-radius: 12px; width: min(92vw, 400px); aspect-ratio: 1; touch-action: none; }
+.hk-2048 div { background: #cdc1b4; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: clamp(16px, 6vw, 28px); color: #776e65; }
+/* ブロック */
+.hk-blk { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; background: #cfd8dc; padding: 5px; border-radius: 10px; width: min(92vw, 380px); aspect-ratio: 1; }
+.hk-blk div { background: #fff; border-radius: 4px; }
+.hk-blk div.f { background: #1e3a8a; }
+.hk-pieces { display: flex; justify-content: space-around; width: min(92vw, 380px); margin-top: 14px; min-height: 90px; align-items: center; }
+.hk-piece { display: grid; gap: 2px; padding: 8px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; }
+.hk-piece.sel { border-color: #ffb300; background: #fff8e1; }
+.hk-piece i { width: 16px; height: 16px; border-radius: 3px; background: #1e3a8a; display: block; }
+.hk-piece i.e { background: transparent; }
+/* 数独 */
+.hk-sdk { display: grid; grid-template-columns: repeat(9, 1fr); width: min(94vw, 400px); aspect-ratio: 1; border: 2px solid #333; background: #fff; }
+.hk-sdk div { display: flex; align-items: center; justify-content: center; font-size: clamp(14px, 5vw, 22px); border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; color: #111; cursor: pointer; }
+.hk-sdk div.g { font-weight: 800; color: #111; }
+.hk-sdk div.u { color: #1565c0; }
+.hk-sdk div.br { border-right: 2px solid #333; }
+.hk-sdk div.bb { border-bottom: 2px solid #333; }
+.hk-sdk div.sel { background: #fff3c4; }
+.hk-sdk div.same { background: #e3f2fd; }
+.hk-sdk div.bad { color: #e53935; }
+.hk-pad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: min(94vw, 400px); margin-top: 12px; }
+.hk-pad button { border: 1px solid var(--line); border-radius: 10px; background: var(--card); padding: 12px 0; font-size: 20px; font-weight: 700; color: var(--text); cursor: pointer; }
+/* マインスイーパー */
+.hk-mine { display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; width: min(94vw, 400px); aspect-ratio: 1; }
+.hk-mine div { background: #90a4ae; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: clamp(13px, 4.5vw, 20px); cursor: pointer; }
+.hk-mine div.o { background: #eceff1; }
+.hk-mine div.boom { background: #e53935; }
+.hk-mtool { display: flex; gap: 8px; margin-top: 12px; width: min(94vw, 400px); }
+.hk-mtool .btn { flex: 1; }
