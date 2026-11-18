@@ -230,16 +230,26 @@ function viewField(s) {
       <div class="lec-list">${Object.entries(s.lectures).map(([k, v]) => {
         const m = v.match(/^(第\S+?回)\s*(.*)$/) || [null, v, ''];
         const qn = count((g) => String(g.lecture) === k && match(g, 'l'));
-        const acc = lectureAcc(s, k);
+        const acc = accFor(s, (g) => String(g.lecture) === k);
         const on = f.lectures.has(k);
-        return `<button class="lec" data-act="fl" data-k="${k}" aria-pressed="${on}" ${qn ? '' : 'disabled'}>
+        return `<button class="lec" data-act="fl" data-k="${k}" aria-pressed="${on}" ${qn || on ? '' : 'disabled'}>
           <span class="box">${on ? '✓' : ''}</span>
           <span class="body"><span class="no">${esc(m[1])}</span><span class="ttl">${esc(m[2])}</span>
             <span class="meta"><span>${qn}問 ・ ${acc ? `正答率 ${acc.pct}%` : 'まだ解いていない'}</span>${acc ? `<span class="meter"><i style="width:${acc.pct}%"></i></span>` : ''}</span></span>
         </button>`;
       }).join('')}</div>
-      <h3 class="sec">問題の型（選ばなければ全部）</h3>
-      <div class="chips">${Object.entries(s.types).map(([k, v]) => `<button class="chip" data-act="ft" data-k="${k}" aria-pressed="${f.types.has(k)}">${esc(v)}<small>${count((g) => g.type === k && match(g, 't'))}</small></button>`).join('')}</div>
+      <div class="sec-row"><h3 class="sec">問題の型（選ばなければ全部）</h3>
+        <div class="mini-btns"><button data-act="tall">すべて</button><button data-act="tnone">解除</button></div></div>
+      <div class="lec-list">${Object.entries(s.types).map(([k, v]) => {
+        const qn = count((g) => g.type === k && match(g, 't'));
+        const acc = accFor(s, (g) => g.type === k);
+        const on = f.types.has(k);
+        return `<button class="lec" data-act="ft" data-k="${k}" aria-pressed="${on}" ${qn || on ? '' : 'disabled'}>
+          <span class="box">${on ? '✓' : ''}</span>
+          <span class="body"><span class="no">${esc(v)}</span>
+            <span class="meta"><span>${qn}問 ・ ${acc ? `正答率 ${acc.pct}%` : 'まだ解いていない'}</span>${acc ? `<span class="meter"><i style="width:${acc.pct}%"></i></span>` : ''}</span></span>
+        </button>`;
+      }).join('')}</div>
       <h3 class="sec">問題の種類</h3>
       <div class="chips">${[['all', '両方'], ['original', 'オリジナル'], ['past', '本番の問題']].map(([k, v]) => `<button class="chip" data-act="fs" data-k="${k}" aria-pressed="${f.src === k}">${v}</button>`).join('')}</div>
       <div class="card mt"><label class="switch"><span>出題順をシャッフル</span><input type="checkbox" data-act="fsh" ${f.shuffle ? 'checked' : ''}></label></div>
@@ -248,10 +258,10 @@ function viewField(s) {
   fieldSel.match = match;
 }
 
-// その回の自分の正答率（解いたことのある問題の正解・不正解の合計から）
-function lectureAcc(s, k) {
+// 条件に合う大問の自分の正答率（解いたことのある問題の正解・不正解の合計から）
+function accFor(s, pred) {
   let c = 0, w = 0;
-  for (const g of s.groups) if (String(g.lecture) === k) for (const q of g.questions) { const st = store.stats[q.id]; if (st) { c += st.c; w += st.w; } }
+  for (const g of s.groups) if (pred(g)) for (const q of g.questions) { const st = store.stats[q.id]; if (st) { c += st.c; w += st.w; } }
   return c + w ? { pct: Math.round((c / (c + w)) * 100) } : null;
 }
 
@@ -726,6 +736,8 @@ document.addEventListener('click', async (e) => {
       return;
     case 'fall': Object.keys(s.lectures).forEach((k) => fieldSel.lectures.add(k)); return viewField(s);
     case 'fnone': fieldSel.lectures.clear(); return viewField(s);
+    case 'tall': Object.keys(s.types).forEach((k) => fieldSel.types.add(k)); return viewField(s);
+    case 'tnone': fieldSel.types.clear(); return viewField(s);
     case 'reset':
       if (confirm('成績と間違えた問題の記録をすべて消しますか？')) { store.stats = {}; store.history = []; save(); toast('消しました'); }
       return;
