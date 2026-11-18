@@ -21,6 +21,13 @@ const store = Object.assign({ settings: { shufflePast: false, shuffleOriginal: t
 store.lessons ||= {};
 if (store.settings.sound === undefined) store.settings.sound = true;
 sfx.enabled = store.settings.sound;
+store.settings.theme ||= 'auto';
+function applyTheme() {
+  const t = store.settings.theme;
+  if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  else delete document.documentElement.dataset.theme;
+}
+applyTheme();
 const save = () => writeJSON(KEY, store);
 let session = readJSON(SKEY, null);
 const saveSession = () => writeJSON(SKEY, session);
@@ -218,8 +225,19 @@ function viewField(s) {
   $app.innerHTML = `
     ${top('分野別', { back: 's/' + s.id })}
     <main class="wrap">
-      <h3 class="sec">回（選ばなければ全部）</h3>
-      <div class="chips">${Object.entries(s.lectures).map(([k, v]) => `<button class="chip" data-act="fl" data-k="${k}" aria-pressed="${f.lectures.has(k)}">${esc(v)}<small>${count((g) => String(g.lecture) === k && match(g, 'l'))}</small></button>`).join('')}</div>
+      <div class="sec-row"><h3 class="sec">回（選ばなければ全部）</h3>
+        <div class="mini-btns"><button data-act="fall">すべて</button><button data-act="fnone">解除</button></div></div>
+      <div class="lec-list">${Object.entries(s.lectures).map(([k, v]) => {
+        const m = v.match(/^(第\S+?回)\s*(.*)$/) || [null, v, ''];
+        const qn = count((g) => String(g.lecture) === k && match(g, 'l'));
+        const acc = lectureAcc(s, k);
+        const on = f.lectures.has(k);
+        return `<button class="lec" data-act="fl" data-k="${k}" aria-pressed="${on}" ${qn ? '' : 'disabled'}>
+          <span class="box">${on ? '✓' : ''}</span>
+          <span class="body"><span class="no">${esc(m[1])}</span><span class="ttl">${esc(m[2])}</span>
+            <span class="meta"><span>${qn}問 ・ ${acc ? `正答率 ${acc.pct}%` : 'まだ解いていない'}</span>${acc ? `<span class="meter"><i style="width:${acc.pct}%"></i></span>` : ''}</span></span>
+        </button>`;
+      }).join('')}</div>
       <h3 class="sec">問題の型（選ばなければ全部）</h3>
       <div class="chips">${Object.entries(s.types).map(([k, v]) => `<button class="chip" data-act="ft" data-k="${k}" aria-pressed="${f.types.has(k)}">${esc(v)}<small>${count((g) => g.type === k && match(g, 't'))}</small></button>`).join('')}</div>
       <h3 class="sec">問題の種類</h3>
@@ -228,6 +246,13 @@ function viewField(s) {
     </main>
     <div class="bottom"><div class="bottom-in"><button class="btn" data-act="fstart" ${n ? '' : 'disabled'}>${n}問を解く</button></div></div>`;
   fieldSel.match = match;
+}
+
+// その回の自分の正答率（解いたことのある問題の正解・不正解の合計から）
+function lectureAcc(s, k) {
+  let c = 0, w = 0;
+  for (const g of s.groups) if (String(g.lecture) === k) for (const q of g.questions) { const st = store.stats[q.id]; if (st) { c += st.c; w += st.w; } }
+  return c + w ? { pct: Math.round((c / (c + w)) * 100) } : null;
 }
 
 /* ---------- セッション作成 ---------- */
@@ -616,6 +641,11 @@ function viewSettings() {
   $app.innerHTML = `
     ${top('設定', { back: '' })}
     <main class="wrap">
+      <h3 class="sec">画面の明るさ</h3>
+      <div class="card">
+        <div class="seg" role="group" aria-label="テーマ">${[['auto', '自動'], ['light', 'ライト'], ['dark', 'ダーク']].map(([k, v]) => `<button data-act="theme" data-v="${k}" aria-pressed="${store.settings.theme === k}">${v}</button>`).join('')}</div>
+        <p class="muted small" style="margin:8px 0 0">自動：端末の設定（ライト／ダーク）に合わせる</p>
+      </div>
       <h3 class="sec">効果音</h3>
       <div class="card">
         <label class="switch"><span>正解・不正解の効果音<br><small class="muted">分野別・復習・基礎コースで1問ごと、模試は採点時に鳴る</small></span><input type="checkbox" data-act="set" data-k="sound" ${store.settings.sound ? 'checked' : ''}></label>
@@ -690,6 +720,12 @@ document.addEventListener('click', async (e) => {
       store.settings[el.dataset.k] = el.checked; save();
       if (el.dataset.k === 'sound') { sfx.enabled = el.checked; if (el.checked) sfx.ok(); }
       return;
+    case 'theme':
+      store.settings.theme = el.dataset.v; save(); applyTheme();
+      document.querySelectorAll('[data-act=theme]').forEach((b) => b.setAttribute('aria-pressed', b === el));
+      return;
+    case 'fall': Object.keys(s.lectures).forEach((k) => fieldSel.lectures.add(k)); return viewField(s);
+    case 'fnone': fieldSel.lectures.clear(); return viewField(s);
     case 'reset':
       if (confirm('成績と間違えた問題の記録をすべて消しますか？')) { store.stats = {}; store.history = []; save(); toast('消しました'); }
       return;

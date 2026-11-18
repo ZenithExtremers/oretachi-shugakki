@@ -11,6 +11,10 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="俺たちの秋学期">
+  <script>
+    // テーマを先に当てて、読み込み時のちらつきを防ぐ
+    try { var t = (JSON.parse(localStorage.getItem('oretachi:v1') || '{}').settings || {}).theme; if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
