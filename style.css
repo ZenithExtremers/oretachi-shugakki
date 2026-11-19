@@ -660,3 +660,70 @@ main.wrap { zoom: var(--zoom, 1); }
 .sheet-body { flex: 1; overflow: auto; padding: 0 12px 12px; zoom: var(--zoom, 1); }
 .bottom-in { gap: 8px; }
 body.sheet-open main.wrap { padding-bottom: calc(min(46vh, 440px) + 110px); }
+
+/* 冒険：パーティ編成（編成枠＋マス目＋詳細） */
+.rp-form { background: linear-gradient(160deg, rgba(245, 197, 66, .14), rgba(255, 255, 255, .04)); border: 1px solid var(--line); border-radius: 18px; padding: 12px; }
+.rp-formhead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; font-size: 13px; color: var(--muted); }
+.rp-formhead > b { color: var(--brand); font-size: 15px; }
+.rp-formhead span b { color: var(--text); font-size: 16px; }
+.rp-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.rp-slot { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; border: 1.5px solid var(--line); background: rgba(0, 0, 0, .2); border-radius: 14px; padding: 10px 2px 8px; color: var(--text); cursor: pointer; min-width: 0; }
+.rp-slot.sel { border-color: #f5c542; box-shadow: 0 0 0 2px rgba(245, 197, 66, .4); }
+.rp-slot.empty { border-style: dashed; cursor: default; }
+.rp-slot .rp-face { width: 52px; height: 52px; }
+.rp-slot small { font-size: 11.5px; font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-slot em { font-style: normal; font-size: 11px; color: var(--brand); font-weight: 800; }
+.rp-leader { position: absolute; top: -8px; font-style: normal; font-size: 10px; font-weight: 800; background: #f5c542; color: #2a1650; border-radius: 99px; padding: 0 6px; }
+.rp-gridhead { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 8px; }
+.rp-sort { display: flex; gap: 4px; }
+.rp-sort button { border: 1px solid var(--line); background: rgba(255, 255, 255, .06); color: var(--muted); border-radius: 99px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.rp-sort button[aria-pressed="true"] { background: #f5c542; color: #2a1650; border-color: #f5c542; }
+.rp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.rp-cell { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; border: 1.5px solid var(--line); background: rgba(255, 255, 255, .05); border-radius: 14px; padding: 8px 2px 6px; color: var(--text); cursor: pointer; min-width: 0; }
+.rp-cell.r2 { border-color: rgba(147, 197, 253, .6); }
+.rp-cell.r3 { border-color: #f5c542; background: radial-gradient(circle at 50% 25%, rgba(245, 197, 66, .3), rgba(255, 255, 255, .04)); }
+.rp-cell.sel { box-shadow: 0 0 0 3px #f5c542; }
+.rp-cell.inp { background-color: rgba(74, 222, 128, .08); }
+.rp-cell .rp-face { width: 46px; height: 46px; }
+.rp-cell em { font-style: normal; font-size: 11px; font-weight: 800; }
+.rp-cell > i { position: absolute; top: 4px; right: 4px; font-style: normal; font-size: 9px; font-weight: 800; background: #4ade80; color: #052e16; border-radius: 6px; padding: 0 4px; }
+.rp-cell.unknown { cursor: default; opacity: .45; }
+.rp-detail { position: sticky; bottom: 0; align-self: stretch; margin-top: 12px; background: linear-gradient(180deg, #2a1d55, #1a1446); border: 1.5px solid #f5c542; border-radius: 18px; padding: 12px; box-shadow: 0 -8px 24px rgba(0, 0, 0, .5); animation: sheet-up .2s ease-out; }
+.rp-dhead { display: flex; align-items: center; gap: 12px; }
+.rp-dhead > div { flex: 1; min-width: 0; }
+.rp-dhead b { font-size: 18px; }
+.rp-dhead .rp-face { width: 56px; height: 56px; }
+.rp-dhead .rp-lv small { color: var(--muted); font-weight: 400; font-size: 11px; }
+.rp-x { border: 0; background: rgba(255, 255, 255, .1); color: var(--text); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; flex: none; }
+.rp-detail .rp-tags { margin-top: 8px; }
+.rp-detail .rp-tags em { font-size: 12.5px; padding: 2px 8px; }
+.rp-skill { font-size: 13.5px; margin: 8px 0 10px; color: var(--text); }
+.rp-dbtns { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 8px; align-items: center; }
+.rp-dbtns .rp-btn { min-height: 46px; padding: 8px 6px; font-size: 14px; }
+/* 冒険：バトルの緩急 */
+.rp-ready { display: grid; place-items: center; height: 180px; }
+.rp-ready span { font-size: 34px; font-weight: 900; letter-spacing: .12em; color: #c7d2fe; animation: rp-ready .5s ease-out; }
+.rp-ready.go span { color: #f5c542; font-size: 48px; text-shadow: 0 0 20px rgba(245, 197, 66, .7); animation: rp-go .32s ease-out; }
+@keyframes rp-ready { from { opacity: 0; transform: scale(1.4); } }
+@keyframes rp-go { from { opacity: 0; transform: scale(.4); } 60% { transform: scale(1.2); } }
+.rp-event { margin-top: 8px; border-radius: 10px; padding: 6px 10px; font-size: 13px; font-weight: 800; text-align: center; animation: rp-ev 1s infinite alternate; }
+.rp-event.chance { background: rgba(245, 197, 66, .2); border: 1px solid #f5c542; color: #ffe28a; }
+.rp-event.charge { background: rgba(225, 29, 72, .2); border: 1px solid #fb7185; color: #fecdd3; }
+@keyframes rp-ev { to { filter: brightness(1.35); } }
+.rp-team.atk .rp-tm .rp-face { animation: rp-jump .38s ease-out both; }
+.rp-team.atk .rp-tm:nth-child(2) .rp-face { animation-delay: .05s; }
+.rp-team.atk .rp-tm:nth-child(3) .rp-face { animation-delay: .1s; }
+.rp-team.atk .rp-tm:nth-child(4) .rp-face { animation-delay: .15s; }
+@keyframes rp-jump { 40% { transform: translateY(-26px) scale(1.15); } }
+.rp-enemy.lunge { animation: rp-lunge .38s ease-in; }
+@keyframes rp-lunge { 50% { transform: translateY(30px) scale(1.35); } }
+.rp-after { margin-top: 10px; border-radius: 12px; padding: 10px 12px; font-size: 14.5px; line-height: 1.6; }
+.rp-after b { display: block; font-size: 17px; }
+.rp-after.ok { background: rgba(74, 222, 128, .12); border: 1px solid rgba(74, 222, 128, .5); }
+.rp-after.ok b { color: #4ade80; }
+.rp-after.ng { background: rgba(251, 113, 133, .12); border: 1px solid rgba(251, 113, 133, .5); }
+.rp-after.ng b { color: #fb7185; }
+.rp-after span b { display: inline; font-size: inherit; color: inherit; }
+/* 冒険などのオーバーレイ中は、トーストを上に出して下のボタンと重ねない */
+body.hk-lock #toast { bottom: auto; top: calc(64px + env(safe-area-inset-top)); transform: translateX(-50%) translateY(-10px); }
+body.hk-lock #toast.show { transform: translateX(-50%) translateY(0); }

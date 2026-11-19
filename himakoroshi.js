@@ -132,7 +132,7 @@ let rpg = null;
 
 export function viewHima($app, top, api) {
   leaveHima();
-  if (!rpg) rpg = makeRPG({ S, save, openOv, closeOv, body: () => body(), info: (t) => info(t), toast, setCleanup: (f) => { cleanup = f; }, esc, shuffle, rnd, owlSVG, DECKS, addFood, api });
+  if (!rpg) rpg = makeRPG({ S, save, openOv, closeOv, body: () => body(), info: (t) => info(t), toast, setCleanup: (f) => { cleanup = f; }, renderTop: () => renderTop(), esc, shuffle, rnd, owlSVG, DECKS, addFood, api });
   $app.innerHTML = `
     ${top('ヒマコロシ', { back: '', right: '<span class="hk-pill" id="hk-food"></span>' })}
     <main class="wrap hima" id="hk-main"></main>

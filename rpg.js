@@ -194,31 +194,75 @@ export function makeRPG(ctx) {
     inp.onkeydown = (e) => { if (e.key === 'Enter') ok(); };
   }
 
-  /* ---------- パーティ編成 ---------- */
+  /* ---------- パーティ編成（上に編成枠、下に仲間のマス目。タップで詳しく・エサやり） ---------- */
+  const FEED_EXP = 20; // 🐛1つで経験値20
+  function feedTo(o, n) {
+    let ups = 0;
+    o.exp += FEED_EXP * n;
+    while (o.exp >= needExp(o.lv)) { o.exp -= needExp(o.lv); o.lv++; ups++; }
+    return ups;
+  }
   function openParty() {
     openOv('パーティ編成'); darkOv();
+    let sel = null, sort = 'rar';
     const draw = () => {
-      const r = R(), ids = Object.keys(CHARS).filter((id) => r.owned[id]);
-      body().innerHTML = `<p class="muted small rp-full">${esc(heroName())}＋仲間3人まで。タップで入れ替え</p>
-        <div class="rp-list">${ids.map((id) => {
-          const x = member(id), inP = r.party.includes(id), o = r.owned[id];
-          return `<button class="rp-card r${x.rar}${inP ? ' on' : ''}" data-id="${id}">${iconHTML(id)}
-            <span class="rp-cinfo"><b>${esc(x.name)} <span class="rp-rar">${RAR[x.rar]}</span></b>
-            <span class="rp-tags"><em>Lv.${x.lv}</em><em>HP ${x.hp}</em><em>攻撃 ${x.atk}</em><em>得意 ${x.subj === 'all' ? 'ぜんぶ' : SUBJ.find((s) => s[0] === x.subj)[1]}</em></span>
-            <small>スキル「${esc(x.skill.name)}」${SKILL_DESC[x.skill.kind](x.skill)}（正解${x.skill.cost}回でたまる）</small>
-            <span class="rp-exp"><i style="width:${(o.exp / needExp(o.lv)) * 100}%"></i></span></span>
-            <span class="rp-in">${inP ? '出撃中' : ''}</span></button>`;
-        }).join('')}</div>
-        <p class="muted small rp-full">まだ ${Object.keys(CHARS).length - ids.length} 人の仲間がいる。ガチャで見つけよう。</p>`;
+      const r = R(), t = team();
+      const ownedIds = Object.keys(CHARS).filter((id) => r.owned[id]);
+      const sorted = [...ownedIds].sort((a, b) => (sort === 'lv' ? r.owned[b].lv - r.owned[a].lv : CHARS[b].rar - CHARS[a].rar || r.owned[b].lv - r.owned[a].lv));
+      const unknown = Object.keys(CHARS).length - ownedIds.length;
+      const d = sel ? member(sel) : null;
+      const o = sel === 'hero' ? r.hero : sel ? r.owned[sel] : null;
+      body().innerHTML = `
+        <div class="rp-form rp-full">
+          <div class="rp-formhead"><b>編成</b><span>HP <b>${t.reduce((a, x) => a + x.hp, 0)}</b>　攻撃 <b>${t.reduce((a, x) => a + x.atk, 0)}</b></span></div>
+          <div class="rp-slots">
+            ${['hero', ...r.party, null, null, null].slice(0, 4).map((id, i) => id
+              ? `<button class="rp-slot${sel === id ? ' sel' : ''}" data-pick="${id}">${iconHTML(id)}<small>${esc(member(id).name)}</small><em>Lv.${member(id).lv}</em>${i === 0 ? '<i class="rp-leader">リーダー</i>' : ''}</button>`
+              : '<span class="rp-slot empty"><span class="rp-face empty">＋</span><small>空き</small></span>').join('')}
+          </div>
+        </div>
+        <div class="rp-gridhead rp-full"><b>仲間 ${ownedIds.length}/${Object.keys(CHARS).length}</b>
+          <span class="rp-sort"><button data-sort="rar" aria-pressed="${sort === 'rar'}">★順</button><button data-sort="lv" aria-pressed="${sort === 'lv'}">Lv順</button></span></div>
+        <div class="rp-grid rp-full">
+          ${sorted.map((id) => `<button class="rp-cell r${CHARS[id].rar}${r.party.includes(id) ? ' inp' : ''}${sel === id ? ' sel' : ''}" data-pick="${id}">${iconHTML(id)}<span class="rp-rar">${RAR[CHARS[id].rar]}</span><em>Lv.${r.owned[id].lv}</em>${r.party.includes(id) ? '<i>編成中</i>' : ''}</button>`).join('')}
+          ${Array(unknown).fill('<span class="rp-cell unknown"><span class="rp-face empty">？</span><em>未発見</em></span>').join('')}
+        </div>
+        <p class="muted small rp-full">エサ🐛はヒマコロシ全体で共通（今 🐛 ${S.food}）。🐛1つで経験値${FEED_EXP}。</p>
+        ${d ? `<div class="rp-detail">
+          <div class="rp-dhead">${iconHTML(sel)}<div><b>${esc(d.name)}</b> ${d.rar ? `<span class="rp-rar">${RAR[d.rar]}</span>` : '<span class="rp-rar">リーダー</span>'}
+            <div class="rp-lv">Lv.${d.lv}<span class="rp-exp"><i style="width:${(o.exp / needExp(o.lv)) * 100}%"></i></span><small>${o.exp}/${needExp(o.lv)}</small></div></div>
+            <button class="rp-x" data-close-detail aria-label="閉じる">✕</button></div>
+          <div class="rp-tags"><em>HP ${d.hp}</em><em>攻撃 ${d.atk}</em><em>得意 ${d.subj == null ? 'なし' : d.subj === 'all' ? 'ぜんぶ' : SUBJ.find((x) => x[0] === d.subj)[1]}</em></div>
+          <p class="rp-skill">スキル「${esc(d.skill.name)}」：${SKILL_DESC[d.skill.kind](d.skill)}（正解${d.skill.cost}回でたまる）</p>
+          <div class="rp-dbtns">
+            ${sel === 'hero' ? '<span class="muted small">リーダーはいつも出撃</span>' : `<button class="rp-btn" data-toggle>${r.party.includes(sel) ? '編成から外す' : '編成に入れる'}</button>`}
+            <button class="rp-btn gold" data-feed="1" ${S.food < 1 ? 'disabled' : ''}>🐛 あげる</button>
+            <button class="rp-btn gold" data-feed="5" ${S.food < 5 ? 'disabled' : ''}>🐛×5</button>
+          </div></div>` : ''}`;
     };
     draw();
     body().onclick = (e) => {
-      const c = e.target.closest('[data-id]'); if (!c) return;
-      const r = R(), id = c.dataset.id, i = r.party.indexOf(id);
-      if (i >= 0) r.party.splice(i, 1);
-      else if (r.party.length >= 3) { toast('仲間は3人まで。先にだれかを外してね'); return; }
-      else r.party.push(id);
-      bgm.sfx('tap'); save(); draw();
+      const r = R();
+      const sb = e.target.closest('[data-sort]'); if (sb) { sort = sb.dataset.sort; draw(); return; }
+      if (e.target.closest('[data-close-detail]')) { sel = null; draw(); return; }
+      const pk = e.target.closest('[data-pick]'); if (pk) { sel = pk.dataset.pick; bgm.sfx('tap'); draw(); return; }
+      if (e.target.closest('[data-toggle]') && sel && sel !== 'hero') {
+        const i = r.party.indexOf(sel);
+        if (i >= 0) r.party.splice(i, 1);
+        else if (r.party.length >= 3) { toast('仲間は3人まで。先にだれかを外してね'); return; }
+        else r.party.push(sel);
+        bgm.sfx('tap'); save(); draw(); return;
+      }
+      const fb = e.target.closest('[data-feed]');
+      if (fb && !fb.disabled && sel) {
+        const n = +fb.dataset.feed; if (S.food < n) return;
+        S.food -= n;
+        const o = sel === 'hero' ? r.hero : r.owned[sel];
+        const ups = feedTo(o, n);
+        save(); ctx.renderTop?.();
+        if (ups) { bgm.sfx('win'); toast(`${member(sel).name} が Lv.${o.lv} になった！`); } else { bgm.sfx('heal'); toast(`経験値 +${FEED_EXP * n}`); }
+        draw();
+      }
     };
   }
 
@@ -269,7 +313,7 @@ export function makeRPG(ctx) {
       : shuffle([...E.zako]).slice(0, 3).map(([name, icon]) => ({ name, icon, hp: Math.round(100 * lvScale), atk: Math.round(18 * lvScale) }));
     const t = team();
     const maxHp = t.reduce((a, x) => a + x.hp, 0);
-    const st = { foes, fi: 0, ehp: foes[0].hp, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: boss ? 90 : 12, busy: false, combo: 0, correct: 0, over: false };
+    const st = { foes, fi: 0, ehp: foes[0].hp, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: boss ? 90 : 12, busy: false, combo: 0, correct: 0, over: false, turns: 0, event: null };
     const deck = DECKS.find((d) => d.id === subj).words;
     const no = (lectures[subj][lec].match(/^(第\S+?回)/) || [lectures[subj][lec]])[0];
     openOv(`${no} ${boss ? 'BOSS' : 'STAGE ' + n}`); darkOv();
@@ -296,6 +340,7 @@ export function makeRPG(ctx) {
             <div class="rp-team" id="rp-team"></div>
             <div class="rp-hpbar party"><i id="rp-php"></i><span id="rp-phptxt"></span></div>
             <div class="rp-timebar"><i id="rp-time"></i></div>
+            <div class="rp-event" id="rp-event" hidden></div>
           </div>
           <div id="rp-q"></div>
         </div>`;
@@ -331,8 +376,8 @@ export function makeRPG(ctx) {
       const fl = document.querySelector('.rp-field'); if (fl) { fl.classList.remove('flash'); void fl.offsetWidth; fl.classList.add('flash'); }
       drawHp();
     }
-    function hitParty() {
-      let d = foes[st.fi].atk * (0.85 + Math.random() * 0.3);
+    function hitParty(mult = 1) {
+      let d = foes[st.fi].atk * (0.85 + Math.random() * 0.3) * mult;
       if (st.guard) { d /= 2; st.guard--; }
       st.hp -= Math.round(d);
       bgm.sfx('ouch');
@@ -340,29 +385,53 @@ export function makeRPG(ctx) {
       drawHp();
     }
 
+    const wait = (ms) => new Promise((res) => setTimeout(res, ms));
+    // チャンス（次の攻撃2倍）／ピンチ（敵が力をためる：次に受けるダメージ2倍）
+    function rollEvent() {
+      st.event = null;
+      if (st.turns > 0) { const x = Math.random(); st.event = x < 0.16 ? 'chance' : x < 0.3 ? 'charge' : null; }
+      const ev = document.getElementById('rp-event'); if (!ev) return;
+      ev.hidden = !st.event;
+      ev.className = 'rp-event ' + (st.event || '');
+      ev.textContent = st.event === 'chance' ? '✨ チャンス！ 次の攻撃が2倍' : st.event === 'charge' ? `⚠️ ${foes[st.fi].name}が力をためている…（ミスすると大ダメージ）` : '';
+      if (st.event) bgm.sfx(st.event === 'chance' ? 'skill' : 'miss');
+    }
+
     async function nextQuestion() {
       if (st.over) return;
-      st.busy = false;
+      st.busy = true;
       const qEl = document.getElementById('rp-q'); if (!qEl) return;
-      if (foes[st.fi].boss) {
-        const bq = await api.bossQuestion(subj, lec);
-        if (!document.getElementById('rp-q')) return;
-        st.q = { answer: bq.answer, exp: bq.exp, n: bq.choices.length };
+      rollEvent();
+      // Ready… GO!（問題が出てから時間が動く）
+      qEl.innerHTML = '<div class="rp-ready"><span>READY…</span></div>';
+      const bqP = foes[st.fi].boss ? api.bossQuestion(subj, lec) : null;
+      await wait(st.event ? 900 : 550);
+      if (st.over || !document.getElementById('rp-q')) return;
+      qEl.innerHTML = '<div class="rp-ready go"><span>GO!</span></div>';
+      bgm.sfx('tap');
+      await wait(320);
+      if (st.over || !document.getElementById('rp-q')) return;
+      if (bqP) {
+        const bq = await bqP;
+        if (st.over || !document.getElementById('rp-q')) return;
+        st.q = { answer: bq.answer, exp: bq.exp, n: bq.choices.length, boss: true };
         qEl.innerHTML = `<div class="rp-bq">${bq.body}<div class="q-text">${bq.q}</div>${bq.qcode}</div>
           <div class="choices">${bq.choices.map((c, i) => `<button class="choice" data-c="${i}"><span class="num">(${i + 1})</span><span class="txt">${c}</span></button>`).join('')}</div>`;
       } else {
         const pool = shuffle([...deck]); const c = pool[0]; const flip = rnd(2) === 1;
         const q = flip ? c[1] : c[0], a = flip ? c[0] : c[1];
         const opts = shuffle([a, ...pool.slice(1, 4).map((x) => (flip ? x[0] : x[1]))]);
-        st.q = { answer: opts.indexOf(a), exp: `${c[0]}：${c[1]}`, n: 4 };
+        st.q = { answer: opts.indexOf(a), exp: `<b>${esc(c[0])}</b>：${esc(c[1])}`, n: 4 };
         qEl.innerHTML = `<div class="rp-zq${q.length > 14 ? ' long' : ''}">${esc(q)}</div>
           <div class="hk-choices word rp-zc">${opts.map((o, i) => `<button data-c="${i}">${esc(o)}</button>`).join('')}</div>`;
       }
       document.querySelector('#hk-obody')?.scrollTo({ top: 0 });
+      st.busy = false;
       st.left = st.limit + st.bonusT;
       st.total = st.left;
       clearInterval(st.timer);
       const tick = () => {
+        if (document.hidden) return; // 別のアプリにいるあいだは止める
         st.left -= 0.1;
         const tb = document.getElementById('rp-time');
         if (tb) { tb.style.width = Math.max(0, (st.left / st.total) * 100) + '%'; tb.classList.toggle('hurry', st.left < Math.min(5, st.total * 0.25)); }
@@ -372,32 +441,47 @@ export function makeRPG(ctx) {
       tick(); st.timer = setInterval(tick, 100);
     }
 
-    function answer(i, btn) {
+    function anim(el, cls) { if (!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+    async function answer(i, btn) {
       if (st.busy || st.over) return;
-      st.busy = true; clearInterval(st.timer);
+      st.busy = true; clearInterval(st.timer); st.turns++;
       const ok = i === st.q.answer;
+      const ev = st.event; st.event = null;
       const btns = document.querySelectorAll('#rp-q [data-c]');
       btns.forEach((b) => { b.disabled = true; if (+b.dataset.c === st.q.answer) b.classList.add('ok'); });
       if (btn && !ok) btn.classList.add('ng');
+      const evEl = document.getElementById('rp-event'); if (evEl) evEl.hidden = true;
+      let line = '';
       if (ok) {
         st.combo++; st.correct++;
         const speed = 1 + (Math.max(0, st.left) / st.total) * 0.6; // 1.0〜1.6
-        const big = speed > 1.45 || st.combo >= 3;
-        hitEnemy(partyAtk() * speed * (1 + Math.min(st.combo - 1, 5) * 0.1), st.combo > 1 ? `${st.combo}コンボ` : speed > 1.45 ? 'はやい！' : '', big);
+        const mult = ev === 'chance' ? 2 : 1;
+        const big = speed > 1.45 || st.combo >= 3 || mult > 1;
+        anim(document.getElementById('rp-team'), 'atk'); // 仲間が飛びかかる
+        await wait(380);
+        if (st.over) return;
+        hitEnemy(partyAtk() * speed * mult * (1 + Math.min(st.combo - 1, 5) * 0.1), mult > 1 ? 'チャンス！' : st.combo > 1 ? `${st.combo}コンボ` : speed > 1.45 ? 'はやい！' : '', big);
         t.forEach((x) => { st.gauge[x.id]++; });
         drawTeam();
+        line = `<div class="rp-after ok"><b>正解！</b>${st.q.boss ? '' : `<span>${st.q.exp}</span>`}</div>`;
       } else {
         st.combo = 0;
         bgm.sfx('miss');
-        hitParty(); pop(i < 0 ? '時間切れ' : 'ミス', 'miss');
+        anim(document.getElementById('rp-enemy'), 'lunge'); // 敵の反撃
+        await wait(380);
+        if (st.over) return;
+        hitParty(ev === 'charge' ? 2 : 1); pop(ev === 'charge' ? '大ダメージ！' : i < 0 ? '時間切れ' : 'ミス', 'miss');
+        line = st.q.boss
+          ? `<div class="exp ng"><span class="verdict">${i < 0 ? '時間切れ' : '不正解'}</span>${st.q.exp}</div>`
+          : `<div class="rp-after ng"><b>${i < 0 ? '時間切れ…' : 'ざんねん…'}</b><span>${st.q.exp}</span></div>`;
       }
-      if (!ok && foes[st.fi].boss) {
-        // ボスで間違えたら解説を見せる
-        const qEl = document.getElementById('rp-q');
-        qEl.insertAdjacentHTML('beforeend', `<div class="exp ng"><span class="verdict">${i < 0 ? '時間切れ' : '不正解'}</span>${st.q.exp}</div><button class="rp-btn gold wide mt" id="rp-next">つづける</button>`);
-        document.getElementById('rp-next').onclick = () => afterTurn();
-        document.getElementById('rp-next').scrollIntoView({ block: 'nearest' });
-      } else setTimeout(afterTurn, ok ? 650 : 1300);
+      // 自分のペースで「つぎへ」
+      const qEl = document.getElementById('rp-q'); if (!qEl) return;
+      const label = st.hp <= 0 ? '結果を見る' : st.ehp <= 0 ? (st.fi + 1 < foes.length ? 'たおした！ つぎの敵へ ▶' : 'たおした！ ▶') : 'つぎへ ▶';
+      qEl.insertAdjacentHTML('beforeend', `${line}<button class="rp-btn gold wide mt" id="rp-next">${label}</button>`);
+      const nb = document.getElementById('rp-next');
+      nb.onclick = () => { nb.disabled = true; afterTurn(); };
+      nb.scrollIntoView({ block: 'nearest' });
     }
 
     function afterTurn() {
@@ -423,7 +507,7 @@ export function makeRPG(ctx) {
       st.gauge[id] = 0;
       const k = x.skill;
       if (k.kind === 'heal') { st.hp = Math.min(st.maxHp, st.hp + st.maxHp * k.pow); pop('回復！', 'heal'); bgm.sfx('heal'); drawHp(); }
-      else if (k.kind === 'dmg') { bgm.sfx('skill'); hitEnemy(atkOf(x) * k.pow, k.name, true); if (st.ehp <= 0 && !st.busy) { st.busy = true; clearInterval(st.timer); setTimeout(afterTurn, 500); } }
+      else if (k.kind === 'dmg') { bgm.sfx('skill'); hitEnemy(atkOf(x) * k.pow, k.name, true); if (st.ehp <= 0 && !st.busy) { st.busy = true; clearInterval(st.timer); document.querySelectorAll('#rp-q [data-c]').forEach((b) => { b.disabled = true; }); setTimeout(afterTurn, 600); } }
       else if (k.kind === 'time') { st.bonusT += k.pow; st.left += k.pow; st.total += k.pow; pop(`+${k.pow}秒`, 'info'); bgm.sfx('skill'); }
       else if (k.kind === 'guard') { st.guard += k.pow; pop('ガード！', 'info'); bgm.sfx('skill'); drawHp(); }
       else if (k.kind === 'hint') {

@@ -65,6 +65,21 @@ function schedule() {
   }
 }
 
+// スマホで別のアプリ・別のタブに移ったら止め、戻ってきたら続きから鳴らす
+let paused = false;
+function onVis() {
+  if (!ctx) return;
+  if (document.hidden) {
+    if (song) { paused = true; clearInterval(timer); timer = null; }
+    ctx.suspend().catch(() => {});
+  } else if (paused && enabled && song) {
+    paused = false;
+    ctx.resume().then(() => { nextT = ctx.currentTime + 0.08; schedule(); timer = setInterval(schedule, 40); }).catch(() => {});
+  }
+}
+if (typeof document !== 'undefined') document.addEventListener('visibilitychange', onVis);
+if (typeof window !== 'undefined') window.addEventListener('pagehide', () => { if (ctx) { if (song) { paused = true; clearInterval(timer); timer = null; } ctx.suspend().catch(() => {}); } });
+
 export const bgm = {
   get on() { return enabled; },
   setEnabled(v) { enabled = v; if (!v) this.stop(); },
@@ -74,16 +89,17 @@ export const bgm = {
     if (!ac()) return;
     this.stop();
     song = SONGS[name]; step = 0; nextT = ctx.currentTime + 0.08;
+    if (document.hidden) { paused = true; return; }
     master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(0.5, ctx.currentTime);
     schedule(); timer = setInterval(schedule, 40);
   },
   stop() {
-    clearInterval(timer); timer = null; song = null;
+    clearInterval(timer); timer = null; song = null; paused = false;
     if (ctx && master) { master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(0, ctx.currentTime); master.gain.setValueAtTime(0.5, ctx.currentTime + 0.3); }
   },
   // 効果音
   sfx(name) {
-    if (!enabled || !ac()) return;
+    if (!enabled || document.hidden || !ac()) return;
     const t = ctx.currentTime + 0.01;
     const seq = (ns, gap, type, vol, dur) => ns.forEach((m, i) => note(hz(m), t + i * gap, dur || gap * 1.6, type, vol));
     switch (name) {
