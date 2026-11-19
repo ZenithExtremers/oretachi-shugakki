@@ -727,3 +727,26 @@ body.sheet-open main.wrap { padding-bottom: calc(min(46vh, 440px) + 110px); }
 /* 冒険などのオーバーレイ中は、トーストを上に出して下のボタンと重ねない */
 body.hk-lock #toast { bottom: auto; top: calc(64px + env(safe-area-inset-top)); transform: translateX(-50%) translateY(-10px); }
 body.hk-lock #toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ヒマコロシ：ホームのキャラ */
+.hk-feedrow { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; }
+.hk-feedrow .btn { min-height: 50px; padding: 10px 6px; }
+.hk-change { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin-top: 10px; padding: 11px; border: 1.5px dashed var(--line); border-radius: 14px; background: none; color: var(--brand); font-weight: 800; font-size: 15px; cursor: pointer; }
+.hk-change span { font-size: 18px; }
+.hk-owl { display: grid; place-items: center; min-height: 180px; }
+.hk-pimg { width: 150px; height: 150px; border-radius: 34px; box-shadow: var(--shadow); margin: 15px 0; }
+.hk-pemo { font-size: 120px; line-height: 180px; display: inline-block; }
+.hk-pimg.happy, .hk-pemo.happy { animation: hk-hop .5s; }
+@keyframes hk-hop { 40% { transform: translateY(-14px) scale(1.06); } }
+.hk-owl.hk-eat { animation: hk-eat .5s; }
+@keyframes hk-eat { 30% { transform: scale(1.08); } 60% { transform: scale(.97); } }
+.hk-rar { color: #d97706; font-size: 13px; }
+.hk-pick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; max-width: 460px; }
+.hk-pcell { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px; border: 1.5px solid var(--line); border-radius: 14px; background: var(--card); color: var(--text); cursor: pointer; min-width: 0; }
+.hk-pcell.on { border-color: var(--brand-2); box-shadow: 0 0 0 2px var(--brand-soft); }
+.hk-pcell small { font-size: 11.5px; font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hk-pcell em { font-style: normal; font-size: 11px; color: var(--brand); font-weight: 800; }
+.hk-pcell.lock { opacity: .45; cursor: default; }
+.hk-pface { width: 50px; height: 50px; border-radius: 50%; background: var(--brand-soft); display: grid; place-items: center; font-size: 30px; overflow: hidden; }
+img.hk-pface { object-fit: cover; }
+.hk-pface.owl svg { width: 58px; height: 58px; margin-top: 6px; }

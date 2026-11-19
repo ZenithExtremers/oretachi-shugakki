@@ -60,8 +60,9 @@ const SUBJ = [['ccpp', 'C/C++'], ['db', 'DB'], ['sd', '設計']];
 export function makeRPG(ctx) {
   const { S, save, openOv, closeOv, body, info, toast, setCleanup, esc, shuffle, rnd, owlSVG, DECKS, addFood, api } = ctx;
   const R = () => {
-    if (!S.rpg) S.rpg = { coins: 300, hero: { lv: 1, exp: 0 }, owned: { owl: { lv: 1, exp: 0 } }, party: ['owl'], clear: {}, subj: 'ccpp', pulls: 0 };
+    if (!S.rpg) S.rpg = { coins: 300, hero: { lv: 1, exp: 0 }, owned: { owl: S.owl || { lv: 1, exp: 0 } }, party: ['owl'], clear: {}, subj: 'ccpp', pulls: 0 };
     const r = S.rpg;
+    if (S.owl && r.owned.owl !== S.owl) r.owned.owl = S.owl; // フクロウはホームと共通
     if (!r.heroName) r.heroName = '主人公';
     if (!r.sound) r.sound = 'silent'; // 'silent' | 'bgm'（講義中に使うので最初はサイレント）
     return r;
@@ -557,5 +558,12 @@ export function makeRPG(ctx) {
   // ヒマコロシの冒険タブから離れたとき
   function leave() { bgm.stop(); }
 
-  return { renderQuestTab, leave };
+  // ヒマコロシのホームから使う：主人公・仲間の情報と記録（rec を書きかえるとレベルが変わる）
+  function memberInfo(id) {
+    const r = R();
+    const m = member(id);
+    return { ...m, rec: id === 'hero' ? r.hero : r.owned[id] };
+  }
+
+  return { renderQuestTab, leave, memberInfo };
 }

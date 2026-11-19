@@ -3,7 +3,7 @@
 // 音は鳴らさない（講義中に使うため）。
 
 import DECKS from './data/hima-words.js';
-import { makeRPG } from './rpg.js';
+import { makeRPG, CHARS } from './rpg.js';
 
 const KEY = 'oretachi:hima';
 const DEF = {
@@ -18,6 +18,13 @@ const DEF = {
 let S;
 try { S = Object.assign(structuredClone(DEF), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { S = structuredClone(DEF); }
 if (!S.daily || typeof S.daily !== 'object') S.daily = { d: '', ids: {} };
+// フクロウはホームと冒険で1つ（S.owl）。前のデータからは高いほうのレベルを引き継ぐ
+if (!S.owl) {
+  const ro = S.rpg && S.rpg.owned && S.rpg.owned.owl, hl = S.level || 1;
+  S.owl = ro && ro.lv >= hl ? { lv: ro.lv, exp: ro.exp || 0 } : { lv: hl, exp: Math.min(Math.round(((S.xp || 0) / (hl * 30)) * hl * 50), hl * 50 - 1) };
+}
+if (S.rpg && S.rpg.owned) S.rpg.owned.owl = S.owl;
+if (!S.partner) S.partner = 'owl'; // ホームに置くキャラ
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* 保存できない環境 */ } };
 
 const rnd = (n) => Math.floor(Math.random() * n);
@@ -78,9 +85,10 @@ export function himaSummary() {
   return { food: S.food, quest: r ? `${r.heroName || '主人公'} Lv.${r.hero.lv}・${n}ステージ` : '' };
 }
 
-/* ---------- フクロウ ---------- */
-const need = (l) => l * 30;
-const stage = () => (S.level >= 15 ? 3 : S.level >= 8 ? 2 : S.level >= 3 ? 1 : 0);
+/* ---------- ホームのキャラ（フクロウ・主人公・冒険の仲間） ---------- */
+const needExp = (l) => l * 50; // 冒険と同じ
+const FEED_EXP = 20; // 🐛1つで経験値20（冒険と同じ）
+const stage = () => (S.owl.lv >= 15 ? 3 : S.owl.lv >= 8 ? 2 : S.owl.lv >= 3 ? 1 : 0);
 const STAGE_NAME = ['ひなフクロウ', '見習いフクロウ', '学生フクロウ', 'フクロウ博士'];
 export function owlSVG(st = stage(), happy = false) {
   const s = [0.72, 0.85, 0.95, 1][st];
@@ -96,33 +104,87 @@ export function owlSVG(st = stage(), happy = false) {
   <circle cx="205" cy="240" r="44" fill="#fff"/><circle cx="307" cy="240" r="44" fill="#fff"/>
   ${eye}${glasses}<path d="M240 285 L256 310 L272 285 Z" fill="#ffb300"/>${book}${hat}</g></svg>`;
 }
+// キャラごとの口ぐせ（idle：ふだん／fed：エサ／poke：つつく）
 const LINES = {
-  idle: ['ホー。', '講義、ちゃんと聞いてる？', 'ヒマなら勉強しよ', 'おなかすいた…', 'ノートとった？', 'あと何分？'],
-  fed: ['うまい！', 'もっとちょうだい', '知識の味がする', 'ホッホー！'],
-  poke: ['なに？', 'くすぐったい', '今いいとこなのに', '先生こっち見てるよ'],
-  nofood: ['エサがない…勉強してきて', '計算アタックで🐛がもらえるよ'],
+  owl: { idle: ['ホー。', '講義、ちゃんと聞いてる？', 'ヒマなら勉強しよ', 'おなかすいた…', 'ノートとった？', 'あと何分？'], fed: ['うまい！', 'もっとちょうだい', '知識の味がする', 'ホッホー！'], poke: ['なに？', 'くすぐったい', '今いいとこなのに', '先生こっち見てるよ'] },
+  hero: { idle: ['よし、やるか。', '期末まであと少し。', '今日は何問いける？', 'ちょっと休憩…'], fed: ['いただきます！', 'エネルギー満タン！', 'これで頑張れる'], poke: ['なになに？', '起きてるって', 'ちゃんと聞いてるよ'] },
+  piyo: { idle: ['ぴよ。', 'ぴよぴよ…（眠い）', 'ノートの端っこ、ぴよ'], fed: ['ぴよ〜！', 'おいしいぴよ'], poke: ['ぴっ！', 'くすぐったいぴよ'] },
+  chu: { idle: ['チュー。チーズない？', 'メモリのすみっこに住んでる', '小さいけど強いよ'], fed: ['チュー！', 'カリカリしてうまい'], poke: ['かじるぞ', 'チュッ！'] },
+  kero: { idle: ['ケロっ、講義きいてる？', 'NULL はケロっとスルー', '雨の日が好き'], fed: ['ケロケロ〜', 'ごちそうさまケロ'], poke: ['ケロっ！', 'びっくりしたケロ'] },
+  mimi: { idle: ['ミミをすませてる', 'SELECT にんじん FROM はたけ', 'ぴょん。'], fed: ['もぐもぐ', 'にんじんの次においしい'], poke: ['ぴょんっ', 'ミミはさわらないで'] },
+  maimai: { idle: ['のんびりいこう…', 'ゆっくりでも進めば着く', 'すこし眠い…'], fed: ['ありがと…', 'ゆっくり食べるね'], poke: ['からに入るよ', 'のろのろ…'] },
+  kame: { idle: ['あわてず、こつこつ。', 'こうらの中は静か', '設計は急がない'], fed: ['かたじけない', 'うむ、うまい'], poke: ['ひっこむぞ', 'のし'] },
+  pen: { idle: ['ひんやり集中', '頭を冷やしていこう', 'ペンギンだけどペン持てない'], fed: ['キュッ！', 'さかなの味がする'], poke: ['すべる〜', 'ペタペタ'] },
+  tora: { idle: ['ガオ。テストは狩るもの', 'コードの獲物はどこだ', '寝ていても強い'], fed: ['ガオー！', 'もっと肉…いや虫か'], poke: ['ツメ出すぞ', 'ガルル…'] },
+  konko: { idle: ['コン。化かすのは得意', 'WHERE 忘れはだめコン', 'きつね火で照らすよ'], fed: ['コンコン♪', 'おいしいコン'], poke: ['しっぽは触らないで', 'コンッ'] },
+  kuma: { idle: ['どっしり行こう', 'あわてると間違える', 'ハチミツの夢を見た'], fed: ['うまいクマ', 'もう一個…'], poke: ['のそっ', 'ん？'] },
+  panda: { idle: ['先輩だから何でも聞いて', '過去問は宝だよ', 'ささ食べる？'], fed: ['ありがとう、後輩', 'ささの次においしい'], poke: ['こらこら', '先輩をつつかない'] },
+  robo: { idle: ['コンパイル完了。', 'エラー0、警告0。', 'ピピッ、学習中'], fed: ['エネルギー補給、感謝。', 'ピポパ'], poke: ['不正なアクセス', 'ビッ！'] },
+  kujira: { idle: ['ぶおー。海は広いな', 'データの海を泳ぐ', 'しおふく？'], fed: ['ぶおーっ', 'ちょっと足りない（大きいので）'], poke: ['しおふくぞ', 'ぶお？'] },
+  chou: { idle: ['ひらひら…', '設計図の上を飛ぶ', '時間をゆっくりにしようか'], fed: ['あまい…', 'ひらり♪'], poke: ['ひらっ', 'りんぷん出るよ'] },
+  yuni: { idle: ['虹の向こうに合格がある', 'つかれたら癒すよ', 'キラキラ'], fed: ['キラーン！', 'ありがとう、すてき'], poke: ['角はあぶないよ', 'ふふっ'] },
+  ryu: { idle: ['われはリュウ。', 'ボスなど一息で…', '強くなりたいか'], fed: ['うむ。', '力がみなぎる'], poke: ['ほう…', 'いい度胸だ'] },
 };
-const say = (k) => { const a = LINES[k], el = $('#hk-say'); if (el) el.textContent = a[rnd(a.length)]; };
+const NOFOOD = ['エサがない…勉強してきて', '計算アタックや本編の正解で🐛がもらえるよ'];
+const partner = () => (S.partner === 'owl' || S.partner === 'hero' || (S.rpg && S.rpg.owned && S.rpg.owned[S.partner]) ? S.partner : 'owl');
+const say = (k) => { const set = LINES[partner()] || LINES.owl; const a = k === 'nofood' ? NOFOOD : set[k] || LINES.owl[k]; const el = $('#hk-say'); if (el) el.textContent = a[rnd(a.length)]; };
 function renderTop() { const p = $('#hk-food'); if (p) p.textContent = '🐛 ' + S.food; }
+// いまのキャラの記録 { lv, exp } と表示名
+function partnerRec() {
+  const id = partner();
+  if (id === 'owl') return { rec: S.owl, name: STAGE_NAME[stage()], rar: '' };
+  const r = rpg.memberInfo(id); // 冒険のデータ（主人公・仲間）
+  return { rec: r.rec, name: r.name, rar: r.rar ? '★'.repeat(r.rar) : '' };
+}
+function partnerArt(happy) {
+  const id = partner();
+  if (id === 'owl') return owlSVG(stage(), happy);
+  if (id === 'hero') return `<img class="hk-pimg${happy ? ' happy' : ''}" src="icons/icon-192.png" alt="">`;
+  const c = CHARS[id];
+  return c.icon === 'owl' ? owlSVG(stage(), happy) : `<span class="hk-pemo${happy ? ' happy' : ''}">${c.icon}</span>`;
+}
 function renderHome(happy) {
   if (!$('#hk-owl')) return;
-  $('#hk-owl').innerHTML = owlSVG(stage(), happy);
-  $('#hk-name').textContent = `Lv.${S.level} ${STAGE_NAME[stage()]}`;
-  $('#hk-xpbar').style.width = Math.min(100, (S.xp / need(S.level)) * 100) + '%';
-  $('#hk-xptext').textContent = `次のレベルまで ${need(S.level) - S.xp} XP`;
+  const { rec, name, rar } = partnerRec();
+  $('#hk-owl').innerHTML = partnerArt(happy);
+  $('#hk-name').innerHTML = `Lv.${rec.lv} ${esc(name)} <span class="hk-rar">${rar}</span>`;
+  $('#hk-xpbar').style.width = Math.min(100, (rec.exp / needExp(rec.lv)) * 100) + '%';
+  $('#hk-xptext').textContent = `次のレベルまで ${needExp(rec.lv) - rec.exp} XP`;
   $('#hk-stc').textContent = S.correct; $('#hk-stf').textContent = S.fed; $('#hk-stp').textContent = S.plays;
+  const f5 = $('[data-hk="feed5"]'); if (f5) f5.disabled = S.food < 5;
   renderTop();
 }
-function feed() {
-  if (S.food <= 0) { say('nofood'); return; }
-  S.food--; S.fed++; S.xp += 10;
-  const before = stage(); let up = false;
-  while (S.xp >= need(S.level)) { S.xp -= need(S.level); S.level++; up = true; }
+function feed(n = 1) {
+  if (S.food < n) { say('nofood'); return; }
+  const id = partner(), { rec } = partnerRec();
+  const beforeStage = stage(), beforeLv = rec.lv;
+  S.food -= n; S.fed += n; rec.exp += FEED_EXP * n;
+  while (rec.exp >= needExp(rec.lv)) { rec.exp -= needExp(rec.lv); rec.lv++; }
   save(); renderHome(true); say('fed');
-  if (up) toast(stage() > before ? `進化！${STAGE_NAME[stage()]}になった` : `レベルアップ！ Lv.${S.level}`);
+  const nm = partnerRec().name;
+  if (id === 'owl' && stage() > beforeStage) toast(`進化！${STAGE_NAME[stage()]}になった`);
+  else if (rec.lv > beforeLv) toast(`レベルアップ！ ${nm} Lv.${rec.lv}`);
+  const art = $('#hk-owl'); if (art) { art.classList.remove('hk-eat'); void art.offsetWidth; art.classList.add('hk-eat'); }
   setTimeout(() => renderHome(false), 900);
 }
 function poke() { say('poke'); renderHome(true); setTimeout(() => renderHome(false), 600); }
+// ホームに置くキャラを選ぶ
+function openPartnerPick() {
+  openOv('ホームのキャラ');
+  const ids = ['owl', 'hero', ...Object.keys(CHARS).filter((id) => id !== 'owl')];
+  const owned = (id) => id === 'owl' || id === 'hero' || (S.rpg && S.rpg.owned && S.rpg.owned[id]);
+  body().innerHTML = `<p class="muted small" style="align-self:stretch;margin:0 0 10px">ホームに置くキャラを選ぶ。エサをあげるとそのキャラのレベルが上がる（冒険でも強くなる）。仲間は冒険のガチャで増える。</p>
+    <div class="hk-pick">${ids.map((id) => {
+      if (!owned(id)) return '<span class="hk-pcell lock"><span class="hk-pface">？</span><small>未発見</small></span>';
+      const info = id === 'owl' ? { name: 'フクロウ', lv: S.owl.lv } : rpg.memberInfo(id);
+      const face = id === 'owl' ? `<span class="hk-pface owl">${owlSVG(stage())}</span>` : id === 'hero' ? '<img class="hk-pface" src="icons/icon-192.png" alt="">' : `<span class="hk-pface">${CHARS[id].icon}</span>`;
+      return `<button class="hk-pcell${partner() === id ? ' on' : ''}" data-partner="${id}">${face}<small>${esc(info.name)}</small><em>Lv.${info.lv}</em></button>`;
+    }).join('')}</div>`;
+  body().onclick = (e) => {
+    const b = e.target.closest('[data-partner]'); if (!b) return;
+    S.partner = b.dataset.partner; save(); closeOv(); renderTab();
+  };
+}
 
 /* ---------- 画面 ---------- */
 let tab = 'home';
@@ -169,16 +231,18 @@ function renderTab() {
         <div class="hk-bar"><i id="hk-xpbar"></i></div>
         <div class="muted small" id="hk-xptext"></div>
       </div>
-      <div class="row mt">
-        <button class="btn" data-hk="feed">エサをあげる 🐛</button>
+      <div class="hk-feedrow mt">
+        <button class="btn" data-hk="feed">🐛 あげる</button>
+        <button class="btn" data-hk="feed5">🐛×5</button>
         <button class="btn sub" data-hk="poke">つつく</button>
       </div>
+      <button class="hk-change" data-hk="partner">🔄 キャラを変える <span>›</span></button>
       <div class="card hk-stats mt">
         <div><b id="hk-stc">0</b>正解数</div>
         <div><b id="hk-stf">0</b>エサやり</div>
         <div><b id="hk-stp">0</b>ゲーム</div>
       </div>
-      <p class="muted small center">勉強で正解するとエサ🐛がもらえる。エサでフクロウが育つ。<br>本編（模試・分野別・復習・基礎コース）の正解でも1問につき1日1回🐛+1。</p>`;
+      <p class="muted small center">勉強で正解するとエサ🐛がもらえる。🐛1つで経験値${FEED_EXP}。<br>本編（模試・分野別・復習・基礎コース）の正解でも1問につき1日1回🐛+1。</p>`;
     say('idle'); renderHome();
   } else if (tab === 'study') {
     m.innerHTML = `
@@ -235,7 +299,9 @@ function onMainClick(e) {
   const del = e.target.closest('[data-del]'); if (del) { S.cards.splice(+del.dataset.del, 1); save(); renderWords(); return; }
   const h = e.target.closest('[data-hk]'); if (!h) return;
   const a = h.dataset.hk;
-  if (a === 'feed') feed();
+  if (a === 'feed') feed(1);
+  else if (a === 'feed5') feed(5);
+  else if (a === 'partner') openPartnerPick();
   else if (a === 'poke') poke();
   else if (a === 'addwords') {
     let n = 0;
@@ -295,7 +361,7 @@ const OPEN = {};
 /* ===== 計算アタック ===== */
 OPEN.calc = () => {
   openOv('計算アタック'); let score = 0;
-  const lv = Math.min(S.level, 20);
+  const lv = Math.min(S.owl.lv, 20);
   function gen() {
     const op = ['+', '−', '×'][rnd(lv >= 3 ? 3 : 2)]; let a, b, ans;
     const m = 10 + lv * 4;
