@@ -2,6 +2,7 @@
 // 主人公はアプリのアイコンの人。仲間はガチャで集めて育てる。キャラ・敵・物語はすべてオリジナル。
 // 雑魚戦：単語帳（data/hima-words.js）の4択 ／ ボス戦：本編のその回の5択（コード・図つき）
 // 保存は ヒマコロシの S.rpg（キー oretachi:hima）
+import { bgm } from './bgm.js';
 
 /* ---------- データ ---------- */
 // 仲間。subj が一致するステージでは攻撃力×1.5（'all' はどこでも×1.2）
@@ -60,9 +61,14 @@ export function makeRPG(ctx) {
   const { S, save, openOv, closeOv, body, info, toast, setCleanup, esc, shuffle, rnd, owlSVG, DECKS, addFood, api } = ctx;
   const R = () => {
     if (!S.rpg) S.rpg = { coins: 300, hero: { lv: 1, exp: 0 }, owned: { owl: { lv: 1, exp: 0 } }, party: ['owl'], clear: {}, subj: 'ccpp', pulls: 0 };
-    return S.rpg;
+    const r = S.rpg;
+    if (!r.heroName) r.heroName = '主人公';
+    if (!r.sound) r.sound = 'silent'; // 'silent' | 'bgm'（講義中に使うので最初はサイレント）
+    return r;
   };
+  bgm.setEnabled(R().sound === 'bgm');
   let lectures = null; // { ccpp: {1:'第1回 …'}, … }
+  const heroName = () => R().heroName;
 
   const iconHTML = (id, cls = '') => {
     if (id === 'hero') return `<img class="rp-face ${cls}" src="icons/icon-192.png" alt="">`;
@@ -71,46 +77,100 @@ export function makeRPG(ctx) {
   };
   const member = (id) => {
     const r = R();
-    if (id === 'hero') return { id, name: HERO.name, lv: r.hero.lv, hp: statOf(HERO.hp, r.hero.lv), atk: statOf(HERO.atk, r.hero.lv), skill: HERO.skill, subj: null };
+    if (id === 'hero') return { id, name: heroName(), lv: r.hero.lv, hp: statOf(HERO.hp, r.hero.lv), atk: statOf(HERO.atk, r.hero.lv), skill: HERO.skill, subj: null };
     const c = CHARS[id], o = r.owned[id];
     return { id, name: c.name, lv: o.lv, hp: statOf(c.hp, o.lv), atk: statOf(c.atk, o.lv), skill: c.skill, subj: c.subj, rar: c.rar };
   };
   const team = () => ['hero', ...R().party.filter((id) => R().owned[id])].map(member);
+  const darkOv = () => document.getElementById('hk-ov')?.classList.add('rp-ov');
 
-  /* ---------- 冒険タブ ---------- */
+  /* ---------- 冒険タブ（すごろくマップ） ---------- */
   async function renderQuestTab(m) {
     const r = R();
     if (!lectures) lectures = await api.lectures();
     const t = team();
+    const chapters = Object.entries(lectures[r.subj] || {});
+    // 下から上へ：各章 章の看板 → ステージ1 → ステージ2 → ボス
+    const rows = [];
+    chapters.forEach(([k, v], ci) => {
+      const mt = v.match(/^(第\S+?回)\s*(.*)$/) || [null, v, ''];
+      rows.push({ kind: 'sign', no: mt[1], title: mt[2], ci });
+      [1, 2, 3].forEach((n) => rows.push({ kind: 'node', k, n, ci, open: isOpen(r.subj, k, n, ci), done: !!r.clear[`${r.subj}-${k}-${n}`] }));
+    });
+    const nodes = rows.filter((x) => x.kind === 'node');
+    const here = nodes.find((x) => x.open && !x.done) || nodes[nodes.length - 1];
+    const RH = { node: 96, sign: 58 };
+    let y = 40; const pos = [];
+    for (let i = 0; i < rows.length; i++) {
+      const x = rows[i];
+      const h = RH[x.kind];
+      pos[i] = { y: y + h / 2, x: x.kind === 'sign' ? 50 : x.n === 3 ? 50 : x.n === 1 ? 28 : 72 };
+      y += h;
+    }
+    const H = y + 30;
+    const Y = (i) => H - pos[i].y; // 下から積む
+    const pts = rows.map((x, i) => (x.kind === 'node' ? `${pos[i].x},${Y(i)}` : null)).filter(Boolean).join(' ');
+    const doneIdx = rows.map((x, i) => (x.kind === 'node' && x.done ? i : -1)).filter((i) => i >= 0);
+    const lastDone = doneIdx.length ? doneIdx[doneIdx.length - 1] : -1;
+    const donePts = rows.slice(0, lastDone + 2).map((x, i) => (x.kind === 'node' ? `${pos[i].x},${Y(i)}` : null)).filter(Boolean).join(' ');
+    const E = ENEMIES[r.subj];
     m.innerHTML = `
-      <div class="card mt rp-hero">
-        <img class="rp-heroimg" src="icons/icon-192.png" alt="">
-        <div class="rp-herotxt"><b>${HERO.name} Lv.${r.hero.lv}</b>
-          <div class="hk-bar"><i style="width:${(r.hero.exp / needExp(r.hero.lv)) * 100}%"></i></div>
-          <small class="muted">パーティ HP ${t.reduce((a, x) => a + x.hp, 0)} ・ 攻撃 ${t.reduce((a, x) => a + x.atk, 0)}</small></div>
-        <span class="hk-pill">🪙 ${r.coins}</span>
+      <div class="rp-hud">
+        <div class="rp-hudtop">
+          <img class="rp-heroimg" src="icons/icon-192.png" alt="">
+          <div class="rp-herotxt">
+            <button class="rp-name" data-rp="rename"><b>${esc(heroName())}</b><span>✏️</span></button>
+            <div class="rp-lv">Lv.${r.hero.lv}<span class="rp-exp"><i style="width:${(r.hero.exp / needExp(r.hero.lv)) * 100}%"></i></span></div>
+          </div>
+          <div class="rp-hudright">
+            <span class="rp-coin">🪙 ${r.coins}</span>
+            <button class="rp-sound" data-rp="sound" aria-label="音の切り替え">${r.sound === 'bgm' ? '🎵 BGM' : '🔇 サイレント'}</button>
+          </div>
+        </div>
+        <div class="rp-hudparty">
+          <div class="rp-faces">${t.map((x) => iconHTML(x.id, 'sm')).join('')}${Array(4 - t.length).fill('<span class="rp-face sm empty">＋</span>').join('')}</div>
+          <div class="rp-stat"><span>HP <b>${t.reduce((a, x) => a + x.hp, 0)}</b></span><span>攻撃 <b>${t.reduce((a, x) => a + x.atk, 0)}</b></span></div>
+        </div>
+        <div class="rp-hudbtns"><button class="rp-btn" data-rp="party">👥 パーティ</button><button class="rp-btn gold" data-rp="gacha">🎁 ガチャ</button></div>
+        <div class="seg rp-seg" role="group">${SUBJ.map(([k, n]) => `<button data-rp="subj" data-k="${k}" aria-pressed="${r.subj === k}">${n}</button>`).join('')}</div>
       </div>
-      <div class="rp-partyrow">${t.map((x) => `<span class="rp-pm">${iconHTML(x.id)}<small>Lv.${x.lv}</small></span>`).join('')}${Array(4 - t.length).fill('<span class="rp-pm empty">＋</span>').join('')}</div>
-      <div class="row"><button class="btn sub" data-rp="party">👥 パーティ</button><button class="btn" data-rp="gacha">🎁 ガチャ</button></div>
-      <div class="seg mt" role="group">${SUBJ.map(([k, n]) => `<button data-rp="subj" data-k="${k}" aria-pressed="${r.subj === k}">${n}</button>`).join('')}</div>
-      <div class="rp-chapters">${Object.entries(lectures[r.subj] || {}).map(([k, v], ci) => {
-        const mt = v.match(/^(第\S+?回)\s*(.*)$/) || [null, v, ''];
-        return `<div class="card rp-ch"><div class="rp-chhead"><b>${esc(mt[1])}</b><span class="muted small">${esc(mt[2])}</span></div>
-          <div class="rp-nodes">${[1, 2, 3].map((n) => {
-            const id = `${r.subj}-${k}-${n}`, open = isOpen(r.subj, k, n, ci), done = r.clear[id];
-            return `<button class="rp-node${n === 3 ? ' boss' : ''}${done ? ' done' : ''}" data-rp="stage" data-k="${k}" data-n="${n}" ${open ? '' : 'disabled'}>
-              <span>${!open ? '🔒' : n === 3 ? '👑' : n}</span><small>${n === 3 ? 'ボス' : 'ステージ' + n}${done ? ' ✓' : ''}</small></button>`;
-          }).join('<span class="rp-path"></span>')}</div></div>`;
-      }).join('')}</div>
-      <p class="muted small center">雑魚は単語帳の4択、ボスは本番形式の5択。速く答えるほど大ダメージ。</p>`;
+      <div class="rp-mapbox" id="rp-mapbox"><div class="rp-map" style="height:${H}px">
+        <svg class="rp-road" viewBox="0 0 100 ${H}" preserveAspectRatio="none"><polyline points="${pts}" class="all"/>${donePts ? `<polyline points="${donePts}" class="done"/>` : ''}</svg>
+        ${rows.map((x, i) => {
+          const top = Y(i);
+          if (x.kind === 'sign') return `<div class="rp-sign" style="top:${top}px"><b>${esc(x.no)}</b><span>${esc(x.title)}</span></div>`;
+          const isHere = x === here;
+          const boss = x.n === 3;
+          return `<button class="rp-spot${boss ? ' boss' : ''}${x.done ? ' done' : ''}${isHere ? ' here' : ''}" style="left:${pos[i].x}%;top:${top}px" data-rp="stage" data-k="${x.k}" data-n="${x.n}" ${x.open ? '' : 'disabled'}>
+            <span class="c">${!x.open ? '🔒' : boss ? esc(E.boss[x.k]?.[1] || '👑') : x.n}</span>
+            <small>${boss ? 'BOSS' : 'STAGE ' + x.n}${x.done ? ' ★' : ''}</small>
+            ${isHere ? '<img class="rp-me" src="icons/icon-192.png" alt="">' : ''}
+          </button>`;
+        }).join('')}
+      </div></div>
+      <p class="rp-tip">雑魚は単語帳の4択、ボスは本番形式の5択。速く答えるほど大ダメージ。</p>`;
     m.onclick = (e) => {
       const b = e.target.closest('[data-rp]'); if (!b || b.disabled) return;
       const a = b.dataset.rp;
+      bgm.sfx('tap');
       if (a === 'subj') { R().subj = b.dataset.k; save(); renderQuestTab(m); }
       else if (a === 'party') openParty();
       else if (a === 'gacha') openGacha();
-      else if (a === 'stage') startBattle(R().subj, b.dataset.k, +b.dataset.n);
+      else if (a === 'rename') openRename();
+      else if (a === 'sound') {
+        const r2 = R(); r2.sound = r2.sound === 'bgm' ? 'silent' : 'bgm'; save();
+        bgm.setEnabled(r2.sound === 'bgm');
+        if (r2.sound === 'bgm') bgm.play('map');
+        toast(r2.sound === 'bgm' ? '🎵 BGMモード：音楽と効果音が鳴る' : '🔇 サイレントモード：音は鳴らない');
+        renderQuestTab(m);
+      } else if (a === 'stage') startBattle(R().subj, b.dataset.k, +b.dataset.n);
     };
+    bgm.play('map');
+    // いる場所まで自動でスクロール
+    requestAnimationFrame(() => {
+      const box = m.querySelector('#rp-mapbox'), here2 = m.querySelector('.rp-spot.here');
+      if (box && here2) box.scrollTop = here2.offsetTop - box.clientHeight / 2;
+    });
   }
   // 解放条件：その科目の最初のステージは最初から。ほかは1つ前のステージをクリア
   function isOpen(subj, k, n, ci) {
@@ -120,20 +180,34 @@ export function makeRPG(ctx) {
     return !!r.clear[`${subj}-${keys[ci - 1]}-3`];
   }
 
+  /* ---------- 名前を変える ---------- */
+  function openRename() {
+    openOv('主人公の名前'); darkOv();
+    body().innerHTML = `<div class="card rp-full" style="max-width:420px">
+      <img class="rp-heroimg big" src="icons/icon-192.png" alt="">
+      <input class="hk-input rp-nameinput" id="rp-nin" maxlength="10" value="${esc(heroName())}" style="min-height:0">
+      <p class="muted small">10文字まで</p>
+      <button class="btn wide" id="rp-nok">決定</button></div>`;
+    const inp = document.getElementById('rp-nin');
+    const ok = () => { const v = inp.value.trim().slice(0, 10); if (!v) { toast('名前を入れてね'); return; } R().heroName = v; save(); toast(`「${v}」になった！`); closeOv(); };
+    document.getElementById('rp-nok').onclick = ok;
+    inp.onkeydown = (e) => { if (e.key === 'Enter') ok(); };
+  }
+
   /* ---------- パーティ編成 ---------- */
   function openParty() {
-    openOv('パーティ編成');
+    openOv('パーティ編成'); darkOv();
     const draw = () => {
       const r = R(), ids = Object.keys(CHARS).filter((id) => r.owned[id]);
-      body().innerHTML = `<p class="muted small rp-full">主人公＋仲間3人まで。タップで入れ替え（★の多いほど強い）</p>
+      body().innerHTML = `<p class="muted small rp-full">${esc(heroName())}＋仲間3人まで。タップで入れ替え</p>
         <div class="rp-list">${ids.map((id) => {
           const x = member(id), inP = r.party.includes(id), o = r.owned[id];
-          return `<button class="rp-card${inP ? ' on' : ''}" data-id="${id}">${iconHTML(id)}
-            <span class="rp-cinfo"><b>${esc(x.name)} <span class="rp-rar r${x.rar}">${RAR[x.rar]}</span></b>
-            <small>Lv.${x.lv} ・ HP ${x.hp} ・ 攻撃 ${x.atk} ・ 得意 ${x.subj === 'all' ? 'ぜんぶ' : SUBJ.find((s) => s[0] === x.subj)[1]}</small>
+          return `<button class="rp-card r${x.rar}${inP ? ' on' : ''}" data-id="${id}">${iconHTML(id)}
+            <span class="rp-cinfo"><b>${esc(x.name)} <span class="rp-rar">${RAR[x.rar]}</span></b>
+            <span class="rp-tags"><em>Lv.${x.lv}</em><em>HP ${x.hp}</em><em>攻撃 ${x.atk}</em><em>得意 ${x.subj === 'all' ? 'ぜんぶ' : SUBJ.find((s) => s[0] === x.subj)[1]}</em></span>
             <small>スキル「${esc(x.skill.name)}」${SKILL_DESC[x.skill.kind](x.skill)}（正解${x.skill.cost}回でたまる）</small>
-            <span class="hk-bar"><i style="width:${(o.exp / needExp(o.lv)) * 100}%"></i></span></span>
-            <span class="rp-in">${inP ? 'パーティ' : ''}</span></button>`;
+            <span class="rp-exp"><i style="width:${(o.exp / needExp(o.lv)) * 100}%"></i></span></span>
+            <span class="rp-in">${inP ? '出撃中' : ''}</span></button>`;
         }).join('')}</div>
         <p class="muted small rp-full">まだ ${Object.keys(CHARS).length - ids.length} 人の仲間がいる。ガチャで見つけよう。</p>`;
     };
@@ -144,7 +218,7 @@ export function makeRPG(ctx) {
       if (i >= 0) r.party.splice(i, 1);
       else if (r.party.length >= 3) { toast('仲間は3人まで。先にだれかを外してね'); return; }
       else r.party.push(id);
-      save(); draw();
+      bgm.sfx('tap'); save(); draw();
     };
   }
 
@@ -155,15 +229,15 @@ export function makeRPG(ctx) {
     return pool[rnd(pool.length)];
   }
   function openGacha() {
-    openOv('ガチャ');
+    openOv('ガチャ'); darkOv();
     const draw = (res) => {
       const r = R();
       body().innerHTML = `
-        <div class="card rp-gacha rp-full"><div class="rp-gbox">🎁</div>
-          <p class="muted small" style="margin:6px 0 12px">★★★ 6% ・ ★★ 26% ・ ★ 68%　かぶったらレベル+1</p>
-          <div class="row"><button class="btn" data-g="1" ${r.coins < 100 ? 'disabled' : ''}>1回 🪙100</button><button class="btn" data-g="10" ${r.coins < 900 ? 'disabled' : ''}>10回 🪙900</button></div>
-          <p class="small" style="margin:10px 0 0">持っている 🪙 <b>${r.coins}</b></p></div>
-        ${res ? `<div class="rp-gres">${res.map(([id, isNew]) => `<span class="rp-gitem r${CHARS[id].rar}">${iconHTML(id)}<small>${esc(CHARS[id].name)}</small><em>${isNew ? 'NEW!' : 'Lv+1'}</em></span>`).join('')}</div>` : ''}`;
+        <div class="rp-gacha rp-full"><div class="rp-gbox${res ? ' open' : ''}">🎁</div>
+          <p class="rp-rates">★★★ 6% ・ ★★ 26% ・ ★ 68%　かぶったらレベル+1</p>
+          <div class="row"><button class="rp-btn gold big" data-g="1" ${r.coins < 100 ? 'disabled' : ''}>1回<small>🪙100</small></button><button class="rp-btn gold big" data-g="10" ${r.coins < 900 ? 'disabled' : ''}>10回<small>🪙900</small></button></div>
+          <p class="rp-have">持っている 🪙 <b>${r.coins}</b></p></div>
+        ${res ? `<div class="rp-gres">${res.map(([id, isNew], i) => `<span class="rp-gitem r${CHARS[id].rar}" style="animation-delay:${i * 0.08}s">${iconHTML(id)}<span class="rp-rar">${RAR[CHARS[id].rar]}</span><small>${esc(CHARS[id].name)}</small><em>${isNew ? 'NEW!' : 'Lv+1'}</em></span>`).join('')}</div>` : ''}`;
     };
     draw();
     body().onclick = (e) => {
@@ -178,6 +252,8 @@ export function makeRPG(ctx) {
         else { r.owned[id] = { lv: 1, exp: 0 }; res.push([id, true]); if (r.party.length < 3) r.party.push(id); }
       }
       save(); draw(res);
+      const rare = res.some(([id]) => CHARS[id].rar === 3);
+      bgm.sfx('gacha'); if (rare) setTimeout(() => bgm.sfx('rare'), 500);
       if (res.some(([id, isNew]) => isNew && CHARS[id].rar === 3)) toast('★★★ の仲間が来た！');
     };
   }
@@ -193,28 +269,34 @@ export function makeRPG(ctx) {
       : shuffle([...E.zako]).slice(0, 3).map(([name, icon]) => ({ name, icon, hp: Math.round(100 * lvScale), atk: Math.round(18 * lvScale) }));
     const t = team();
     const maxHp = t.reduce((a, x) => a + x.hp, 0);
-    const st = { foes, fi: 0, ehp: foes[0].hp, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, limit: boss ? 90 : 12, busy: false, combo: 0, correct: 0, over: false };
+    const st = { foes, fi: 0, ehp: foes[0].hp, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: boss ? 90 : 12, busy: false, combo: 0, correct: 0, over: false };
     const deck = DECKS.find((d) => d.id === subj).words;
-    const title = `${(lectures[subj][lec].match(/^(第\S+?回)/) || [lectures[subj][lec]])[0]} ${boss ? 'ボス' : 'ステージ' + n}`;
-    openOv(title);
-    setCleanup(() => clearInterval(st.timer));
+    const no = (lectures[subj][lec].match(/^(第\S+?回)/) || [lectures[subj][lec]])[0];
+    openOv(`${no} ${boss ? 'BOSS' : 'STAGE ' + n}`); darkOv();
+    setCleanup(() => { clearInterval(st.timer); bgm.play('map'); });
+    bgm.play(boss ? 'boss' : 'battle');
 
     const atkOf = (x) => x.atk * (x.subj === subj ? 1.5 : x.subj === 'all' ? 1.2 : 1);
     const partyAtk = () => t.reduce((a, x) => a + atkOf(x), 0);
 
     function layout() {
+      const f = foes[st.fi];
       body().innerHTML = `
         <div class="rp-battle">
-          <div class="rp-field${foes[st.fi].boss ? ' boss' : ''}">
-            <div class="rp-wave muted small">${foes[st.fi].boss ? 'BOSS' : `${st.fi + 1} / ${foes.length}`}</div>
-            <div class="rp-enemy" id="rp-enemy">${foes[st.fi].icon}</div>
-            <div class="rp-ename">${esc(foes[st.fi].name)}</div>
-            <div class="rp-hpbar enemy"><i id="rp-ehp"></i></div>
-            <div class="rp-pop" id="rp-pop"></div>
+          <div class="rp-head">
+            <div class="rp-field${f.boss ? ' boss' : ''}">
+              <div class="rp-enemy" id="rp-enemy">${f.icon}</div>
+              <div class="rp-einfo">
+                <div class="rp-wave">${f.boss ? 'BOSS' : `ENEMY ${st.fi + 1}/${foes.length}`}</div>
+                <div class="rp-ename">${esc(f.name)}</div>
+                <div class="rp-hpbar enemy"><i id="rp-ehp"></i><span id="rp-ehptxt"></span></div>
+              </div>
+              <div class="rp-pop" id="rp-pop"></div>
+            </div>
+            <div class="rp-team" id="rp-team"></div>
+            <div class="rp-hpbar party"><i id="rp-php"></i><span id="rp-phptxt"></span></div>
+            <div class="rp-timebar"><i id="rp-time"></i></div>
           </div>
-          <div class="rp-team" id="rp-team"></div>
-          <div class="rp-hpbar party"><i id="rp-php"></i><span id="rp-phptxt"></span></div>
-          <div class="rp-timebar"><i id="rp-time"></i></div>
           <div id="rp-q"></div>
         </div>`;
       drawTeam(); drawHp();
@@ -228,26 +310,32 @@ export function makeRPG(ctx) {
       }).join('');
     }
     function drawHp() {
-      const e = document.getElementById('rp-ehp'), p = document.getElementById('rp-php'), pt = document.getElementById('rp-phptxt');
-      if (e) e.style.width = Math.max(0, (st.ehp / foes[st.fi].hp) * 100) + '%';
-      if (p) p.style.width = Math.max(0, (st.hp / st.maxHp) * 100) + '%';
-      if (pt) pt.textContent = `HP ${Math.max(0, Math.round(st.hp))} / ${st.maxHp}${st.guard ? ` 🛡️${st.guard}` : ''}`;
+      const f = foes[st.fi];
+      const e = document.getElementById('rp-ehp'), et = document.getElementById('rp-ehptxt'), p = document.getElementById('rp-php'), pt = document.getElementById('rp-phptxt');
+      if (e) e.style.width = Math.max(0, (st.ehp / f.hp) * 100) + '%';
+      if (et) et.textContent = `${Math.max(0, Math.round(st.ehp))} / ${f.hp}`;
+      if (p) { p.style.width = Math.max(0, (st.hp / st.maxHp) * 100) + '%'; p.classList.toggle('low', st.hp / st.maxHp < 0.3); }
+      if (pt) pt.textContent = `HP ${Math.max(0, Math.round(st.hp))} / ${st.maxHp}${st.guard ? `　🛡️×${st.guard}` : ''}`;
     }
     function pop(txt, cls) {
       const p = document.getElementById('rp-pop'); if (!p) return;
       const s = document.createElement('span'); s.className = 'rp-num ' + cls; s.textContent = txt;
-      p.appendChild(s); setTimeout(() => s.remove(), 900);
+      s.style.left = 30 + Math.random() * 40 + '%';
+      p.appendChild(s); setTimeout(() => s.remove(), 1000);
     }
-    function hitEnemy(dmg, label) {
+    function hitEnemy(dmg, label, big) {
       dmg = Math.max(1, Math.round(dmg));
-      st.ehp -= dmg; pop((label ? label + ' ' : '') + dmg, 'hit');
+      st.ehp -= dmg; pop((label ? label + ' ' : '') + dmg, big ? 'hit big' : 'hit');
+      bgm.sfx(big ? 'crit' : 'hit');
       const en = document.getElementById('rp-enemy'); if (en) { en.classList.remove('shake'); void en.offsetWidth; en.classList.add('shake'); }
+      const fl = document.querySelector('.rp-field'); if (fl) { fl.classList.remove('flash'); void fl.offsetWidth; fl.classList.add('flash'); }
       drawHp();
     }
     function hitParty() {
       let d = foes[st.fi].atk * (0.85 + Math.random() * 0.3);
       if (st.guard) { d /= 2; st.guard--; }
       st.hp -= Math.round(d);
+      bgm.sfx('ouch');
       const bt = document.querySelector('.rp-battle'); if (bt) { bt.classList.remove('ouch'); void bt.offsetWidth; bt.classList.add('ouch'); }
       drawHp();
     }
@@ -267,15 +355,17 @@ export function makeRPG(ctx) {
         const q = flip ? c[1] : c[0], a = flip ? c[0] : c[1];
         const opts = shuffle([a, ...pool.slice(1, 4).map((x) => (flip ? x[0] : x[1]))]);
         st.q = { answer: opts.indexOf(a), exp: `${c[0]}：${c[1]}`, n: 4 };
-        qEl.innerHTML = `<div class="hk-q${q.length > 14 ? ' long' : ''}" style="font-size:24px;margin:10px 0">${esc(q)}</div>
-          <div class="hk-choices word">${opts.map((o, i) => `<button data-c="${i}">${esc(o)}</button>`).join('')}</div>`;
+        qEl.innerHTML = `<div class="rp-zq${q.length > 14 ? ' long' : ''}">${esc(q)}</div>
+          <div class="hk-choices word rp-zc">${opts.map((o, i) => `<button data-c="${i}">${esc(o)}</button>`).join('')}</div>`;
       }
+      document.querySelector('#hk-obody')?.scrollTo({ top: 0 });
       st.left = st.limit + st.bonusT;
       st.total = st.left;
       clearInterval(st.timer);
       const tick = () => {
         st.left -= 0.1;
-        const tb = document.getElementById('rp-time'); if (tb) tb.style.width = Math.max(0, (st.left / st.total) * 100) + '%';
+        const tb = document.getElementById('rp-time');
+        if (tb) { tb.style.width = Math.max(0, (st.left / st.total) * 100) + '%'; tb.classList.toggle('hurry', st.left < Math.min(5, st.total * 0.25)); }
         info(`⏱ ${Math.max(0, Math.ceil(st.left))}`);
         if (st.left <= 0) { clearInterval(st.timer); answer(-1, null); }
       };
@@ -292,31 +382,38 @@ export function makeRPG(ctx) {
       if (ok) {
         st.combo++; st.correct++;
         const speed = 1 + (Math.max(0, st.left) / st.total) * 0.6; // 1.0〜1.6
-        hitEnemy(partyAtk() * speed * (1 + Math.min(st.combo - 1, 5) * 0.1), st.combo > 1 ? `${st.combo}コンボ` : '');
+        const big = speed > 1.45 || st.combo >= 3;
+        hitEnemy(partyAtk() * speed * (1 + Math.min(st.combo - 1, 5) * 0.1), st.combo > 1 ? `${st.combo}コンボ` : speed > 1.45 ? 'はやい！' : '', big);
         t.forEach((x) => { st.gauge[x.id]++; });
         drawTeam();
       } else {
         st.combo = 0;
+        bgm.sfx('miss');
         hitParty(); pop(i < 0 ? '時間切れ' : 'ミス', 'miss');
       }
-      const wait = ok ? 700 : foes[st.fi].boss ? 0 : 1300;
       if (!ok && foes[st.fi].boss) {
         // ボスで間違えたら解説を見せる
         const qEl = document.getElementById('rp-q');
-        qEl.insertAdjacentHTML('beforeend', `<div class="exp ng"><span class="verdict">${i < 0 ? '時間切れ' : '不正解'}</span>${st.q.exp}</div><button class="btn wide mt" id="rp-next">つづける</button>`);
+        qEl.insertAdjacentHTML('beforeend', `<div class="exp ng"><span class="verdict">${i < 0 ? '時間切れ' : '不正解'}</span>${st.q.exp}</div><button class="rp-btn gold wide mt" id="rp-next">つづける</button>`);
         document.getElementById('rp-next').onclick = () => afterTurn();
         document.getElementById('rp-next').scrollIntoView({ block: 'nearest' });
-      } else setTimeout(afterTurn, wait);
+      } else setTimeout(afterTurn, ok ? 650 : 1300);
     }
 
     function afterTurn() {
       if (st.over) return;
       if (st.hp <= 0) return finish(false);
       if (st.ehp <= 0) {
-        if (st.fi + 1 < foes.length) {
-          st.fi++; st.ehp = foes[st.fi].hp;
-          layout(); pop('つぎの敵！', 'info');
-        } else return finish(true);
+        const en = document.getElementById('rp-enemy');
+        if (en) en.classList.add('ko');
+        bgm.sfx('ko');
+        st.busy = true;
+        setTimeout(() => {
+          if (st.over) return;
+          if (st.fi + 1 < foes.length) { st.fi++; st.ehp = foes[st.fi].hp; layout(); pop('つぎの敵！', 'info'); nextQuestion(); }
+          else finish(true);
+        }, 650);
+        return;
       }
       nextQuestion();
     }
@@ -325,14 +422,14 @@ export function makeRPG(ctx) {
       const x = t.find((m) => m.id === id); if (!x || st.gauge[id] < x.skill.cost || st.over) return;
       st.gauge[id] = 0;
       const k = x.skill;
-      if (k.kind === 'heal') { st.hp = Math.min(st.maxHp, st.hp + st.maxHp * k.pow); pop(`回復！`, 'heal'); drawHp(); }
-      else if (k.kind === 'dmg') { hitEnemy(atkOf(x) * k.pow, k.name); if (st.ehp <= 0 && !st.busy) { st.busy = true; clearInterval(st.timer); setTimeout(afterTurn, 600); } }
-      else if (k.kind === 'time') { st.bonusT += k.pow; st.left += k.pow; st.total += k.pow; pop(`+${k.pow}秒`, 'info'); }
-      else if (k.kind === 'guard') { st.guard += k.pow; pop('ガード！', 'info'); drawHp(); }
+      if (k.kind === 'heal') { st.hp = Math.min(st.maxHp, st.hp + st.maxHp * k.pow); pop('回復！', 'heal'); bgm.sfx('heal'); drawHp(); }
+      else if (k.kind === 'dmg') { bgm.sfx('skill'); hitEnemy(atkOf(x) * k.pow, k.name, true); if (st.ehp <= 0 && !st.busy) { st.busy = true; clearInterval(st.timer); setTimeout(afterTurn, 500); } }
+      else if (k.kind === 'time') { st.bonusT += k.pow; st.left += k.pow; st.total += k.pow; pop(`+${k.pow}秒`, 'info'); bgm.sfx('skill'); }
+      else if (k.kind === 'guard') { st.guard += k.pow; pop('ガード！', 'info'); bgm.sfx('skill'); drawHp(); }
       else if (k.kind === 'hint') {
         const wrong = [...document.querySelectorAll('#rp-q [data-c]')].filter((b) => +b.dataset.c !== st.q.answer && !b.disabled);
         shuffle(wrong).slice(0, k.pow).forEach((b) => { b.disabled = true; b.classList.add('rp-gone'); });
-        pop('ひらめき！', 'info');
+        pop('ひらめき！', 'info'); bgm.sfx('skill');
       }
       toast(`${x.name}「${k.name}」`);
       drawTeam();
@@ -340,24 +437,27 @@ export function makeRPG(ctx) {
 
     function finish(win) {
       st.over = true; clearInterval(st.timer);
+      bgm.stop(); bgm.sfx(win ? 'win' : 'lose');
       const r = R(), id = `${subj}-${lec}-${n}`, first = win && !r.clear[id];
-      let coins = 0, exp = 0, ups = [];
+      let coins = 0, exp = 0;
+      const ups = [];
       if (win) {
         coins = Math.round((boss ? 120 : 40) * (1 + ci * 0.15)) * (first ? 2 : 1);
         exp = boss ? 80 : 30;
         r.coins += coins; r.clear[id] = 1;
         const grow = (o, name) => { o.exp += exp; while (o.exp >= needExp(o.lv)) { o.exp -= needExp(o.lv); o.lv++; ups.push(`${name} Lv.${o.lv}`); } };
-        grow(r.hero, HERO.name);
+        grow(r.hero, heroName());
         r.party.forEach((pid) => r.owned[pid] && grow(r.owned[pid], CHARS[pid].name));
         if (first) addFood(2);
         save();
       }
-      body().innerHTML = `<div class="hk-result card">
+      body().innerHTML = `<div class="rp-result${win ? ' win' : ''}">
         <div class="rp-endicon">${win ? '🏆' : '💫'}</div>
-        <div class="big">${win ? 'クリア！' : 'やられた…'}</div>
-        <p>${win ? `🪙 ${coins}${first ? '（初クリア×2）' : ''} ・ EXP ${exp}${first ? ' ・ 🐛2' : ''}` : `正解 ${st.correct}問。パーティを育ててまた挑戦しよう`}</p>
-        ${ups.length ? `<p class="small"><b>レベルアップ！</b><br>${ups.map(esc).join('<br>')}</p>` : ''}
-        <div class="row"><button class="btn" id="rp-again">${win ? 'もう一回' : 'リトライ'}</button><button class="btn sub" id="rp-back">冒険へ</button></div></div>`;
+        <div class="rp-endtitle">${win ? 'STAGE CLEAR!' : 'GAME OVER'}</div>
+        <p class="rp-endsub">${win ? `${esc(foes[foes.length - 1].name)}をたおした！` : `正解 ${st.correct}問。パーティを育ててまた挑戦しよう`}</p>
+        ${win ? `<div class="rp-rewards"><span>🪙 ${coins}${first ? '<em>初クリア×2</em>' : ''}</span><span>EXP ${exp}</span>${first ? '<span>🐛 2</span>' : ''}</div>` : ''}
+        ${ups.length ? `<div class="rp-ups"><b>LEVEL UP!</b>${ups.map((u) => `<span>${esc(u)}</span>`).join('')}</div>` : ''}
+        <div class="row"><button class="rp-btn gold big" id="rp-again">${win ? 'もう一回' : 'リトライ'}</button><button class="rp-btn big" id="rp-back">マップへ</button></div></div>`;
       document.getElementById('rp-again').onclick = () => startBattle(subj, lec, n);
       document.getElementById('rp-back').onclick = closeOv;
     }
@@ -370,5 +470,8 @@ export function makeRPG(ctx) {
     nextQuestion();
   }
 
-  return { renderQuestTab };
+  // ヒマコロシの冒険タブから離れたとき
+  function leave() { bgm.stop(); }
+
+  return { renderQuestTab, leave };
 }

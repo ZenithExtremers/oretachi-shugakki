@@ -71,6 +71,12 @@ export function rewardCorrect(key) {
   return true;
 }
 export const himaFood = () => S.food;
+// ホームに出す要約（エサの数と冒険の進み具合）
+export function himaSummary() {
+  const r = S.rpg;
+  const n = r ? Object.keys(r.clear || {}).length : 0;
+  return { food: S.food, quest: r ? `${r.heroName || '主人公'} Lv.${r.hero.lv}・${n}ステージ` : '' };
+}
 
 /* ---------- フクロウ ---------- */
 const need = (l) => l * 30;
@@ -145,6 +151,8 @@ export function viewHima($app, top, api) {
 function renderTab() {
   const m = $('#hk-main'); if (!m) return;
   window.scrollTo(0, 0);
+  document.body.classList.toggle('rp-night', tab === 'quest');
+  if (tab !== 'quest' && rpg) rpg.leave();
   if (tab === 'quest') {
     m.onclick = null;
     rpg.renderQuestTab(m);
@@ -261,7 +269,14 @@ function closeOv() {
   if (tab === 'quest' && $('#hk-main')) renderTab();
 }
 // 画面を離れるとき（ルーターから呼ぶ）
-export function leaveHima() { if (cleanup || $('#hk-ov')) closeOv(); $root = null; }
+export function leaveHima() {
+  // 画面を離れるときは描き直さずに閉じる
+  if (cleanup) { cleanup(); cleanup = null; }
+  $('#hk-ov')?.remove();
+  document.body.classList.remove('hk-lock', 'rp-night');
+  if (rpg) rpg.leave();
+  $root = null;
+}
 const info = (t) => { const el = $('#hk-oinfo'); if (el) el.textContent = t; };
 const body = () => $('#hk-obody');
 function timerLoop(sec, onTick, onEnd) {

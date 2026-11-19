@@ -2,7 +2,7 @@
 import SUBJECTS from './data/subjects.js';
 import NOTES from './data/patchnotes.js';
 import { sfx } from './sfx.js';
-import { viewHima, leaveHima, rewardCorrect, himaFood, owlSVG } from './himakoroshi.js';
+import { viewHima, leaveHima, rewardCorrect, himaSummary, owlSVG } from './himakoroshi.js';
 
 const VERSION = NOTES[0].version;
 
@@ -22,6 +22,10 @@ store.lessons ||= {};
 if (store.settings.sound === undefined) store.settings.sound = true;
 sfx.enabled = store.settings.sound;
 store.settings.theme ||= 'auto';
+store.settings.zoom ||= 'm';
+const ZOOM = { s: 0.92, m: 1, l: 1.12 };
+function applyZoom() { document.documentElement.style.setProperty('--zoom', ZOOM[store.settings.zoom] || 1); }
+applyZoom();
 function applyTheme() {
   const t = store.settings.theme;
   if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
@@ -85,8 +89,11 @@ const reviewIds = (s) => s.groups.flatMap((g) => g.questions).filter((q) => stor
 let timer = null;
 let cur = null; // 表示中の科目
 window.addEventListener('hashchange', route);
+let routeSeq = 0; // 非同期の描画が古い画面に上書きしないように
 async function route() {
+  routeSeq++;
   clearInterval(timer);
+  document.body.classList.remove('sheet-open');
   leaveHima();
   const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
   window.scrollTo(0, 0);
@@ -115,40 +122,46 @@ function go(path) {
 }
 
 /* ---------- ホーム ---------- */
-function viewHome() {
+async function viewHome() {
   const resume = session && !session.finished ? session : null;
   const resumeMeta = resume && SUBJECTS.find((s) => s.id === resume.subject);
+  const my = routeSeq;
+  const subs = await Promise.all(SUBJECTS.map((m) => getSubject(m.id)));
+  if (my !== routeSeq) return; // 読み込み中に別の画面へ移ったとき
+  const hs = himaSummary();
+  const tile = (s) => {
+    const qs = s.groups.flatMap((g) => g.questions);
+    let c = 0, w = 0, tried = 0;
+    for (const q of qs) { const st = store.stats[q.id]; if (st && st.c + st.w) { c += st.c; w += st.w; tried++; } }
+    const acc = c + w ? Math.round((c / (c + w)) * 100) : null;
+    const lessonsDone = s.lessons.filter((l) => store.lessons[l.id]).length;
+    const days = s.meta.examDate ? Math.ceil((new Date(s.meta.examDate + 'T00:00:00') - new Date(new Date().toDateString())) / 86400000) : null;
+    return `<button class="stile" data-act="nav" data-to="s/${s.id}" style="--c:${s.meta.color}">
+      <span class="stile-top"><span class="stile-mark">${esc(s.meta.mark || '')}</span>${days != null && days >= 0 ? `<span class="stile-days">${days === 0 ? '今日が本番！' : `期末まで <b>${days}</b>日`}</span>` : ''}</span>
+      <b class="stile-name">${esc(s.meta.name)}</b>
+      <span class="stile-row"><span>正答率</span><b>${acc == null ? '—' : acc + '%'}</b></span>
+      <span class="stile-bar"><i style="width:${acc || 0}%"></i></span>
+      <span class="stile-sub">解いた ${tried}/${qs.length}問 ・ 基礎 ${lessonsDone}/${s.lessons.length}</span>
+    </button>`;
+  };
   $app.innerHTML = `
     ${top('俺たちの秋学期', { right: `<button class="icon-btn" data-act="share" aria-label="共有">${ICON.share}</button><button class="icon-btn" data-act="nav" data-to="settings" aria-label="設定">${ICON.gear}</button>` })}
-    <main class="wrap">
-      <div class="hero"><img src="icons/icon-192.png" alt=""><div><h2>俺たちの秋学期</h2><p>本番と同じ形式で、テスト対策。</p></div></div>
+    <main class="wrap home">
       ${resume && resumeMeta ? `
-        <h3 class="sec">続きから</h3>
-        <button class="card subject resume" data-act="resume">
-          <div class="dot" style="background:${resumeMeta.color}">▶</div>
-          <div><b>${esc(resume.title)}</b><small>${esc(resumeMeta.name)} ・ 回答 ${Object.keys(resume.answers).length}/${resume.qids.length}</small></div>
-          <span class="chev">${ICON.next}</span>
-        </button>` : ''}
+        <button class="resume-banner" data-act="resume" style="--c:${resumeMeta.color}">
+          <span class="rb-play">▶</span>
+          <span class="rb-txt"><small>続きから</small><b>${esc(resume.title)}</b><small>${esc(resumeMeta.name)} ・ ${Object.keys(resume.answers).length}/${resume.qids.length}問</small></span>
+          <span class="rb-ring" style="--p:${(Object.keys(resume.answers).length / resume.qids.length) * 100}"></span>
+        </button>` : `<div class="home-hello"><img src="icons/icon-192.png" alt=""><div><b>今日もやろう。</b><small>本番と同じ形式で、テスト対策。</small></div></div>`}
       <h3 class="sec">科目</h3>
-      ${SUBJECTS.map((s) => `
-        <button class="card subject" data-act="nav" data-to="s/${s.id}">
-          <div class="dot" style="background:${s.color}">${esc(s.mark || s.name.slice(0, 2))}</div>
-          <div><b>${esc(s.name)}</b><small>${esc(s.sub || '')}</small></div>
-          <span class="chev">${ICON.next}</span>
-        </button>`).join('')}
-      <p class="muted small mt">ほかの科目は資料がそろいしだい追加します。</p>
-      <h3 class="sec">ひと休み</h3>
-      <button class="card subject" data-act="nav" data-to="hima">
-        <div class="dot hk-homeowl">${owlSVG()}</div>
-        <div><b>ヒマコロシ</b><small>フクロウ育成・勉強ミニ・ミニゲーム ・ 🐛 ${himaFood()}</small></div>
-        <span class="chev">${ICON.next}</span>
+      <div class="stiles">${subs.map(tile).join('')}</div>
+      <p class="muted small">ほかの科目は資料がそろいしだい追加します。</p>
+      <button class="hima-banner" data-act="nav" data-to="hima">
+        <span class="hb-owl">${owlSVG()}</span>
+        <span class="hb-txt"><b>ヒマコロシ</b><small>フクロウ育成・ミニゲーム・冒険</small></span>
+        <span class="hb-stats"><span>🐛 ${hs.food}</span>${hs.quest ? `<span>⚔️ ${esc(hs.quest)}</span>` : ''}</span>
       </button>
-      <h3 class="sec">お知らせ</h3>
-      <button class="card subject" data-act="nav" data-to="notes">
-        <div class="dot" style="background:var(--brand-soft);color:var(--brand)">📝</div>
-        <div><b>パッチノート</b><small>v${VERSION} ・ ${fmtDate(NOTES[0].date)} 更新</small></div>
-        <span class="chev">${ICON.next}</span>
-      </button>
+      <button class="note-row" data-act="nav" data-to="notes"><span>📝 パッチノート</span><small>v${VERSION} ・ ${fmtDate(NOTES[0].date)} 更新</small><span class="chev">${ICON.next}</span></button>
       <p class="muted small center mt">俺たちの秋学期 v${VERSION}</p>
     </main>`;
 }
@@ -369,6 +382,8 @@ function miniTable(txt) {
   const [h, ...rows] = lines.map((l) => l.split('|').map((c) => c.trim()));
   return `<table class="mini"><thead><tr>${h.map((c) => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.length ? rows.map((r) => `<tr>${r.map((c) => `<td>${c === 'NULL' ? '<span class="null">NULL</span>' : esc(c)}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${h.length}" class="null">（0行）</td></tr>`}</tbody></table>`;
 }
+// 問題を解きながら見られる「コード／表／図」のラベル（無ければ空）
+function refLabel(g) { return g.code ? '&lt;/&gt; コード' : g.tables?.length ? '▦ 表' : g.diagram ? '◇ 図' : ''; }
 function renderDiagram(svg) { return `<div class="diagram">${svg}</div>`; }
 function renderGroupBody(g) {
   return `${g.intro ? `<p class="intro">${inline(g.intro)}</p>` : ''}
@@ -413,6 +428,7 @@ function renderQuestion(q) {
 }
 
 function viewQuiz(s) {
+  document.body.classList.remove('sheet-open');
   const p = session.pages[session.page];
   const g = s.groupById[p.gid];
   const qs = p.qids.map((id) => s.qById[id]);
@@ -435,10 +451,13 @@ function viewQuiz(s) {
     <div class="bottom"><div class="bottom-in">
       <button class="icon-btn" data-act="prev" aria-label="前へ" ${session.page ? '' : 'disabled'}>${ICON.back}</button>
       <button class="icon-btn" data-act="palette" aria-label="問題一覧">${ICON.grid}</button>
+      ${refLabel(g) ? `<button class="ref-btn" data-act="sheet" aria-expanded="false">${refLabel(g)}</button>` : ''}
       ${last
         ? `<button class="btn" data-act="finish">${session.mode === 'exam' ? '採点する' : '結果を見る'}</button>`
         : `<button class="btn" data-act="next">次へ ${ICON.next.replace('<svg', '<svg width="18" height="18"')}</button>`}
-    </div></div>`;
+    </div></div>
+    ${refLabel(g) ? `<div class="sheet" id="sheet" hidden><div class="sheet-head"><b>${refLabel(g)}</b><span class="muted small">${esc(g.title)}</span><button class="icon-btn" data-act="sheet" aria-label="閉じる">✕</button></div>
+      <div class="sheet-body">${g.diagram ? renderDiagram(g.diagram) : ''}${(g.tables || []).map(renderTable).join('')}${g.code ? renderCode(g.code, g.id + '-s', g.lang || cur.lang) : ''}</div></div>` : ''}`;
   if (session.mode === 'exam' && session.minutes) {
     const tick = () => {
       const el = document.getElementById('timer');
@@ -683,6 +702,11 @@ function viewSettings() {
         <div class="seg" role="group" aria-label="テーマ">${[['auto', '自動'], ['light', 'ライト'], ['dark', 'ダーク']].map(([k, v]) => `<button data-act="theme" data-v="${k}" aria-pressed="${store.settings.theme === k}">${v}</button>`).join('')}</div>
         <p class="muted small" style="margin:8px 0 0">自動：端末の設定（ライト／ダーク）に合わせる</p>
       </div>
+      <h3 class="sec">文字の大きさ</h3>
+      <div class="card">
+        <div class="seg" role="group" aria-label="文字の大きさ">${[['s', '小'], ['m', '中'], ['l', '大']].map(([k, v]) => `<button data-act="zoom" data-v="${k}" aria-pressed="${store.settings.zoom === k}" style="font-size:${k === 's' ? 13 : k === 'm' ? 15 : 17}px">${v}</button>`).join('')}</div>
+        <p class="muted small" style="margin:8px 0 0">問題文・選択肢・コードなど、画面の中身の大きさ</p>
+      </div>
       <h3 class="sec">効果音</h3>
       <div class="card">
         <label class="switch"><span>正解・不正解の効果音<br><small class="muted">分野別・復習・基礎コースで1問ごと、模試は採点時に鳴る</small></span><input type="checkbox" data-act="set" data-k="sound" ${store.settings.sound ? 'checked' : ''}></label>
@@ -746,8 +770,17 @@ document.addEventListener('click', async (e) => {
     }
     case 'lretry': { const l = s.lessonById[lessonState.id]; lessonState = null; viewLesson(s, l); window.scrollTo(0, 0); return; }
     case 'lnext': lessonState = null; return go(el.dataset.to);
+    case 'sheet': {
+      const sh = document.getElementById('sheet'); if (!sh) return;
+      sh.hidden = !sh.hidden;
+      document.body.classList.toggle('sheet-open', !sh.hidden);
+      document.querySelectorAll('[data-act=sheet].ref-btn').forEach((b) => b.setAttribute('aria-expanded', String(!sh.hidden)));
+      return;
+    }
     case 'line': {
-      const tr = document.querySelector(`#code-${el.dataset.g} tr[data-line="${el.dataset.line}"]`);
+      const sh = document.getElementById('sheet');
+      const inSheet = sh && !sh.hidden;
+      const tr = document.querySelector(`#code-${el.dataset.g}${inSheet ? '-s' : ''} tr[data-line="${el.dataset.line}"]`);
       if (!tr) return;
       tr.scrollIntoView({ block: 'center', behavior: 'smooth' });
       tr.classList.add('flash'); setTimeout(() => tr.classList.remove('flash'), 1600);
@@ -756,6 +789,10 @@ document.addEventListener('click', async (e) => {
     case 'set':
       store.settings[el.dataset.k] = el.checked; save();
       if (el.dataset.k === 'sound') { sfx.enabled = el.checked; if (el.checked) sfx.ok(); }
+      return;
+    case 'zoom':
+      store.settings.zoom = el.dataset.v; save(); applyZoom();
+      document.querySelectorAll('[data-act=zoom]').forEach((b) => b.setAttribute('aria-pressed', b === el));
       return;
     case 'theme':
       store.settings.theme = el.dataset.v; save(); applyTheme();

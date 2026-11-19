@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-title" content="俺たちの秋学期">
   <script>
     // テーマを先に当てて、読み込み時のちらつきを防ぐ
-    try { var t = (JSON.parse(localStorage.getItem('oretachi:v1') || '{}').settings || {}).theme; if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    try { var t = (JSON.parse(localStorage.getItem('oretachi:v1') || '{}').settings || {}).theme; if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; var z = { s: 0.92, m: 1, l: 1.12 }[(JSON.parse(localStorage.getItem('oretachi:v1') || '{}').settings || {}).zoom]; if (z) document.documentElement.style.setProperty('--zoom', z); } catch (e) {}
   </script>
   <link rel="stylesheet" href="style.css">
 </head>
