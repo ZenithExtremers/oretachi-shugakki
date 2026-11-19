@@ -3,6 +3,7 @@
 // 音は鳴らさない（講義中に使うため）。
 
 import DECKS from './data/hima-words.js';
+import { makeRPG } from './rpg.js';
 
 const KEY = 'oretachi:hima';
 const DEF = {
@@ -120,10 +121,12 @@ function poke() { say('poke'); renderHome(true); setTimeout(() => renderHome(fal
 /* ---------- 画面 ---------- */
 let tab = 'home';
 let $root = null;
-const TABS = [['home', '🦉', 'ホーム'], ['study', '📚', '勉強'], ['game', '🎮', 'ゲーム'], ['words', '🗂️', '単語']];
+const TABS = [['home', '🦉', 'ホーム'], ['quest', '⚔️', '冒険'], ['study', '📚', '勉強'], ['game', '🎮', 'ゲーム'], ['words', '🗂️', '単語']];
+let rpg = null;
 
-export function viewHima($app, top) {
+export function viewHima($app, top, api) {
   leaveHima();
+  if (!rpg) rpg = makeRPG({ S, save, openOv, closeOv, body: () => body(), info: (t) => info(t), toast, setCleanup: (f) => { cleanup = f; }, esc, shuffle, rnd, owlSVG, DECKS, addFood, api });
   $app.innerHTML = `
     ${top('ヒマコロシ', { back: '', right: '<span class="hk-pill" id="hk-food"></span>' })}
     <main class="wrap hima" id="hk-main"></main>
@@ -142,6 +145,13 @@ export function viewHima($app, top) {
 function renderTab() {
   const m = $('#hk-main'); if (!m) return;
   window.scrollTo(0, 0);
+  if (tab === 'quest') {
+    m.onclick = null;
+    rpg.renderQuestTab(m);
+    renderTop();
+    return;
+  }
+  m.onclick = null;
   if (tab === 'home') {
     m.innerHTML = `
       <div class="card hk-owlwrap">
@@ -248,6 +258,7 @@ function closeOv() {
   $('#hk-ov')?.remove();
   document.body.classList.remove('hk-lock');
   renderTop(); renderStudyBest(); renderGameBest();
+  if (tab === 'quest' && $('#hk-main')) renderTab();
 }
 // 画面を離れるとき（ルーターから呼ぶ）
 export function leaveHima() { if (cleanup || $('#hk-ov')) closeOv(); $root = null; }

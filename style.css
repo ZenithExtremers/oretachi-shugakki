@@ -422,3 +422,91 @@ body.hk-lock { overflow: hidden; }
 .lec .meter { flex: 1; max-width: 90px; height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; }
 .lec .meter i { display: block; height: 100%; background: var(--ok); }
 .lec[disabled] { opacity: .45; cursor: default; }
+
+/* ===== ヒマコロシ「冒険」（クラスは rp- で始める） ===== */
+.hk-nav button { font-size: 10.5px; }
+.rp-full { align-self: stretch; }
+.rp-face { width: 44px; height: 44px; border-radius: 50%; display: inline-grid; place-items: center; background: var(--brand-soft); overflow: hidden; flex: none; }
+img.rp-face { object-fit: cover; }
+.rp-emo { font-size: 28px; line-height: 1; }
+.rp-owl svg { width: 52px; height: 52px; margin-top: 6px; }
+.rp-hero { display: flex; align-items: center; gap: 12px; }
+.rp-heroimg { width: 64px; height: 64px; border-radius: 16px; flex: none; }
+.rp-herotxt { flex: 1; min-width: 0; }
+.rp-herotxt small { display: block; }
+.rp-partyrow { display: flex; justify-content: space-around; margin: 12px 0; }
+.rp-pm { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; color: var(--muted); }
+.rp-pm.empty { width: 44px; height: 44px; border-radius: 50%; border: 2px dashed var(--line); display: grid; place-items: center; font-size: 18px; }
+.rp-chapters { margin-top: 12px; }
+.rp-ch { padding: 12px 14px; }
+.rp-chhead { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.rp-chhead .muted { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-nodes { display: flex; align-items: center; }
+.rp-path { flex: 1; height: 3px; background: var(--line); border-radius: 99px; }
+.rp-node { flex: none; display: flex; flex-direction: column; align-items: center; gap: 3px; border: 0; background: none; cursor: pointer; color: var(--text); padding: 0; }
+.rp-node > span { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 18px; background: var(--brand-2); color: #fff; box-shadow: var(--shadow); }
+.rp-node.boss > span { background: #b45309; font-size: 22px; }
+.rp-node.done > span { background: var(--ok); }
+.rp-node[disabled] { cursor: default; opacity: .5; }
+.rp-node[disabled] > span { background: var(--line); color: var(--muted); }
+.rp-node small { font-size: 11px; color: var(--muted); }
+/* パーティ・ガチャ */
+.rp-list { display: grid; gap: 8px; width: 100%; max-width: 460px; }
+.rp-card { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 10px 12px; color: var(--text); cursor: pointer; }
+.rp-card.on { border-color: var(--brand-2); background: var(--brand-soft); }
+.rp-cinfo { flex: 1; min-width: 0; }
+.rp-cinfo small { display: block; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.rp-in { font-size: 11px; font-weight: 700; color: var(--brand); flex: none; }
+.rp-rar { font-size: 12px; color: #d97706; }
+.rp-gacha { text-align: center; max-width: 460px; }
+.rp-gbox { font-size: 64px; }
+.rp-gres { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; width: 100%; max-width: 460px; margin-top: 12px; }
+.rp-gitem { display: flex; flex-direction: column; align-items: center; gap: 2px; background: var(--card); border: 1.5px solid var(--line); border-radius: 12px; padding: 8px 4px; animation: rp-in .4s both; }
+.rp-gitem.r2 { border-color: #60a5fa; }
+.rp-gitem.r3 { border-color: #f59e0b; background: linear-gradient(160deg, var(--card), rgba(245, 158, 11, .18)); }
+.rp-gitem small { font-size: 12px; font-weight: 700; }
+.rp-gitem em { font-style: normal; font-size: 11px; color: var(--brand); }
+@keyframes rp-in { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* バトル */
+.rp-battle { width: 100%; max-width: 560px; }
+.rp-battle.ouch { animation: rp-ouch .35s; }
+@keyframes rp-ouch { 0%, 100% { transform: none; } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.rp-field { position: relative; text-align: center; background: linear-gradient(180deg, var(--brand-soft), var(--card)); border: 1px solid var(--line); border-radius: 16px; padding: 8px 12px 12px; }
+.rp-field.boss { background: linear-gradient(180deg, rgba(180, 83, 9, .22), var(--card)); }
+.rp-wave { position: absolute; left: 12px; top: 8px; font-weight: 700; }
+.rp-enemy { font-size: 64px; line-height: 1.15; }
+.rp-field.boss .rp-enemy { font-size: 84px; }
+.rp-enemy.shake { animation: rp-shake .35s; }
+@keyframes rp-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-8px) rotate(-6deg); } 60% { transform: translateX(8px) rotate(6deg); } }
+.rp-ename { font-weight: 800; }
+.rp-hpbar { position: relative; height: 12px; background: var(--line); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+.rp-hpbar i { display: block; height: 100%; transition: width .3s; }
+.rp-hpbar.enemy i { background: #e11d48; }
+.rp-hpbar.party { height: 16px; }
+.rp-hpbar.party i { background: var(--ok); }
+.rp-hpbar span { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; font-weight: 800; color: var(--text); }
+.rp-pop { position: absolute; inset: 0; pointer-events: none; }
+.rp-num { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); font-weight: 900; font-size: 22px; white-space: nowrap; animation: rp-float .9s forwards; text-shadow: 0 1px 0 #fff, 0 0 6px rgba(255, 255, 255, .8); }
+.rp-num.hit { color: #e11d48; }
+.rp-num.miss { color: #64748b; }
+.rp-num.heal { color: #16a34a; }
+.rp-num.info { color: #2563eb; font-size: 18px; }
+@keyframes rp-float { from { opacity: 1; margin-top: 0; } to { opacity: 0; margin-top: -40px; } }
+.rp-team { display: flex; justify-content: space-around; gap: 4px; margin-top: 10px; }
+.rp-tm { display: flex; flex-direction: column; align-items: center; gap: 3px; border: 0; background: none; padding: 2px; color: var(--text); cursor: pointer; width: 70px; }
+.rp-tm[disabled] { cursor: default; }
+.rp-tm small { font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70px; }
+.rp-tm.ready .rp-face { box-shadow: 0 0 0 3px #f59e0b; animation: rp-glow 1s infinite alternate; }
+.rp-tm.ready small { color: #d97706; font-weight: 800; }
+@keyframes rp-glow { from { box-shadow: 0 0 0 2px #f59e0b; } to { box-shadow: 0 0 0 5px rgba(245, 158, 11, .5); } }
+.rp-gauge { width: 44px; height: 5px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.rp-gauge i { display: block; height: 100%; background: #f59e0b; }
+.rp-timebar { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 8px 0 4px; }
+.rp-timebar i { display: block; height: 100%; background: var(--brand-2); }
+.rp-bq { margin-top: 6px; }
+.rp-bq .q-text { margin: 10px 0 6px; font-weight: 700; }
+.rp-gtitle { margin-top: 4px; }
+#rp-q .choices { margin-top: 8px; }
+#rp-q .rp-gone, #rp-q .hk-choices .rp-gone { opacity: .25; }
+.hk-choices button:disabled { cursor: default; }
+.rp-endicon { font-size: 56px; }

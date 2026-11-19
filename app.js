@@ -106,7 +106,7 @@ async function route() {
   }
   if (parts[0] === 'settings') return viewSettings();
   if (parts[0] === 'notes') return viewNotes();
-  if (parts[0] === 'hima') return viewHima($app, top);
+  if (parts[0] === 'hima') return viewHima($app, top, HIMA_API);
   return viewHome();
 }
 function go(path) {
@@ -631,6 +631,33 @@ function lessonFinishCheck(s, l) {
     : `<div class="card mt center"><b>${l.questions.filter((q, i) => st.answers[i] === q.answer).length}/${l.questions.length} 問正解</b><p class="muted small">全問正解でクリアです。説明を読み直してもう一度。</p><button class="btn wide" data-act="lretry">もう一度</button></div>`;
   box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
+
+/* ---------- ヒマコロシ「冒険」に渡す道具 ---------- */
+const HIMA_API = {
+  // 科目ごとの回の一覧 { ccpp: { 1: '第1回 …' }, … }
+  async lectures() {
+    const out = {};
+    for (const m of SUBJECTS) out[m.id] = (await getSubject(m.id)).lectures;
+    return out;
+  },
+  // ボス戦の問題：その回の本番形式5択を1問（コード・表・図つき）
+  async bossQuestion(sid, lec) {
+    const s = await getSubject(sid);
+    cur = s;
+    const qs = s.groups.filter((g) => String(g.lecture) === String(lec)).flatMap((g) => g.questions);
+    const q = qs[Math.floor(Math.random() * qs.length)];
+    const g = q.group, ch = choicesOf(q);
+    const perm = shuffle(ch.map((_, i) => i));
+    return {
+      body: `<div class="rp-gtitle muted small">${esc(g.title)}</div>${renderGroupBody(g)}`,
+      q: inline(q.q),
+      qcode: q.code ? renderCode(q.code, 'rq' + Math.random().toString(36).slice(2, 7), q.lang || g.lang || s.lang, q.code.includes('\n')) : '',
+      choices: perm.map((i) => choiceHTML(q, monoOf(q), ch[i])),
+      answer: perm.indexOf(q.answer),
+      exp: `正解は (${perm.indexOf(q.answer) + 1})。${inline(q.exp)}`,
+    };
+  },
+};
 
 /* ---------- パッチノート ---------- */
 function fmtDate(d) { const [y, m, dd] = d.split('-').map(Number); return `${y}/${m}/${dd}`; }

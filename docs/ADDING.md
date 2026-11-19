@@ -72,3 +72,8 @@ blocks は 文字列（**太字** と `コード` が使える）／ `{ code, la
 - 画面は `#/hima`。保存は別キー `oretachi:hima`（本編の `oretachi:v1` とは別）。クラス名は `hk-` で始める。
 - 本編の正解でエサを渡すのは `rewardCorrect(key)`（app.js の `record()` と基礎コースの `case 'lans'` から呼ぶ）。同じ key は1日1回まで。
 - 講義中に使うので音は鳴らさない。
+
+## ヒマコロシ「冒険」（rpg.js）
+- 仲間は `CHARS`、敵（バグ）は `ENEMIES`（科目ごとに雑魚とボス）。ボスは回ごとに1体。
+- 科目や回を足したら `ENEMIES[科目].boss[回]` を足す。雑魚戦は `data/hima-words.js` の単語帳、ボス戦は本編のその回の問題を使う。
+- 進み具合は `oretachi:hima` の `rpg` に保存（コイン・仲間・クリア状況）。
