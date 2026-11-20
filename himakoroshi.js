@@ -12,7 +12,7 @@ const DEF = {
     ['abandon', '見捨てる'], ['evacuate', '避難させる'], ['resilience', '回復力'], ['diplomacy', '外交'],
     ['hazard', '危険要因'], ['negotiate', '交渉する'], ['sovereignty', '主権'], ['infrastructure', '社会基盤'],
   ],
-  daily: { d: '', ids: {} }, // 本編の正解でもらったエサ（1問1日1回）
+  daily: { d: '', ids: {} }, // 本編の正解でもらった知恵の実（1問1日1回）
   deck: 'all', // 単語クイズ・単語カードで最後に選んだ単語帳
 };
 let S;
@@ -68,7 +68,7 @@ function pickDeck(title, min, start) {
 
 /* ---------- 本編との連携 ---------- */
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
-// 本編で正解したときに呼ぶ。同じ問題（key）は1日1回だけエサ+1。もらえたら true
+// 本編で正解したときに呼ぶ。同じ問題（key）は1日1回だけ🌰知恵の実+1。もらえたら true
 export function rewardCorrect(key) {
   if (S.daily.d !== today()) S.daily = { d: today(), ids: {} };
   if (S.daily.ids[key]) return false;
@@ -78,7 +78,7 @@ export function rewardCorrect(key) {
   return true;
 }
 export const himaFood = () => S.food;
-// ホームに出す要約（エサの数と冒険の進み具合）
+// ホームに出す要約（知恵の実の数と冒険の進み具合）
 export function himaSummary() {
   const r = S.rpg;
   const n = r ? Object.keys(r.clear || {}).length : 0;
@@ -87,7 +87,7 @@ export function himaSummary() {
 
 /* ---------- ホームのキャラ（フクロウ・主人公・冒険の仲間） ---------- */
 const needExp = (l) => l * 50; // 冒険と同じ
-const FEED_EXP = 20; // 🐛1つで経験値20（冒険と同じ）
+const FEED_EXP = 20; // 🌰1つで経験値20（冒険と同じ）
 const stage = () => (S.owl.lv >= 15 ? 3 : S.owl.lv >= 8 ? 2 : S.owl.lv >= 3 ? 1 : 0);
 const STAGE_NAME = ['ひなフクロウ', '見習いフクロウ', '学生フクロウ', 'フクロウ博士'];
 export function owlSVG(st = stage(), happy = false) {
@@ -104,7 +104,7 @@ export function owlSVG(st = stage(), happy = false) {
   <circle cx="205" cy="240" r="44" fill="#fff"/><circle cx="307" cy="240" r="44" fill="#fff"/>
   ${eye}${glasses}<path d="M240 285 L256 310 L272 285 Z" fill="#ffb300"/>${book}${hat}</g></svg>`;
 }
-// キャラごとの口ぐせ（idle：ふだん／fed：エサ／poke：つつく）
+// キャラごとの口ぐせ（idle：ふだん／fed：知恵の実／poke：つつく）
 const LINES = {
   owl: { idle: ['ホー。', '講義、ちゃんと聞いてる？', 'ヒマなら勉強しよ', 'おなかすいた…', 'ノートとった？', 'あと何分？'], fed: ['うまい！', 'もっとちょうだい', '知識の味がする', 'ホッホー！'], poke: ['なに？', 'くすぐったい', '今いいとこなのに', '先生こっち見てるよ'] },
   hero: { idle: ['よし、やるか。', '期末まであと少し。', '今日は何問いける？', 'ちょっと休憩…'], fed: ['いただきます！', 'エネルギー満タン！', 'これで頑張れる'], poke: ['なになに？', '起きてるって', 'ちゃんと聞いてるよ'] },
@@ -125,10 +125,10 @@ const LINES = {
   yuni: { idle: ['虹の向こうに合格がある', 'つかれたら癒すよ', 'キラキラ'], fed: ['キラーン！', 'ありがとう、すてき'], poke: ['角はあぶないよ', 'ふふっ'] },
   ryu: { idle: ['われはリュウ。', 'ボスなど一息で…', '強くなりたいか'], fed: ['うむ。', '力がみなぎる'], poke: ['ほう…', 'いい度胸だ'] },
 };
-const NOFOOD = ['エサがない…勉強してきて', '計算アタックや本編の正解で🐛がもらえるよ'];
+const NOFOOD = ['知恵の実がない…勉強してきて', '計算アタックや本編の正解で🌰知恵の実がもらえるよ'];
 const partner = () => (S.partner === 'owl' || S.partner === 'hero' || (S.rpg && S.rpg.owned && S.rpg.owned[S.partner]) ? S.partner : 'owl');
 const say = (k) => { const set = LINES[partner()] || LINES.owl; const a = k === 'nofood' ? NOFOOD : set[k] || LINES.owl[k]; const el = $('#hk-say'); if (el) el.textContent = a[rnd(a.length)]; };
-function renderTop() { const p = $('#hk-food'); if (p) p.textContent = '🐛 ' + S.food; }
+function renderTop() { const p = $('#hk-food'); if (p) p.textContent = '🌰 ' + S.food; }
 // いまのキャラの記録 { lv, exp } と表示名
 function partnerRec() {
   const id = partner();
@@ -173,7 +173,7 @@ function openPartnerPick() {
   openOv('ホームのキャラ');
   const ids = ['owl', 'hero', ...Object.keys(CHARS).filter((id) => id !== 'owl')];
   const owned = (id) => id === 'owl' || id === 'hero' || (S.rpg && S.rpg.owned && S.rpg.owned[id]);
-  body().innerHTML = `<p class="muted small" style="align-self:stretch;margin:0 0 10px">ホームに置くキャラを選ぶ。エサをあげるとそのキャラのレベルが上がる（冒険でも強くなる）。仲間は冒険のガチャで増える。</p>
+  body().innerHTML = `<p class="muted small" style="align-self:stretch;margin:0 0 10px">ホームに置くキャラを選ぶ。🌰知恵の実をあげるとそのキャラのレベルが上がる（冒険でも強くなる）。仲間は冒険のガチャで増える。</p>
     <div class="hk-pick">${ids.map((id) => {
       if (!owned(id)) return '<span class="hk-pcell lock"><span class="hk-pface">？</span><small>未発見</small></span>';
       const info = id === 'owl' ? { name: 'フクロウ', lv: S.owl.lv } : rpg.memberInfo(id);
@@ -232,23 +232,23 @@ function renderTab() {
         <div class="muted small" id="hk-xptext"></div>
       </div>
       <div class="hk-feedrow mt">
-        <button class="btn" data-hk="feed">🐛 あげる</button>
-        <button class="btn" data-hk="feed5">🐛×5</button>
+        <button class="btn" data-hk="feed">🌰 あげる</button>
+        <button class="btn" data-hk="feed5">🌰×5</button>
         <button class="btn sub" data-hk="poke">つつく</button>
       </div>
       <button class="hk-change" data-hk="partner">🔄 キャラを変える <span>›</span></button>
       <div class="card hk-stats mt">
         <div><b id="hk-stc">0</b>正解数</div>
-        <div><b id="hk-stf">0</b>エサやり</div>
+        <div><b id="hk-stf">0</b>あげた実</div>
         <div><b id="hk-stp">0</b>ゲーム</div>
       </div>
-      <p class="muted small center">勉強で正解するとエサ🐛がもらえる。🐛1つで経験値${FEED_EXP}。<br>本編（模試・分野別・復習・基礎コース）の正解でも1問につき1日1回🐛+1。</p>`;
+      <p class="muted small center">勉強で正解すると🌰知恵の実がもらえる。🌰1つで経験値${FEED_EXP}。<br>本編（模試・分野別・復習・基礎コース）の正解でも1問につき1日1回🌰+1。</p>`;
     say('idle'); renderHome();
   } else if (tab === 'study') {
     m.innerHTML = `
       <div class="hk-grid2 mt">
-        <button class="hk-tile" data-open="calc"><span class="e">➗</span>計算アタック<small>60秒・1問🐛1</small></button>
-        <button class="hk-tile" data-open="quiz"><span class="e">📝</span>単語クイズ<small>4択・1問🐛1・科目の用語も</small></button>
+        <button class="hk-tile" data-open="calc"><span class="e">➗</span>計算アタック<small>60秒・1問🌰1</small></button>
+        <button class="hk-tile" data-open="quiz"><span class="e">📝</span>単語クイズ<small>4択・1問🌰1・科目の用語も</small></button>
         <button class="hk-tile" data-open="flash"><span class="e">🃏</span>単語カード<small>めくって覚える・科目の用語も</small></button>
         <button class="hk-tile" data-open="brain"><span class="e">🧠</span>大小くらべ<small>30秒・脳トレ</small></button>
       </div>
@@ -259,8 +259,8 @@ function renderTab() {
       <div class="hk-grid2 mt">
         <button class="hk-tile" data-open="g2048"><span class="e">🔢</span>2048<small>スワイプ</small></button>
         <button class="hk-tile" data-open="block"><span class="e">🟦</span>ブロック<small>8×8に置いて消す</small></button>
-        <button class="hk-tile" data-open="sudoku"><span class="e">9️⃣</span>数独<small>クリアで🐛5</small></button>
-        <button class="hk-tile" data-open="mine"><span class="e">💣</span>マインスイーパー<small>クリアで🐛3</small></button>
+        <button class="hk-tile" data-open="sudoku"><span class="e">9️⃣</span>数独<small>クリアで🌰5</small></button>
+        <button class="hk-tile" data-open="mine"><span class="e">💣</span>マインスイーパー<small>クリアで🌰3</small></button>
       </div>
       <div class="card mt"><b>ベスト記録</b><div class="muted small" id="hk-gamebest" style="margin-top:6px"></div></div>`;
     renderGameBest();
@@ -381,7 +381,7 @@ OPEN.calc = () => {
     }));
   }
   show();
-  timerLoop(60, (t) => info(`残り${t}秒`), () => { const nb = setBest('calc', score); resultView('計算アタック', `${score}問`, `🐛${score}ゲット${nb ? '　ベスト更新！' : ''}`, OPEN.calc); });
+  timerLoop(60, (t) => info(`残り${t}秒`), () => { const nb = setBest('calc', score); resultView('計算アタック', `${score}問`, `🌰${score}ゲット${nb ? '　ベスト更新！' : ''}`, OPEN.calc); });
 };
 /* ===== 大小くらべ ===== */
 OPEN.brain = () => {
@@ -396,7 +396,7 @@ OPEN.brain = () => {
   }
   function judge(ok, b) { if (ok) { score++; if (score % 2 === 0) study(); else S.correct++; b.classList.add('ok'); setTimeout(show, 150); } else { b.classList.add('ng'); setTimeout(show, 350); } }
   show();
-  timerLoop(30, (t) => info(`残り${t}秒`), () => { save(); const nb = setBest('brain', score); resultView('大小くらべ', `${score}問`, `🐛${Math.floor(score / 2)}ゲット${nb ? '　ベスト更新！' : ''}`, OPEN.brain); });
+  timerLoop(30, (t) => info(`残り${t}秒`), () => { save(); const nb = setBest('brain', score); resultView('大小くらべ', `${score}問`, `🌰${Math.floor(score / 2)}ゲット${nb ? '　ベスト更新！' : ''}`, OPEN.brain); });
 };
 /* ===== 単語クイズ ===== */
 OPEN.quiz = (deck) => (deck ? quiz(deck) : pickDeck('単語クイズ', 4, quiz));
@@ -451,7 +451,7 @@ OPEN.g2048 = () => {
     if (b.join() !== old) { add(); draw(); if (dead()) { over = true; end(); } }
   }
   function dead() { if (b.includes(0)) return false; for (let i = 0; i < 16; i++) { if (i % 4 < 3 && b[i] === b[i + 1]) return false; if (i < 12 && b[i] === b[i + 4]) return false; } return true; }
-  function end() { S.plays++; const f = Math.floor(score / 500); addFood(f); save(); const nb = setBest('g2048', score); setTimeout(() => body() && resultView('2048', score, `🐛${f}ゲット${nb ? '　ベスト更新！' : ''}`, OPEN.g2048), 600); }
+  function end() { S.plays++; const f = Math.floor(score / 500); addFood(f); save(); const nb = setBest('g2048', score); setTimeout(() => body() && resultView('2048', score, `🌰${f}ゲット${nb ? '　ベスト更新！' : ''}`, OPEN.g2048), 600); }
   body().innerHTML = `<div class="hk-2048" id="hk-bd"></div><p class="muted small">スワイプで動かす</p><button class="btn sub" id="hk-giveup" style="max-width:200px">やめる</button>`;
   function draw() { info(`${score}点`); $('#hk-bd').innerHTML = b.map((v) => `<div style="${v ? `background:${COL[v] || '#3c3a32'};color:${v > 4 ? '#fff' : '#776e65'}` : ''}">${v || ''}</div>`).join(''); }
   let sx, sy; const bd = $('#hk-bd');
@@ -495,7 +495,7 @@ OPEN.block = () => {
     const n = rows.length + cols.length; if (n) { score += n * 10 * n; toast(n > 1 ? `${n}ライン！` : '1ライン'); }
     pcs[sel] = null; sel = -1; if (pcs.every((x) => !x)) deal();
     draw();
-    if (!pcs.some((x) => x && anyFit(x))) { over = true; S.plays++; const f = Math.floor(score / 100); addFood(f); save(); const nb = setBest('block', score); setTimeout(() => body() && resultView('ブロック', score, `🐛${f}ゲット${nb ? '　ベスト更新！' : ''}`, OPEN.block), 700); }
+    if (!pcs.some((x) => x && anyFit(x))) { over = true; S.plays++; const f = Math.floor(score / 100); addFood(f); save(); const nb = setBest('block', score); setTimeout(() => body() && resultView('ブロック', score, `🌰${f}ゲット${nb ? '　ベスト更新！' : ''}`, OPEN.block), 700); }
   };
   deal(); draw();
 };
@@ -518,7 +518,7 @@ OPEN.sudoku = () => {
   $('#hk-sp').onclick = (e) => {
     if (done || sel < 0 || giv[sel] || e.target.tagName !== 'BUTTON') return;
     const t = e.target.textContent; cur[sel] = t === '消' ? 0 : +t; draw();
-    if (cur.every((v, i) => v && !conflict(i))) { done = true; stop(); S.plays++; addFood(5); const nb = setBest('sudoku', sec, true); setTimeout(() => body() && resultView('数独クリア', fmt(sec), `🐛5ゲット${nb ? '　ベスト更新！' : ''}`, OPEN.sudoku), 500); }
+    if (cur.every((v, i) => v && !conflict(i))) { done = true; stop(); S.plays++; addFood(5); const nb = setBest('sudoku', sec, true); setTimeout(() => body() && resultView('数独クリア', fmt(sec), `🌰5ゲット${nb ? '　ベスト更新！' : ''}`, OPEN.sudoku), 500); }
   };
   const id = setInterval(() => { sec++; info(fmt(sec)); }, 1000); const stop = () => clearInterval(id); cleanup = stop;
   info('0:00'); draw();
@@ -546,7 +546,7 @@ OPEN.mine = () => {
     if (flag[k]) return; if (!mines) place(k);
     if (mines[k]) { open[k] = 1; over = true; clearInterval(id); S.plays++; save(); draw(true); setTimeout(() => body() && resultView('ドカン', '💥', 'また挑戦しよう', OPEN.mine), 900); return; }
     reveal(k); draw();
-    if (open.filter((o, j) => o && !mines[j]).length === 81 - M) { over = true; clearInterval(id); S.plays++; addFood(3); const b = setBest('mine', sec, true); setTimeout(() => body() && resultView('クリア！', fmt(sec), `🐛3ゲット${b ? '　ベスト更新！' : ''}`, OPEN.mine), 500); }
+    if (open.filter((o, j) => o && !mines[j]).length === 81 - M) { over = true; clearInterval(id); S.plays++; addFood(3); const b = setBest('mine', sec, true); setTimeout(() => body() && resultView('クリア！', fmt(sec), `🌰3ゲット${b ? '　ベスト更新！' : ''}`, OPEN.mine), 500); }
   };
   draw();
 };

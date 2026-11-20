@@ -159,7 +159,7 @@ async function viewHome() {
       <button class="hima-banner" data-act="nav" data-to="hima">
         <span class="hb-owl">${owlSVG()}</span>
         <span class="hb-txt"><b>ヒマコロシ</b><small>フクロウ育成・ミニゲーム・冒険</small></span>
-        <span class="hb-stats"><span>🐛 ${hs.food}</span>${hs.quest ? `<span>⚔️ ${esc(hs.quest)}</span>` : ''}</span>
+        <span class="hb-stats"><span>🌰 ${hs.food}</span>${hs.quest ? `<span>⚔️ ${esc(hs.quest)}</span>` : ''}</span>
       </button>
       <button class="note-row" data-act="nav" data-to="notes"><span>📝 パッチノート</span><small>v${VERSION} ・ ${fmtDate(NOTES[0].date)} 更新</small><span class="chev">${ICON.next}</span></button>
       <p class="muted small center mt">俺たちの秋学期 v${VERSION}</p>
@@ -489,7 +489,7 @@ function answer(s, qid, oi) {
 }
 
 function record(q, ok) {
-  if (ok) rewardCorrect(q.id); // ヒマコロシのエサ（1問1日1回）
+  if (ok) rewardCorrect(q.id); // ヒマコロシの知恵の実（1問1日1回）
   const st = stat(q.id);
   if (ok) { st.c++; st.r = false; } else { st.w++; st.r = true; }
   st.t = Date.now();

@@ -195,8 +195,8 @@ export function makeRPG(ctx) {
     inp.onkeydown = (e) => { if (e.key === 'Enter') ok(); };
   }
 
-  /* ---------- パーティ編成（上に編成枠、下に仲間のマス目。タップで詳しく・エサやり） ---------- */
-  const FEED_EXP = 20; // 🐛1つで経験値20
+  /* ---------- パーティ編成（上に編成枠、下に仲間のマス目。タップで詳しく・知恵の実をあげる） ---------- */
+  const FEED_EXP = 20; // 🌰1つで経験値20
   function feedTo(o, n) {
     let ups = 0;
     o.exp += FEED_EXP * n;
@@ -228,7 +228,7 @@ export function makeRPG(ctx) {
           ${sorted.map((id) => `<button class="rp-cell r${CHARS[id].rar}${r.party.includes(id) ? ' inp' : ''}${sel === id ? ' sel' : ''}" data-pick="${id}">${iconHTML(id)}<span class="rp-rar">${RAR[CHARS[id].rar]}</span><em>Lv.${r.owned[id].lv}</em>${r.party.includes(id) ? '<i>編成中</i>' : ''}</button>`).join('')}
           ${Array(unknown).fill('<span class="rp-cell unknown"><span class="rp-face empty">？</span><em>未発見</em></span>').join('')}
         </div>
-        <p class="muted small rp-full">エサ🐛はヒマコロシ全体で共通（今 🐛 ${S.food}）。🐛1つで経験値${FEED_EXP}。</p>
+        <p class="muted small rp-full">🌰知恵の実はヒマコロシ全体で共通（今 🌰 ${S.food}）。🌰1つで経験値${FEED_EXP}。</p>
         ${d ? `<div class="rp-detail">
           <div class="rp-dhead">${iconHTML(sel)}<div><b>${esc(d.name)}</b> ${d.rar ? `<span class="rp-rar">${RAR[d.rar]}</span>` : '<span class="rp-rar">リーダー</span>'}
             <div class="rp-lv">Lv.${d.lv}<span class="rp-exp"><i style="width:${(o.exp / needExp(o.lv)) * 100}%"></i></span><small>${o.exp}/${needExp(o.lv)}</small></div></div>
@@ -237,8 +237,8 @@ export function makeRPG(ctx) {
           <p class="rp-skill">スキル「${esc(d.skill.name)}」：${SKILL_DESC[d.skill.kind](d.skill)}（正解${d.skill.cost}回でたまる）</p>
           <div class="rp-dbtns">
             ${sel === 'hero' ? '<span class="muted small">リーダーはいつも出撃</span>' : `<button class="rp-btn" data-toggle>${r.party.includes(sel) ? '編成から外す' : '編成に入れる'}</button>`}
-            <button class="rp-btn gold" data-feed="1" ${S.food < 1 ? 'disabled' : ''}>🐛 あげる</button>
-            <button class="rp-btn gold" data-feed="5" ${S.food < 5 ? 'disabled' : ''}>🐛×5</button>
+            <button class="rp-btn gold" data-feed="1" ${S.food < 1 ? 'disabled' : ''}>🌰 あげる</button>
+            <button class="rp-btn gold" data-feed="5" ${S.food < 5 ? 'disabled' : ''}>🌰×5</button>
           </div></div>` : ''}`;
     };
     draw();
@@ -540,7 +540,7 @@ export function makeRPG(ctx) {
         <div class="rp-endicon">${win ? '🏆' : '💫'}</div>
         <div class="rp-endtitle">${win ? 'STAGE CLEAR!' : 'GAME OVER'}</div>
         <p class="rp-endsub">${win ? `${esc(foes[foes.length - 1].name)}をたおした！` : `正解 ${st.correct}問。パーティを育ててまた挑戦しよう`}</p>
-        ${win ? `<div class="rp-rewards"><span>🪙 ${coins}${first ? '<em>初クリア×2</em>' : ''}</span><span>EXP ${exp}</span>${first ? '<span>🐛 2</span>' : ''}</div>` : ''}
+        ${win ? `<div class="rp-rewards"><span>🪙 ${coins}${first ? '<em>初クリア×2</em>' : ''}</span><span>EXP ${exp}</span>${first ? '<span>🌰 2</span>' : ''}</div>` : ''}
         ${ups.length ? `<div class="rp-ups"><b>LEVEL UP!</b>${ups.map((u) => `<span>${esc(u)}</span>`).join('')}</div>` : ''}
         <div class="row"><button class="rp-btn gold big" id="rp-again">${win ? 'もう一回' : 'リトライ'}</button><button class="rp-btn big" id="rp-back">マップへ</button></div></div>`;
       document.getElementById('rp-again').onclick = () => startBattle(subj, lec, n);

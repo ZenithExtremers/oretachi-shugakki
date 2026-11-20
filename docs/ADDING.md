@@ -70,7 +70,7 @@ blocks は 文字列（**太字** と `コード` が使える）／ `{ code, la
 
 ## ヒマコロシ（himakoroshi.js）
 - 画面は `#/hima`。保存は別キー `oretachi:hima`（本編の `oretachi:v1` とは別）。クラス名は `hk-` で始める。
-- 本編の正解でエサを渡すのは `rewardCorrect(key)`（app.js の `record()` と基礎コースの `case 'lans'` から呼ぶ）。同じ key は1日1回まで。
+- 本編の正解で🌰知恵の実を渡すのは `rewardCorrect(key)`（app.js の `record()` と基礎コースの `case 'lans'` から呼ぶ）。同じ key は1日1回まで。
 - 講義中に使うので音は鳴らさない。
 
 ## ヒマコロシ「冒険」（rpg.js）
