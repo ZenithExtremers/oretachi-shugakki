@@ -795,14 +795,14 @@ body.rp-game #rp-page > .rp-form, body.rp-game #rp-page > .rp-gacha { margin-top
 .rp-zbar i { display: block; height: 100%; background: linear-gradient(90deg, #f5c542, #fb923c); }
 .rp-zsec { font-size: 13px; color: #f5c542; margin: 16px 0 8px; }
 .rp-zgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.rp-zc { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 6px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, .14); background: rgba(255, 255, 255, .07); color: #fff; cursor: pointer; min-width: 0; }
-.rp-zc span { font-size: 28px; line-height: 1.1; }
-.rp-zc small { font-size: 10px; width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rp-zc.unk { opacity: .5; cursor: default; }
-.rp-zc.unk span { font-size: 22px; font-weight: 800; color: #8b93b8; }
-.rp-zc.boss { border-color: rgba(244, 63, 94, .5); }
-.rp-zc.rare { border-color: rgba(245, 197, 66, .7); }
-.rp-zc.sel { outline: 2px solid #f5c542; }
+.rp-zk { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 6px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, .14); background: rgba(255, 255, 255, .07); color: #fff; cursor: pointer; min-width: 0; }
+.rp-zk span { font-size: 28px; line-height: 1.1; }
+.rp-zk small { font-size: 10px; width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-zk.unk { opacity: .5; cursor: default; }
+.rp-zk.unk span { font-size: 22px; font-weight: 800; color: #8b93b8; }
+.rp-zk.boss { border-color: rgba(244, 63, 94, .5); }
+.rp-zk.rare { border-color: rgba(245, 197, 66, .7); }
+.rp-zk.sel { outline: 2px solid #f5c542; }
 .rp-zdetail { position: relative; display: flex; gap: 12px; margin-top: 12px; padding: 12px; border-radius: 16px; border: 1.5px solid #f5c542; background: linear-gradient(180deg, #2a1d55, #1a1446); color: #fff; }
 .rp-zdetail .rp-zbig { font-size: 46px; line-height: 1; }
 .rp-zdetail > div { flex: 1; min-width: 0; padding-right: 22px; }
@@ -822,3 +822,55 @@ body.rp-game #rp-page > .rp-form, body.rp-game #rp-page > .rp-gacha { margin-top
 .rp-goal.got { opacity: .55; }
 .rp-gok { font-size: 12px; color: #86efac; white-space: nowrap; }
 .rp-goal .rp-btn { white-space: nowrap; padding: 8px 12px; }
+
+/* ===== 冒険：ライトモードでは「昼の空と金色」（body.rp-day。ダークモードは夜空のまま） ===== */
+body.rp-night.rp-day {
+  --bg: #dff1ff; --card: rgba(255, 255, 255, .85); --text: #1e293b; --muted: #5b6478; --line: rgba(183, 121, 31, .35);
+  --brand: #b7791f; --brand-2: #92400e; --brand-soft: rgba(245, 197, 66, .22); --shadow: 0 2px 10px rgba(30, 64, 120, .12);
+  --ok: #16a34a; --ok-soft: rgba(22, 163, 74, .12); --ng: #e11d48; --ng-soft: rgba(225, 29, 72, .1); --warn-soft: rgba(245, 197, 66, .2);
+  color-scheme: light;
+  background: linear-gradient(180deg, #7cc4f5 0%, #b9e2ff 45%, #eef8ff 100%) fixed;
+}
+.rp-day .hk-nav, .rp-day .rp-gnav { background: rgba(255, 255, 255, .95); border-top-color: rgba(183, 121, 31, .35); }
+.rp-day .rp-gnav button { color: #64748b; }
+.rp-day .rp-gnav button.on { color: #b7791f; }
+.rp-day .rp-ov { background: linear-gradient(180deg, #7cc4f5, #b9e2ff 45%, #eef8ff) !important; }
+.rp-day .rp-ov .hk-ohead { background: rgba(255, 255, 255, .92); }
+.rp-day .rp-head { background: linear-gradient(180deg, #a9d9fb 80%, rgba(169, 217, 251, 0)); }
+/* 白いカード */
+.rp-day .rp-hud, .rp-day .rp-form { background: linear-gradient(160deg, rgba(255, 236, 170, .55), rgba(255, 255, 255, .9)); }
+.rp-day .rp-face, .rp-day .rp-sound, .rp-day .rp-btn:not(.gold), .rp-day .rp-card, .rp-day .rp-gitem, .rp-day .rp-cell, .rp-day .rp-zc button, .rp-day .rp-rewards span,
+.rp-day .rp-sort button, .rp-day .rp-diff, .rp-day .rp-zk, .rp-day .rp-goal, .rp-day .rp-sfoes span { background-color: rgba(255, 255, 255, .88); }
+.rp-day .rp-cell.r3, .rp-day .rp-gitem.r3 { background: radial-gradient(circle at 50% 25%, rgba(245, 197, 66, .45), #fff); }
+.rp-day .rp-slot { background: rgba(255, 255, 255, .7); }
+.rp-day .rp-seg { background: rgba(30, 41, 59, .07); }
+.rp-day .rp-mapbox { background: rgba(255, 255, 255, .35); }
+.rp-day .rp-road .all { stroke: rgba(30, 41, 59, .2); }
+.rp-day .rp-spot small { color: #1e293b; text-shadow: 0 1px 0 #fff, 0 0 4px #fff; }
+.rp-day .rp-spot[disabled] .c { background: rgba(255, 255, 255, .7); border-color: rgba(30, 41, 59, .15); }
+.rp-day .rp-sign, .rp-day .rp-detail, .rp-day .rp-sheet-in, .rp-day .rp-zdetail { background: linear-gradient(180deg, #fffaf0, #fff1c9); color: var(--text); }
+.rp-day .rp-sheet { background: rgba(15, 23, 42, .35); }
+.rp-day .rp-field { background: radial-gradient(circle at 20% 50%, rgba(147, 197, 253, .4), rgba(255, 255, 255, .75) 70%); }
+.rp-day .rp-field.boss { background: radial-gradient(circle at 20% 50%, rgba(225, 29, 72, .28), rgba(255, 255, 255, .75) 70%); }
+.rp-day .rp-field.rare { background: radial-gradient(circle at 50% 40%, rgba(245, 197, 66, .5), rgba(255, 255, 255, .75) 70%); }
+.rp-day .rp-result { background: radial-gradient(circle at 50% 0%, rgba(147, 197, 253, .45), rgba(255, 255, 255, .9) 70%); }
+.rp-day .rp-result.win { background: radial-gradient(circle at 50% 0%, rgba(245, 197, 66, .5), rgba(255, 255, 255, .92) 70%); }
+.rp-day .rp-gacha { background: radial-gradient(circle at 50% 20%, rgba(245, 197, 66, .4), transparent 60%); }
+.rp-day .rp-x, .rp-day .rp-tags em { background: rgba(30, 41, 59, .08); }
+/* バー */
+.rp-day .rp-exp, .rp-day .rp-gauge, .rp-day .rp-timebar, .rp-day .rp-zbar, .rp-day .rp-gbar { background: rgba(30, 41, 59, .12); }
+/* 文字の色（白い背景で読めるように） */
+.rp-day .rp-diff, .rp-day .rp-zhead, .rp-day .rp-zk, .rp-day .rp-goal { color: var(--text); }
+.rp-day .rp-diff small, .rp-day .rp-starrule, .rp-day .rp-zhead span, .rp-day .rp-zdetail small, .rp-day .rp-goal small { color: var(--muted); }
+.rp-day .rp-stars, .rp-day .rp-rar, .rp-day .rp-in, .rp-day .rp-wave, .rp-day .rp-have b, .rp-day .rp-zsec, .rp-day .rp-zhead span b, .rp-day .rp-rewards em,
+.rp-day .rp-gitem em, .rp-day .rp-tm.ready small, .rp-day .rp-sign b { color: #b7791f; }
+.rp-day .rp-endstars span { color: rgba(30, 41, 59, .15); }
+.rp-day .rp-endstars span.on { color: #f5b800; text-shadow: 0 0 10px rgba(245, 184, 0, .6); }
+.rp-day .rp-zq { text-shadow: none; }
+.rp-day .rp-result:not(.win) .rp-endtitle, .rp-day .rp-ready span { color: #4338ca; }
+.rp-day .rp-ready.go span { color: #d99a00; }
+.rp-day .rp-event.chance { color: #92400e; }
+.rp-day .rp-event.charge { color: #9f1239; }
+.rp-day .rp-after.ok b, .rp-day .rp-ups b, .rp-day .rp-gok { color: #15803d; }
+.rp-day .rp-after.ng b, .rp-day .rp-unlock { color: #be123c; }
+.rp-day .rp-sfoes span.unk, .rp-day .rp-zk.unk span { color: #94a3b8; }

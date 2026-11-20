@@ -248,7 +248,7 @@ export function makeRPG(ctx) {
     const r = R(); zsubj = zsubj || r.subj;
     const list = allEnemies(zsubj), got = list.filter((x) => r.zukan[x.key]).length;
     const lecName = (k) => (lectures[zsubj][k] || `第${k}回`);
-    const cell = (x) => { const c = r.zukan[x.key] || 0; return `<button class="rp-zc${c ? '' : ' unk'}${x.kind === 'boss' ? ' boss' : ''}${x.kind === 'rare' ? ' rare' : ''}${zsel === x.key ? ' sel' : ''}" data-z="${esc(x.key)}" ${c ? '' : 'disabled'}><span>${c ? x.icon : '？'}</span><small>${c ? esc(x.name) : '？？？'}</small></button>`; };
+    const cell = (x) => { const c = r.zukan[x.key] || 0; return `<button class="rp-zk${c ? '' : ' unk'}${x.kind === 'boss' ? ' boss' : ''}${x.kind === 'rare' ? ' rare' : ''}${zsel === x.key ? ' sel' : ''}" data-z="${esc(x.key)}" ${c ? '' : 'disabled'}><span>${c ? x.icon : '？'}</span><small>${c ? esc(x.name) : '？？？'}</small></button>`; };
     const lecs = Object.keys(lectures[zsubj]);
     const sel = list.find((x) => x.key === zsel);
     const where = (x) => (x.kind === 'boss' ? `${lecName(x.lec)} のボス` : x.kind === 'lec' ? `${lecName(x.lec)} のステージ` : x.kind === 'rare' ? 'どのステージにもたまに出る' : 'どのステージにも出る');

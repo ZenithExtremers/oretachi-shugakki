@@ -224,6 +224,9 @@ function renderTab() {
   window.scrollTo(0, 0);
   document.body.classList.toggle('rp-night', tab === 'quest');
   document.body.classList.toggle('rp-game', tab === 'quest');
+  // ライトモードなら昼の空、ダークモードなら夜空（設定の「自動」は端末に合わせる）
+  const th = document.documentElement.dataset.theme;
+  document.body.classList.toggle('rp-day', tab === 'quest' && (th === 'light' || (!th && !matchMedia('(prefers-color-scheme: dark)').matches)));
   const h1 = $root?.querySelector('.top h1'); if (h1) h1.textContent = tab === 'quest' ? '冒険' : 'ヒマコロシ';
   if (tab !== 'quest' && rpg) rpg.leave();
   if (tab === 'quest') {
@@ -350,7 +353,7 @@ export function leaveHima() {
   // 画面を離れるときは描き直さずに閉じる
   if (cleanup) { cleanup(); cleanup = null; }
   $('#hk-ov')?.remove();
-  document.body.classList.remove('hk-lock', 'rp-night', 'rp-game');
+  document.body.classList.remove('hk-lock', 'rp-night', 'rp-game', 'rp-day');
   if (rpg) rpg.leave();
   $root = null;
 }
