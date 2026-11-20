@@ -200,9 +200,18 @@ export function viewHima($app, top, api) {
     <main class="wrap hima" id="hk-main"></main>
     <nav class="hk-nav">${TABS.map(([k, i, n]) => `<button data-hk-tab="${k}" class="${k === tab ? 'on' : ''}"><span class="i">${i}</span>${n}</button>`).join('')}</nav>`;
   $root = $app;
+  // 冒険はゲーム画面：下のタブを隠し、左上の＜でヒマコロシのホームへ戻る
+  $app.querySelector('.top [data-act="back"]')?.addEventListener('click', (e) => {
+    if (tab !== 'quest') return;
+    e.stopPropagation(); e.preventDefault();
+    tab = 'home';
+    $app.querySelectorAll('.hk-nav button').forEach((x) => x.classList.toggle('on', x.dataset.hkTab === 'home'));
+    renderTab();
+  });
   $app.querySelector('.hk-nav').addEventListener('click', (e) => {
     const b = e.target.closest('[data-hk-tab]'); if (!b) return;
     tab = b.dataset.hkTab;
+    if (tab === 'quest' && rpg) rpg.resetTab();
     $app.querySelectorAll('.hk-nav button').forEach((x) => x.classList.toggle('on', x === b));
     renderTab();
   });
@@ -214,6 +223,8 @@ function renderTab() {
   const m = $('#hk-main'); if (!m) return;
   window.scrollTo(0, 0);
   document.body.classList.toggle('rp-night', tab === 'quest');
+  document.body.classList.toggle('rp-game', tab === 'quest');
+  const h1 = $root?.querySelector('.top h1'); if (h1) h1.textContent = tab === 'quest' ? '冒険' : 'ヒマコロシ';
   if (tab !== 'quest' && rpg) rpg.leave();
   if (tab === 'quest') {
     m.onclick = null;
@@ -339,7 +350,7 @@ export function leaveHima() {
   // 画面を離れるときは描き直さずに閉じる
   if (cleanup) { cleanup(); cleanup = null; }
   $('#hk-ov')?.remove();
-  document.body.classList.remove('hk-lock', 'rp-night');
+  document.body.classList.remove('hk-lock', 'rp-night', 'rp-game');
   if (rpg) rpg.leave();
   $root = null;
 }

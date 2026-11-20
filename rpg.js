@@ -3,6 +3,7 @@
 // 雑魚戦：単語帳（data/hima-words.js）の4択 ／ ボス戦：本編のその回の5択（コード・図つき）
 // 保存は ヒマコロシの S.rpg（キー oretachi:hima）
 import { bgm } from './bgm.js';
+import { ENEMIES } from './enemies.js';
 
 /* ---------- データ ---------- */
 // 仲間。subj が一致するステージでは攻撃力×1.5（'all' はどこでも×1.2）
@@ -36,21 +37,37 @@ const SKILL_DESC = {
 };
 const RAR = ['', '★', '★★', '★★★'];
 
-// 敵（バグ）。雑魚とボス（回ごと）
-const ENEMIES = {
-  ccpp: {
-    zako: [['ヌルポ', '👻'], ['オフバイワン', '🐛'], ['メモリリーク', '💧'], ['未初期化', '❓'], ['セミコロン忘れ', '🦠'], ['型ちがい', '🧩']],
-    boss: { 1: ['コンパイルエラー大王', '👹'], 2: ['切り捨てゴーレム', '🗿'], 3: ['無限ループの主', '🌀'], 4: ['添字オーバーラン', '🐙'], 5: ['再帰スタック魔人', '🧞'], 6: ['ダングリングポインタ', '👿'], 8: ['ナル文字わすれ', '🦂'] },
-  },
-  db: {
-    zako: [['NULL霊', '👻'], ['重複レコード', '👯'], ['ゴミデータ', '🗑️'], ['文字化け', '🔣'], ['全件DELETE魔', '💣'], ['迷子の主キー', '🔑']],
-    boss: { 2: ['WHERE忘れ大王', '👹'], 3: ['検索の迷宮主', '🧩'], 4: ['並び替えカオス', '🌪️'], 5: ['関数キメラ', '🐲'], 6: ['集計ゴーレム', '🗿'], 7: ['副問合せの影', '👤'], 8: ['NULL消しの番人', '🕳️'] },
-  },
-  sd: {
-    zako: [['仕様あいまい', '🌫️'], ['分析中毒', '🤯'], ['スパゲッティ', '🍝'], ['多重度ミス', '❌'], ['矢印まちがい', '🔀'], ['図なし魔', '📄']],
-    boss: { 1: ['設計図なし魔王', '🧟'], 2: ['境界こわし', '👹'], 4: ['スナップショット幽霊', '👻'], 5: ['継承地獄', '🐉'], 6: ['待ちぼうけデッドロック', '🔒'], 7: ['番号ちがい伝令', '🦜'], 8: ['出口なしステート', '🚪'] },
-  },
-};
+// 敵（バグ）は enemies.js
+// 難易度（周回用）：ノーマル → ハード → ゲキムズ
+const DIFF = [
+  { name: 'ノーマル', tag: '', hp: 1, atk: 1, time: 1, rew: 1 },
+  { name: 'ハード', tag: '🔥', hp: 1.6, atk: 1.5, time: 0.85, rew: 1.8 },
+  { name: 'ゲキムズ', tag: '💀', hp: 2.5, atk: 2.2, time: 0.7, rew: 3 },
+];
+// デイリー・ウィークリー目標
+const DAILY = [
+  { id: 'stage', name: 'ステージを3回クリア', n: 3, coins: 60, food: 1 },
+  { id: 'zako', name: '雑魚を10体たおす', n: 10, coins: 60, food: 1 },
+  { id: 'correct', name: 'バトルで20問正解', n: 20, coins: 60, food: 1 },
+];
+const WEEKLY = [
+  { id: 'boss', name: 'ボスを5回たおす', n: 5, coins: 300, food: 3 },
+  { id: 'stage', name: 'ステージを20回クリア', n: 20, coins: 300, food: 3 },
+  { id: 'star3', name: '★3を5回とる', n: 5, coins: 300, food: 3 },
+  { id: 'hard', name: 'ハード以上を3回クリア', n: 3, coins: 300, food: 3 },
+];
+const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const dayKey = () => ymd(new Date());
+const weekKey = () => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return ymd(d); }; // 月曜はじまり
+// 図鑑：科目ごとの全部の敵 [{key,name,icon,desc,kind,lec}]
+function allEnemies(subj) {
+  const E = ENEMIES[subj], out = [];
+  for (const [k, b] of Object.entries(E.boss)) out.push({ kind: 'boss', lec: k, name: b[0], icon: b[1], desc: b[2] });
+  for (const [k, zs] of Object.entries(E.lec)) for (const z of zs) out.push({ kind: 'lec', lec: k, name: z[0], icon: z[1], desc: z[2] });
+  for (const z of E.common) out.push({ kind: 'common', name: z[0], icon: z[1], desc: z[2] });
+  out.push({ kind: 'rare', name: E.rare[0], icon: E.rare[1], desc: E.rare[2] });
+  return out.map((x) => ({ ...x, key: `${subj}|${x.name}` }));
+}
 
 /* ---------- 計算 ---------- */
 const needExp = (lv) => lv * 50;
@@ -65,6 +82,8 @@ export function makeRPG(ctx) {
     if (S.owl && r.owned.owl !== S.owl) r.owned.owl = S.owl; // フクロウはホームと共通
     if (!r.heroName) r.heroName = '主人公';
     if (!r.sound) r.sound = 'silent'; // 'silent' | 'bgm'（講義中に使うので最初はサイレント）
+    if (!r.stars) { r.stars = {}; for (const id of Object.keys(r.clear)) r.stars[`${id}#0`] = 1; } // 前のデータのクリアは★1から
+    if (!r.zukan) r.zukan = {};
     return r;
   };
   bgm.setEnabled(R().sound === 'bgm');
@@ -85,10 +104,32 @@ export function makeRPG(ctx) {
   const team = () => ['hero', ...R().party.filter((id) => R().owned[id])].map(member);
   const darkOv = () => document.getElementById('hk-ov')?.classList.add('rp-ov');
 
-  /* ---------- 冒険タブ（すごろくマップ） ---------- */
+  /* ---------- 冒険（ゲーム画面）：下のゲーム用タブで マップ・編成・ガチャ・図鑑・目標 ---------- */
+  let gtab = 'map', $m = null;
+  const GTABS = [['map', '🗺️', 'マップ'], ['party', '👥', '編成'], ['gacha', '🎁', 'ガチャ'], ['zukan', '📖', '図鑑'], ['goals', '🎯', '目標']];
   async function renderQuestTab(m) {
-    const r = R();
+    $m = m;
     if (!lectures) lectures = await api.lectures();
+    const canClaim = goalList().some((g) => g.done && !g.got);
+    m.innerHTML = `<div id="rp-page"></div>
+      <nav class="rp-gnav">${GTABS.map(([k, i, n]) => `<button data-gtab="${k}" class="${k === gtab ? 'on' : ''}"><span class="i">${i}</span>${n}${k === 'goals' && canClaim ? '<em class="rp-dot"></em>' : ''}</button>`).join('')}</nav>`;
+    m.onclick = (e) => {
+      const b = e.target.closest('[data-gtab]'); if (!b) return;
+      bgm.sfx('tap'); gtab = b.dataset.gtab; renderQuestTab(m);
+    };
+    const pg = m.querySelector('#rp-page');
+    window.scrollTo(0, 0);
+    if (gtab === 'map') renderMap(pg);
+    else if (gtab === 'party') openParty(pg);
+    else if (gtab === 'gacha') openGacha(pg);
+    else if (gtab === 'zukan') renderZukan(pg);
+    else renderGoals(pg);
+    bgm.play('map');
+  }
+  const starsOf = (id) => [0, 1, 2].map((d) => R().stars[`${id}#${d}`] || 0);
+  const starTxt = (n) => '★'.repeat(n) + '☆'.repeat(3 - n);
+  function renderMap(m) {
+    const r = R();
     const t = team();
     const chapters = Object.entries(lectures[r.subj] || {});
     // 下から上へ：各章 章の看板 → ステージ1 → ステージ2 → ボス
@@ -132,7 +173,6 @@ export function makeRPG(ctx) {
           <div class="rp-faces">${t.map((x) => iconHTML(x.id, 'sm')).join('')}${Array(4 - t.length).fill('<span class="rp-face sm empty">＋</span>').join('')}</div>
           <div class="rp-stat"><span>HP <b>${t.reduce((a, x) => a + x.hp, 0)}</b></span><span>攻撃 <b>${t.reduce((a, x) => a + x.atk, 0)}</b></span></div>
         </div>
-        <div class="rp-hudbtns"><button class="rp-btn" data-rp="party">👥 パーティ</button><button class="rp-btn gold" data-rp="gacha">🎁 ガチャ</button></div>
         <div class="seg rp-seg" role="group">${SUBJ.map(([k, n]) => `<button data-rp="subj" data-k="${k}" aria-pressed="${r.subj === k}">${n}</button>`).join('')}</div>
       </div>
       <div class="rp-mapbox" id="rp-mapbox"><div class="rp-map" style="height:${H}px">
@@ -142,36 +182,126 @@ export function makeRPG(ctx) {
           if (x.kind === 'sign') return `<div class="rp-sign" style="top:${top}px"><b>${esc(x.no)}</b><span>${esc(x.title)}</span></div>`;
           const isHere = x === here;
           const boss = x.n === 3;
+          const st = starsOf(`${r.subj}-${x.k}-${x.n}`), best = Math.max(...st), dmax = st[2] ? 2 : st[1] ? 1 : 0;
           return `<button class="rp-spot${boss ? ' boss' : ''}${x.done ? ' done' : ''}${isHere ? ' here' : ''}" style="left:${pos[i].x}%;top:${top}px" data-rp="stage" data-k="${x.k}" data-n="${x.n}" ${x.open ? '' : 'disabled'}>
             <span class="c">${!x.open ? '🔒' : boss ? esc(E.boss[x.k]?.[1] || '👑') : x.n}</span>
-            <small>${boss ? 'BOSS' : 'STAGE ' + x.n}${x.done ? ' ★' : ''}</small>
+            <small>${boss ? 'BOSS' : 'STAGE ' + x.n}${x.done ? ` <i class="rp-stars">${starTxt(best)}</i>${DIFF[dmax].tag}` : ''}</small>
             ${isHere ? '<img class="rp-me" src="icons/icon-192.png" alt="">' : ''}
           </button>`;
         }).join('')}
       </div></div>
-      <p class="rp-tip">雑魚は単語帳の4択、ボスは本番形式の5択。速く答えるほど大ダメージ。</p>`;
+      <p class="rp-tip">クリアしたステージはハード🔥・ゲキムズ💀で周回できる。</p>`;
     m.onclick = (e) => {
       const b = e.target.closest('[data-rp]'); if (!b || b.disabled) return;
+      e.stopPropagation();
       const a = b.dataset.rp;
       bgm.sfx('tap');
-      if (a === 'subj') { R().subj = b.dataset.k; save(); renderQuestTab(m); }
-      else if (a === 'party') openParty();
-      else if (a === 'gacha') openGacha();
+      if (a === 'subj') { R().subj = b.dataset.k; save(); renderMap(m); }
       else if (a === 'rename') openRename();
       else if (a === 'sound') {
         const r2 = R(); r2.sound = r2.sound === 'bgm' ? 'silent' : 'bgm'; save();
         bgm.setEnabled(r2.sound === 'bgm');
         if (r2.sound === 'bgm') bgm.play('map');
         toast(r2.sound === 'bgm' ? '🎵 BGMモード：音楽と効果音が鳴る' : '🔇 サイレントモード：音は鳴らない');
-        renderQuestTab(m);
-      } else if (a === 'stage') startBattle(R().subj, b.dataset.k, +b.dataset.n);
+        renderMap(m);
+      } else if (a === 'stage') openStage(m, R().subj, b.dataset.k, +b.dataset.n);
     };
-    bgm.play('map');
     // いる場所まで自動でスクロール
     requestAnimationFrame(() => {
       const box = m.querySelector('#rp-mapbox'), here2 = m.querySelector('.rp-spot.here');
       if (box && here2) box.scrollTop = here2.offsetTop - box.clientHeight / 2;
     });
+  }
+
+  // ステージをタップ：出てくる敵・難易度・★を見て出撃
+  function openStage(m, subj, k, n) {
+    const r = R(), id = `${subj}-${k}-${n}`, st = starsOf(id), boss = n === 3, E = ENEMIES[subj];
+    const no = (lectures[subj][k].match(/^(第\S+?回)/) || [lectures[subj][k]])[0];
+    const foes = boss ? [E.boss[k]] : [...(E.lec[k] || []), ...E.common];
+    const seen = (nm) => (r.zukan[`${subj}|${nm}`] || 0) > 0;
+    let d = Math.min(2, st[2] ? 2 : st[1] ? 2 : st[0] ? 1 : 0); // 次の難易度を初期選択
+    if (!r.clear[id]) d = 0;
+    const draw = () => {
+      sh.innerHTML = `<div class="rp-sheet-in">
+        <div class="rp-sheet-h"><b>${esc(no)} ${boss ? 'BOSS' : 'STAGE ' + n}</b><button class="rp-x" data-sx aria-label="閉じる">✕</button></div>
+        <div class="rp-sfoes">${foes.slice(0, boss ? 1 : 8).map((f) => `<span class="${seen(f[0]) ? '' : 'unk'}">${seen(f[0]) ? f[1] : '？'}</span>`).join('')}${boss ? '' : '<span class="rare">🌟?</span>'}</div>
+        <div class="rp-diffs">${DIFF.map((x, i) => {
+          const open = i === 0 || st[i - 1] > 0;
+          return `<button class="rp-diff${d === i ? ' on' : ''}" data-d="${i}" ${open ? '' : 'disabled'}><b>${x.tag}${x.name}</b><i class="rp-stars">${open ? starTxt(st[i]) : '🔒'}</i><small>${i ? `報酬×${x.rew}` : open ? '' : ''}${!open ? `${DIFF[i - 1].name}をクリアで解放` : ''}</small></button>`;
+        }).join('')}</div>
+        <p class="rp-starrule">★1 クリア　★2 HPを半分以上残す　★3 ノーミス</p>
+        <button class="rp-btn gold big wide" data-go>出撃！</button></div>`;
+    };
+    const sh = document.createElement('div'); sh.className = 'rp-sheet';
+    m.appendChild(sh); draw();
+    sh.onclick = (e) => {
+      e.stopPropagation();
+      if (e.target === sh || e.target.closest('[data-sx]')) { sh.remove(); return; }
+      const db = e.target.closest('[data-d]'); if (db && !db.disabled) { d = +db.dataset.d; bgm.sfx('tap'); draw(); return; }
+      if (e.target.closest('[data-go]')) { sh.remove(); startBattle(subj, k, n, d); }
+    };
+  }
+
+  /* ---------- 図鑑：倒した敵が登録される ---------- */
+  let zsubj = null, zsel = null;
+  function renderZukan(m) {
+    const r = R(); zsubj = zsubj || r.subj;
+    const list = allEnemies(zsubj), got = list.filter((x) => r.zukan[x.key]).length;
+    const lecName = (k) => (lectures[zsubj][k] || `第${k}回`);
+    const cell = (x) => { const c = r.zukan[x.key] || 0; return `<button class="rp-zc${c ? '' : ' unk'}${x.kind === 'boss' ? ' boss' : ''}${x.kind === 'rare' ? ' rare' : ''}${zsel === x.key ? ' sel' : ''}" data-z="${esc(x.key)}" ${c ? '' : 'disabled'}><span>${c ? x.icon : '？'}</span><small>${c ? esc(x.name) : '？？？'}</small></button>`; };
+    const lecs = Object.keys(lectures[zsubj]);
+    const sel = list.find((x) => x.key === zsel);
+    const where = (x) => (x.kind === 'boss' ? `${lecName(x.lec)} のボス` : x.kind === 'lec' ? `${lecName(x.lec)} のステージ` : x.kind === 'rare' ? 'どのステージにもたまに出る' : 'どのステージにも出る');
+    m.innerHTML = `
+      <div class="rp-zhead"><b>📖 敵キャラ図鑑</b><span>登録 <b>${got}</b> / ${list.length}</span></div>
+      <div class="rp-zbar"><i style="width:${(got / list.length) * 100}%"></i></div>
+      <div class="seg rp-seg mt" role="group">${SUBJ.map(([k, n]) => `<button data-zs="${k}" aria-pressed="${zsubj === k}">${n}</button>`).join('')}</div>
+      ${sel ? `<div class="rp-zdetail"><span class="rp-zbig">${sel.icon}</span><div><b>${esc(sel.name)}</b>${sel.kind === 'boss' ? '<em>BOSS</em>' : sel.kind === 'rare' ? '<em class="rare">レア</em>' : ''}
+        <p>${esc(sel.desc)}</p><small>${esc(where(sel))}・たおした数 ${r.zukan[sel.key]}</small></div><button class="rp-x" data-zx aria-label="閉じる">✕</button></div>` : '<p class="rp-tip">たおした敵が登録される。タップで説明が見られる。</p>'}
+      <h3 class="rp-zsec">ボス</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'boss').map(cell).join('')}</div>
+      <h3 class="rp-zsec">レア</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'rare').map(cell).join('')}</div>
+      ${lecs.filter((k) => ENEMIES[zsubj].lec[k]).map((k) => `<h3 class="rp-zsec">${esc(lecName(k))}</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'lec' && x.lec === k).map(cell).join('')}</div>`).join('')}
+      <h3 class="rp-zsec">どこにでも出る</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'common').map(cell).join('')}</div>`;
+    m.onclick = (e) => {
+      const zs = e.target.closest('[data-zs]'); if (zs) { e.stopPropagation(); zsubj = zs.dataset.zs; zsel = null; bgm.sfx('tap'); renderZukan(m); return; }
+      if (e.target.closest('[data-zx]')) { e.stopPropagation(); zsel = null; renderZukan(m); return; }
+      const z = e.target.closest('[data-z]'); if (z && !z.disabled) { e.stopPropagation(); zsel = z.dataset.z; bgm.sfx('tap'); renderZukan(m); window.scrollTo(0, 0); }
+    };
+  }
+
+  /* ---------- デイリー・ウィークリー目標 ---------- */
+  function goalState() {
+    const r = R();
+    if (!r.goals || r.goals.day !== dayKey()) r.goals = { ...(r.goals || {}), day: dayKey(), d: {}, dc: {} };
+    if (r.goals.week !== weekKey()) Object.assign(r.goals, { week: weekKey(), w: {}, wc: {} });
+    return r.goals;
+  }
+  function goalList() {
+    const g = goalState();
+    return [...DAILY.map((x) => ({ ...x, scope: 'd', v: g.d[x.id] || 0, got: !!g.dc[x.id] })), ...WEEKLY.map((x) => ({ ...x, scope: 'w', v: g.w[x.id] || 0, got: !!g.wc[x.id] }))].map((x) => ({ ...x, done: x.v >= x.n }));
+  }
+  function bump(id, by = 1, scope) {
+    const g = goalState();
+    if (!scope || scope === 'd') if (DAILY.some((x) => x.id === id)) g.d[id] = (g.d[id] || 0) + by;
+    if (!scope || scope === 'w') if (WEEKLY.some((x) => x.id === id)) g.w[id] = (g.w[id] || 0) + by;
+  }
+  function renderGoals(m) {
+    const gl = goalList();
+    const row = (x) => `<div class="rp-goal${x.got ? ' got' : x.done ? ' done' : ''}">
+      <div><b>${esc(x.name)}</b><span class="rp-gbar"><i style="width:${Math.min(100, (x.v / x.n) * 100)}%"></i></span><small>${Math.min(x.v, x.n)} / ${x.n}　報酬 🪙${x.coins} 🌰${x.food}</small></div>
+      ${x.got ? '<span class="rp-gok">✓ 受け取り済み</span>' : `<button class="rp-btn gold" data-claim="${x.scope}:${x.id}" ${x.done ? '' : 'disabled'}>受け取る</button>`}</div>`;
+    m.innerHTML = `
+      <div class="rp-zhead"><b>🎯 デイリー目標</b><span>毎日0時に更新</span></div>${gl.filter((x) => x.scope === 'd').map(row).join('')}
+      <div class="rp-zhead mt"><b>🏅 ウィークリー目標</b><span>毎週月曜に更新</span></div>${gl.filter((x) => x.scope === 'w').map(row).join('')}`;
+    m.onclick = (e) => {
+      const b = e.target.closest('[data-claim]'); if (!b || b.disabled) return;
+      e.stopPropagation();
+      const [sc, id] = b.dataset.claim.split(':'), g = goalState(), x = gl.find((y) => y.scope === sc && y.id === id);
+      if (!x || !x.done || x.got) return;
+      g[sc + 'c'][id] = 1; R().coins += x.coins; addFood(x.food); save(); ctx.renderTop?.();
+      bgm.sfx('win'); toast(`🪙${x.coins} と 🌰${x.food} をゲット！`);
+      renderQuestTab($m);
+    };
   }
   // 解放条件：その科目の最初のステージは最初から。ほかは1つ前のステージをクリア
   function isOpen(subj, k, n, ci) {
@@ -203,8 +333,7 @@ export function makeRPG(ctx) {
     while (o.exp >= needExp(o.lv)) { o.exp -= needExp(o.lv); o.lv++; ups++; }
     return ups;
   }
-  function openParty() {
-    openOv('パーティ編成'); darkOv();
+  function openParty(B) {
     let sel = null, sort = 'rar';
     const draw = () => {
       const r = R(), t = team();
@@ -213,7 +342,7 @@ export function makeRPG(ctx) {
       const unknown = Object.keys(CHARS).length - ownedIds.length;
       const d = sel ? member(sel) : null;
       const o = sel === 'hero' ? r.hero : sel ? r.owned[sel] : null;
-      body().innerHTML = `
+      B.innerHTML = `
         <div class="rp-form rp-full">
           <div class="rp-formhead"><b>編成</b><span>HP <b>${t.reduce((a, x) => a + x.hp, 0)}</b>　攻撃 <b>${t.reduce((a, x) => a + x.atk, 0)}</b></span></div>
           <div class="rp-slots">
@@ -242,7 +371,7 @@ export function makeRPG(ctx) {
           </div></div>` : ''}`;
     };
     draw();
-    body().onclick = (e) => {
+    B.onclick = (e) => {
       const r = R();
       const sb = e.target.closest('[data-sort]'); if (sb) { sort = sb.dataset.sort; draw(); return; }
       if (e.target.closest('[data-close-detail]')) { sel = null; draw(); return; }
@@ -273,11 +402,10 @@ export function makeRPG(ctx) {
     const pool = Object.keys(CHARS).filter((id) => CHARS[id].rar === rar && id !== 'owl');
     return pool[rnd(pool.length)];
   }
-  function openGacha() {
-    openOv('ガチャ'); darkOv();
+  function openGacha(B) {
     const draw = (res) => {
       const r = R();
-      body().innerHTML = `
+      B.innerHTML = `
         <div class="rp-gacha rp-full"><div class="rp-gbox${res ? ' open' : ''}">🎁</div>
           <p class="rp-rates">★★★ 6% ・ ★★ 26% ・ ★ 68%　かぶったらレベル+1</p>
           <div class="row"><button class="rp-btn gold big" data-g="1" ${r.coins < 100 ? 'disabled' : ''}>1回<small>🪙100</small></button><button class="rp-btn gold big" data-g="10" ${r.coins < 900 ? 'disabled' : ''}>10回<small>🪙900</small></button></div>
@@ -285,7 +413,7 @@ export function makeRPG(ctx) {
         ${res ? `<div class="rp-gres">${res.map(([id, isNew], i) => `<span class="rp-gitem r${CHARS[id].rar}" style="animation-delay:${i * 0.08}s">${iconHTML(id)}<span class="rp-rar">${RAR[CHARS[id].rar]}</span><small>${esc(CHARS[id].name)}</small><em>${isNew ? 'NEW!' : 'Lv+1'}</em></span>`).join('')}</div>` : ''}`;
     };
     draw();
-    body().onclick = (e) => {
+    B.onclick = (e) => {
       const b = e.target.closest('[data-g]'); if (!b || b.disabled) return;
       const n = +b.dataset.g, r = R(), cost = n === 10 ? 900 : 100;
       if (r.coins < cost) return;
@@ -304,20 +432,27 @@ export function makeRPG(ctx) {
   }
 
   /* ---------- バトル ---------- */
-  async function startBattle(subj, lec, n) {
+  async function startBattle(subj, lec, n, d = 0) {
     const ci = Object.keys(lectures[subj]).indexOf(String(lec));
     const boss = n === 3;
-    const E = ENEMIES[subj];
+    const E = ENEMIES[subj], D = DIFF[d];
     const lvScale = 1 + ci * 0.4 + (n - 1) * 0.15;
+    // 雑魚：その回専用（あれば2体）＋どこにでも出る雑魚 で3体。たまにレアが混ざる
+    const zakos = () => {
+      const lz = shuffle([...(E.lec[lec] || [])]).slice(0, 2);
+      const z = shuffle([...lz, ...shuffle([...E.common]).slice(0, 3 - lz.length)]);
+      if (Math.random() < (d ? 0.12 : 0.08)) z[rnd(z.length)] = E.rare;
+      return z.map(([name, icon]) => { const rare = name === E.rare[0]; return { name, icon, rare, hp: Math.round(100 * lvScale * D.hp * (rare ? 0.7 : 1)), atk: Math.round(18 * lvScale * D.atk * (rare ? 0.5 : 1)) }; });
+    };
     const foes = boss
-      ? [{ name: E.boss[lec][0], icon: E.boss[lec][1], hp: Math.round(380 * lvScale), atk: Math.round(35 * lvScale), boss: true }]
-      : shuffle([...E.zako]).slice(0, 3).map(([name, icon]) => ({ name, icon, hp: Math.round(100 * lvScale), atk: Math.round(18 * lvScale) }));
+      ? [{ name: E.boss[lec][0], icon: E.boss[lec][1], hp: Math.round(380 * lvScale * D.hp), atk: Math.round(35 * lvScale * D.atk), boss: true }]
+      : zakos();
     const t = team();
     const maxHp = t.reduce((a, x) => a + x.hp, 0);
-    const st = { foes, fi: 0, ehp: foes[0].hp, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: boss ? 90 : 12, busy: false, combo: 0, correct: 0, over: false, turns: 0, event: null };
+    const st = { foes, fi: 0, ehp: foes[0].hp, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0 };
     const deck = DECKS.find((d) => d.id === subj).words;
     const no = (lectures[subj][lec].match(/^(第\S+?回)/) || [lectures[subj][lec]])[0];
-    openOv(`${no} ${boss ? 'BOSS' : 'STAGE ' + n}`); darkOv();
+    openOv(`${no} ${boss ? 'BOSS' : 'STAGE ' + n}${d ? ' ' + D.tag + D.name : ''}`); darkOv();
     setCleanup(() => { clearInterval(st.timer); bgm.play('map'); });
     bgm.play(boss ? 'boss' : 'battle');
 
@@ -329,10 +464,10 @@ export function makeRPG(ctx) {
       body().innerHTML = `
         <div class="rp-battle">
           <div class="rp-head">
-            <div class="rp-field${f.boss ? ' boss' : ''}">
+            <div class="rp-field${f.boss ? ' boss' : ''}${f.rare ? ' rare' : ''}">
               <div class="rp-enemy" id="rp-enemy">${f.icon}</div>
               <div class="rp-einfo">
-                <div class="rp-wave">${f.boss ? 'BOSS' : `ENEMY ${st.fi + 1}/${foes.length}`}</div>
+                <div class="rp-wave">${f.boss ? 'BOSS' : `ENEMY ${st.fi + 1}/${foes.length}`}${f.rare ? '　🌟レア！' : ''}</div>
                 <div class="rp-ename">${esc(f.name)}</div>
                 <div class="rp-hpbar enemy"><i id="rp-ehp"></i><span id="rp-ehptxt"></span></div>
               </div>
@@ -469,7 +604,7 @@ export function makeRPG(ctx) {
         drawTeam();
         line = `<div class="rp-after ok"><b>正解！</b>${st.q.boss ? '' : `<span>${st.q.exp}</span>`}</div>`;
       } else {
-        st.combo = 0;
+        st.combo = 0; st.miss++;
         bgm.sfx('miss');
         anim(document.getElementById('rp-enemy'), 'lunge'); // 敵の反撃
         await wait(380);
@@ -495,6 +630,8 @@ export function makeRPG(ctx) {
         const en = document.getElementById('rp-enemy');
         if (en) en.classList.add('ko');
         bgm.sfx('ko');
+        // 図鑑に登録・目標
+        { const f = foes[st.fi], r = R(), key = `${subj}|${f.name}`; const isNew = !r.zukan[key]; r.zukan[key] = (r.zukan[key] || 0) + 1; if (f.rare) st.rares++; if (!f.boss) bump('zako'); save(); if (isNew) setTimeout(() => toast(`📖 図鑑に「${f.name}」が登録された！`), 300); }
         st.busy = true;
         setTimeout(() => {
           if (st.over) return;
@@ -526,27 +663,36 @@ export function makeRPG(ctx) {
     function finish(win) {
       st.over = true; clearInterval(st.timer);
       bgm.stop(); bgm.sfx(win ? 'win' : 'lose');
-      const r = R(), id = `${subj}-${lec}-${n}`, first = win && !r.clear[id];
-      let coins = 0, exp = 0;
+      const r = R(), id = `${subj}-${lec}-${n}`, dk = `${id}#${d}`, first = win && !r.stars[dk];
+      let coins = 0, exp = 0, food = 0, stars = 0, newBest = false;
       const ups = [];
+      bump('correct', st.correct);
       if (win) {
-        coins = Math.round((boss ? 120 : 40) * (1 + ci * 0.15)) * (first ? 2 : 1);
-        exp = boss ? 80 : 30;
-        r.coins += coins; r.clear[id] = 1;
+        stars = 1 + (st.hp / st.maxHp >= 0.5 ? 1 : 0) + (st.miss === 0 ? 1 : 0);
+        newBest = stars > (r.stars[dk] || 0);
+        coins = Math.round((boss ? 120 : 40) * (1 + ci * 0.15) * D.rew) * (first ? 2 : 1) + st.rares * 150;
+        exp = Math.round((boss ? 80 : 30) * D.rew);
+        food = first ? 2 : 1;
+        r.coins += coins; r.clear[id] = 1; if (newBest) r.stars[dk] = stars;
         const grow = (o, name) => { o.exp += exp; while (o.exp >= needExp(o.lv)) { o.exp -= needExp(o.lv); o.lv++; ups.push(`${name} Lv.${o.lv}`); } };
         grow(r.hero, heroName());
         r.party.forEach((pid) => r.owned[pid] && grow(r.owned[pid], CHARS[pid].name));
-        if (first) addFood(2);
-        save();
+        addFood(food);
+        bump('stage'); if (boss) bump('boss'); if (stars === 3) bump('star3'); if (d) bump('hard');
       }
+      save();
+      const nextD = win && d < 2 && first ? DIFF[d + 1] : null;
       body().innerHTML = `<div class="rp-result${win ? ' win' : ''}">
         <div class="rp-endicon">${win ? '🏆' : '💫'}</div>
         <div class="rp-endtitle">${win ? 'STAGE CLEAR!' : 'GAME OVER'}</div>
-        <p class="rp-endsub">${win ? `${esc(foes[foes.length - 1].name)}をたおした！` : `正解 ${st.correct}問。パーティを育ててまた挑戦しよう`}</p>
-        ${win ? `<div class="rp-rewards"><span>🪙 ${coins}${first ? '<em>初クリア×2</em>' : ''}</span><span>EXP ${exp}</span>${first ? '<span>🌰 2</span>' : ''}</div>` : ''}
+        ${win ? `<div class="rp-endstars">${[1, 2, 3].map((k) => `<span class="${k <= stars ? 'on' : ''}" style="animation-delay:${k * 0.18}s">★</span>`).join('')}</div>
+        <p class="rp-starrule">★1 クリア ${'✓'}　★2 HP半分以上 ${st.hp / st.maxHp >= 0.5 ? '✓' : '✗'}　★3 ノーミス ${st.miss === 0 ? '✓' : `✗（ミス${st.miss}）`}</p>` : ''}
+        <p class="rp-endsub">${win ? `${esc(foes[foes.length - 1].name)}をたおした！${newBest && !first ? ' ★の記録更新！' : ''}` : `正解 ${st.correct}問。パーティを育ててまた挑戦しよう`}</p>
+        ${win ? `<div class="rp-rewards"><span>🪙 ${coins}${first ? '<em>初クリア×2</em>' : ''}${st.rares ? `<em>レア+${st.rares * 150}</em>` : ''}</span><span>EXP ${exp}</span><span>🌰 ${food}</span></div>` : ''}
+        ${nextD ? `<p class="rp-unlock">${nextD.tag}${nextD.name}が解放された！</p>` : ''}
         ${ups.length ? `<div class="rp-ups"><b>LEVEL UP!</b>${ups.map((u) => `<span>${esc(u)}</span>`).join('')}</div>` : ''}
         <div class="row"><button class="rp-btn gold big" id="rp-again">${win ? 'もう一回' : 'リトライ'}</button><button class="rp-btn big" id="rp-back">マップへ</button></div></div>`;
-      document.getElementById('rp-again').onclick = () => startBattle(subj, lec, n);
+      document.getElementById('rp-again').onclick = () => startBattle(subj, lec, n, d);
       document.getElementById('rp-back').onclick = closeOv;
     }
 
@@ -568,5 +714,5 @@ export function makeRPG(ctx) {
     return { ...m, rec: id === 'hero' ? r.hero : r.owned[id] };
   }
 
-  return { renderQuestTab, leave, memberInfo };
+  return { renderQuestTab, leave, memberInfo, resetTab: () => { gtab = 'map'; } };
 }
