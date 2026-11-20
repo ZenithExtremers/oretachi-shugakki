@@ -1,5 +1,5 @@
 // ソフトウェア設計の問題で使う UML 図（講義の例題・確認クイズをもとに作図）
-import { usecase, classDiagram, sequence, communication } from '../uml.js';
+import { usecase, classDiagram, sequence, communication, stateMachine } from '../uml.js';
 
 // 図書館システムのユースケース図
 export const ucLibrary = usecase({
@@ -134,5 +134,45 @@ export const cmLend = communication({
     { from: 'g', to: 'k', msgs: [{ text: '1.1：貸し出す(本ID)' }] },
     { from: 'k', to: 'b', msgs: [{ text: '1.1.1：可否 = 貸出可能か()' }, { text: '1.1.2 [可否 = 可]：貸出中にする()' }] },
     { from: 'k', to: 'r', msgs: [{ text: '1.1.3 [可否 = 可]：«create»' }] },
+  ],
+});
+
+// ステートマシン図：図書館の「本」の一生（第08回の冒頭の図）
+export const smBook = stateMachine({
+  w: 680, h: 360,
+  states: [
+    { id: 'a', name: '貸出可能', x: 120, y: 60, w: 200, acts: ['entry / 棚に戻す'] },
+    { id: 'b', name: '貸出中', x: 460, y: 60, w: 200, acts: ['do / 返却期限を見張る'] },
+    { id: 'c', name: '延滞中', x: 460, y: 270, w: 200, acts: ['entry / 督促メールを送る'] },
+  ],
+  starts: [{ x: 22, y: 78 }], finals: [{ x: 180, y: 325 }],
+  trans: [
+    { pts: [[32, 78], [120, 78]], label: '登録する', lx: 72, ly: 66 },
+    { pts: [[320, 74], [460, 74]], label: '貸し出す / 貸出記録を作る', lx: 390, ly: 50 },
+    { pts: [[460, 100], [320, 100]], label: '返却する', lx: 390, ly: 120 },
+    { pts: [[580, 116], [580, 270]], label: '返却期限を過ぎる', lx: 570, ly: 200, anchor: 'end' },
+    { pts: [[460, 300], [270, 300], [270, 116]], label: '返却する / 延滞料を記録する', lx: 370, ly: 290 },
+    { pts: [[180, 116], [180, 313]], label: '廃棄する [破損あり]', lx: 170, ly: 220, anchor: 'end' },
+  ],
+});
+
+// ステートマシン図：モバイルオーダーの「注文」の一生（第08回 演習課題1をもとに作図）
+export const smOrder = stateMachine({
+  w: 680, h: 380,
+  states: [
+    { id: 'a', name: '受付済', x: 130, y: 40, w: 140 },
+    { id: 'b', name: '調理中', x: 420, y: 40, w: 140 },
+    { id: 'c', name: '受取待ち', x: 420, y: 170, w: 200, acts: ['entry / 通知を送る'] },
+    { id: 'd', name: '保管中', x: 420, y: 310, w: 140 },
+  ],
+  starts: [{ x: 22, y: 57 }], finals: [{ x: 200, y: 262 }],
+  trans: [
+    { pts: [[32, 57], [130, 57]], label: '注文を確定する', lx: 78, ly: 30 },
+    { pts: [[270, 57], [420, 57]], label: '調理を始める', lx: 345, ly: 47 },
+    { pts: [[490, 74], [490, 170]], label: '調理が終わる', lx: 500, ly: 127, anchor: 'start' },
+    { pts: [[510, 226], [510, 310]], label: '30分過ぎる', lx: 520, ly: 273, anchor: 'start' },
+    { pts: [[200, 74], [200, 250]], label: '取り消す / 返金する', lx: 190, ly: 165, anchor: 'end' },
+    { pts: [[420, 205], [290, 205], [290, 262], [212, 262]], label: '受け取る [番号が一致]', lx: 340, ly: 196 },
+    { pts: [[420, 327], [200, 327], [200, 274]], label: '受け取る', lx: 310, ly: 317 },
   ],
 });

@@ -195,3 +195,25 @@ export function communication(d) {
   }
   return wrap(d.w, d.h, body);
 }
+
+/* ---------- ステートマシン図 ---------- */
+// stateMachine({ w, h, states:[{id,name,x,y,w,acts?:['entry / …']}], starts:[{x,y}], finals:[{x,y}],
+//   trans:[{ pts:[[x,y],…], label?, lx?, ly?, anchor? }] })   座標は手で指定（x,y は箱の左上）
+export function stateMachine(d) {
+  let body = '';
+  for (const t of d.trans) {
+    const p = t.pts;
+    for (let i = 0; i < p.length - 1; i++) body += line(p[i][0], p[i][1], p[i + 1][0], p[i + 1][1], i === p.length - 2 ? { end: 'u-open' } : {});
+    if (t.label) body += text(t.lx, t.ly, t.label, { size: 13, anchor: t.anchor });
+  }
+  for (const s of d.starts || []) body += `<circle cx="${s.x}" cy="${s.y}" r="10" fill="#111"/>`;
+  for (const f of d.finals || []) body += `<circle cx="${f.x}" cy="${f.y}" r="12" fill="#fff" stroke="#111" stroke-width="1.5"/><circle cx="${f.x}" cy="${f.y}" r="7" fill="#111"/>`;
+  for (const s of d.states) {
+    const acts = s.acts || [], h = 34 + acts.length * 22;
+    body += `<rect x="${s.x}" y="${s.y}" width="${s.w}" height="${h}" rx="9" fill="#fff" stroke="#111" stroke-width="1.3"/>`;
+    body += text(s.x + s.w / 2, s.y + 22, s.name, { weight: 700 });
+    if (acts.length) body += line(s.x, s.y + 32, s.x + s.w, s.y + 32);
+    acts.forEach((a, i) => { body += text(s.x + 8, s.y + 50 + i * 22, a, { size: 12, anchor: 'start' }); });
+  }
+  return wrap(d.w, d.h, body);
+}

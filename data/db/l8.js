@@ -1,10 +1,10 @@
 // データベース 第08回 テーブルの結合（講義資料をもとにしたオリジナル問題）
-import { code } from '../lib.js';
+import { code, spread } from '../lib.js';
 import { kakeibo8, himoku, himokuDup, shiten, busyo, shain } from './tables.js';
 
 const R = { lang: 'sql', tableChoices: true };
 
-export default [
+export default spread([
   {
     id: 'db-l8-g01', lecture: 8, type: 'cloze', title: 'リレーションシップと外部キー',
     intro: '次の文章の空欄［A］〜［E］に入る語句を選べ。',
@@ -246,4 +246,4 @@ SELECT k.memo, h.name
       },
     ],
   },
-];
+]);

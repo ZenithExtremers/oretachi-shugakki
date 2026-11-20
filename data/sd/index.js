@@ -1,5 +1,6 @@
 // ソフトウェア設計（sd）
 import groups from './groups.js';
+import l8 from './l8.js';
 import lessons from './lessons.js';
 
 export default {
@@ -12,6 +13,7 @@ export default {
     5: '第05回 クラス図',
     6: '第06回 シーケンス図',
     7: '第07回 コミュニケーション図',
+    8: '第08回 ステートマシン図',
   },
   types: {
     cloze: '文章の空欄補充',
@@ -24,10 +26,10 @@ export default {
     minutes: 60,
     note: '本番の形式が分からないため、C/C++ と同じ5択30問で作っています',
     blueprint: [
-      { lecture: 1, n: 5 }, { lecture: 2, n: 5 }, { lecture: 4, n: 4 },
-      { lecture: 5, n: 6 }, { lecture: 6, n: 5 }, { lecture: 7, n: 5 },
+      { lecture: 1, n: 4 }, { lecture: 2, n: 4 }, { lecture: 4, n: 4 }, { lecture: 5, n: 5 },
+      { lecture: 6, n: 4 }, { lecture: 7, n: 4 }, { lecture: 8, n: 5 },
     ],
   },
   lessons,
-  groups,
+  groups: [...groups, ...l8],
 };

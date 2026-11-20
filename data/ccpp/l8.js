@@ -1,7 +1,7 @@
 // 第8回 文字列とポインタ・cstring ライブラリ（講義資料 ccpp_08 の List をもとにしたオリジナル問題）
-import { code } from '../lib.js';
+import { code, spread } from '../lib.js';
 
-export default [
+export default spread([
   {
     id: 'ccpp-l8-g01', lecture: 8, type: 'output',
     title: '文字列リテラルの大きさ（List8-1）',
@@ -279,4 +279,4 @@ int main()
       },
     ],
   },
-];
+]);
