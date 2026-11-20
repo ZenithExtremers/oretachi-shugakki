@@ -7,6 +7,7 @@ import l3 from './l3.js';
 import l4 from './l4.js';
 import l5 from './l5.js';
 import l6 from './l6.js';
+import l8 from './l8.js';
 import lessons from './lessons.js';
 
 export default {
@@ -21,6 +22,7 @@ export default {
     4: '第4回 配列',
     5: '第5回 関数・再帰・ビット演算',
     6: '第6回 ポインタ・new/delete',
+    8: '第8回 文字列とポインタ',
   },
   types: {
     cloze: '文章の空欄補充',
@@ -50,5 +52,5 @@ export default {
     ],
   },
   lessons,
-  groups: [...l1, ...l2, ...l3, ...l4, ...l5, ...l6, ...midterm2026],
+  groups: [...l1, ...l2, ...l3, ...l4, ...l5, ...l6, ...l8, ...midterm2026],
 };

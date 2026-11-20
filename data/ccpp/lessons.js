@@ -470,4 +470,73 @@ delete[] a;                 // 配列は delete[] で解放`, numbers: false },
       { q: '`const int n = 7; int a[n];` の添字の範囲は？', choices: ['1〜7', '0〜6', '0〜7', '1〜6'], answer: 1, exp: '0 から n-1 まで。' },
     ],
   },
+  {
+    id: 'ccpp-L25', lecture: 8, title: '文字列リテラルとナル文字',
+    blocks: [
+      '二重引用符で囲んだ `"ABC"` を**文字列リテラル**という。メモリ上では最後に**ナル文字** `\\0` が自動で付いた const char 型の配列として格納される。',
+      { table: { cols: ['書き方', '中身', '大きさ（sizeof）'], rows: [['"ABC"', 'A B C ¥0', '4'], ['""', '¥0', '1'], ['"ABC¥0DEF"', 'A B C ¥0 D E F ¥0', '8']] } },
+      '**文字列**＝最後がナル文字の char 型配列。次の3つは同じ中身になる。',
+      { code: code`
+char s1[] = {'A', 'B', 'C', '\0'};
+char s2[] = {"ABC"};
+char s3[] = "ABC";          // いちばんよく使う書き方
+cout << s3;                 // ナル文字の手前まで表示 → ABC`, numbers: false },
+      { note: "{'A', 'B', 'C'} だけだとナル文字が入らず、文字列にならない。" },
+    ],
+    questions: [
+      { q: '`sizeof("ABC")` は？', choices: ['3', '4', '5', '1'], answer: 1, exp: 'ナル文字を含めて4。' },
+      { q: 'ナル文字の書き方は？', choices: ["'\\0'", "'0'", "'\\n'", '"0"'], answer: 0, exp: "値が0の文字 '\\0'。'0' は数字の文字。" },
+      { q: '`char s[] = "Hi";` の要素数は？', choices: ['2', '3', '1', '4'], answer: 1, exp: 'H, i, \\0 の3つ。' },
+    ],
+  },
+  {
+    id: 'ccpp-L26', lecture: 8, title: '文字列を1文字ずつ扱う',
+    blocks: [
+      '`cin >> str;` で文字列を読み込める（配列は十分大きく）。1文字ずつ扱うときは**ナル文字まで**くり返す。',
+      { code: code`
+void put_str(const char s[])
+{
+    for (int i = 0; s[i] != 0; i++)   // ナル文字（値0）まで
+        cout << s[i];
+}`, numbers: false },
+      '文字列の配列は2通りの書き方がある。',
+      { code: code`
+char a[][5] = {"LISP", "C", "Ada"};       // 2次元配列（5×3=15バイト）
+const char* p[] = {"PAUL", "X", "MAC"};   // ポインタの配列
+cout << a[2][0];                          // A（2番目の頭文字）`, numbers: false },
+    ],
+    questions: [
+      { q: '`s[i] != 0` の意味は？', choices: ['s[i] がナル文字でない', 's[i] が数字0でない', 'i が0でない', 's が空でない'], answer: 0, exp: 'ナル文字の値は0。' },
+      { q: '長さ n の文字列の最後の文字は？', choices: ['s[n]', 's[n - 1]', 's[n + 1]', 's[0]'], answer: 1, exp: 's[n] はナル文字。' },
+      { q: '`char a[][5] = {"LISP", "C", "Ada"};` の a[1] は？', choices: ['"LISP"', '"C"', '"Ada"', "'I'"], answer: 1, exp: '添字は0から。' },
+    ],
+  },
+  {
+    id: 'ccpp-L27', lecture: 8, title: 'cstring ライブラリ',
+    blocks: [
+      '`#include <cstring>` で文字列を扱う関数が使える。',
+      { table: { cols: ['関数', 'はたらき'], rows: [
+        ['strlen(s)', '文字列の長さ'],
+        ['strcpy(d, s)', 'd に s をコピー'],
+        ['strncpy(d, s, n)', '先頭 n 文字をコピー'],
+        ['strcat(d, s)', 'd の後ろに s を連結'],
+        ['strncat(d, s, n)', '先頭 n 文字まで連結'],
+      ] } },
+      { code: code`
+char d[16];
+strlen("ABC");              // 3
+strcpy(d, "XXXXXXXXX");
+strncpy(d, "12345", 3);     // d は "123XXXXXX"
+strcpy(d, "QWE");
+strcat(d, "RTY");           // d は "QWERTY"
+strcpy(d, "ABC");
+strncat(d, "123", 1);       // d は "ABC1"`, numbers: false },
+      { note: 'char 配列は = や + でコピー・連結できない。strcpy / strcat を使う。' },
+    ],
+    questions: [
+      { q: '`strlen("ABCDE")` は？', choices: ['5', '6', '4', '0'], answer: 0, exp: 'ナル文字は数えない。' },
+      { q: '"XXXXXXXXX" に `strncpy(s, "12345", 3)` すると？', choices: ['"123"', '"123XXXXXX"', '"12345XXXX"', '"XXX123"'], answer: 1, exp: '3文字だけ上書き。ナル文字は付かない。' },
+      { q: '"ABC" に `strncat(s, "123", 5)` すると？', choices: ['"ABC123"', '"ABC12300"', '"ABC12"', '"123"'], answer: 0, exp: '"123" は3文字しかない。' },
+    ],
+  },
 ];
