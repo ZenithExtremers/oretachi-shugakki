@@ -44,3 +44,24 @@ export const nyushitsu = t('nyushitsu', ['no', 'date', 'name', 'kubun', 'taishit
   [1, '2024-11-01', '佐藤', '1', 1], [2, '2024-11-01', '鈴木', '3', 1], [3, '2024-11-02', '佐藤', '3', 1],
   [4, '2024-11-02', '高橋', '3', 1], [5, '2024-11-03', '佐藤', '2', null], [6, '2024-11-03', '鈴木', '9', null],
 ]);
+
+// ---- 第08回 テーブルの結合 ----
+export const kakeibo8 = t('kakeibo8', ['date', 'himoku_id', 'memo', 'withdraw'], [
+  ['2024-02-03', 2, 'カフェラテを購入', 380],
+  ['2024-02-05', 2, '昼食', 750],
+  ['2024-02-10', 1, '1月の給料', 0],
+  ['2024-02-12', 4, '映画', 1800],
+  ['2024-02-15', null, '不明な出費', 500],
+]);
+export const himoku = t('himoku', ['id', 'name'], [[1, '給料'], [2, '食費'], [3, '水道光熱費']]);
+export const himokuDup = t('himoku_dup', ['id', 'name'], [[1, '給料'], [2, '食費'], [1, '仕送り']]);
+
+export const shiten = t('shiten', ['shiten_id', 'shiten_name', 'shitencho_id'], [[12, '東京', 'S002'], [24, '京都', 'S004']]);
+export const busyo = t('busyo', ['busyo_id', 'busyo_name', 'kyoten_id'], [[1, '企画部', 12], [2, '開発部', 12], [3, '営業部', 24]]);
+export const shain = t('shain', ['number', 'name', 'busyo_id', 'jyoshi_id', 'kinmuchi_id'], [
+  ['S001', '青木', 2, 'S002', 12],
+  ['S002', '井上', 1, null, 12],
+  ['S003', '上田', 2, 'S004', 12],
+  ['S004', '江藤', 3, null, 24],
+  ['S005', '小野', 3, 'S004', 24],
+]);

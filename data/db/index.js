@@ -1,5 +1,6 @@
 // データベース（db）
 import groups from './groups.js';
+import l8 from './l8.js';
 import lessons from './lessons.js';
 
 export default {
@@ -13,6 +14,7 @@ export default {
     5: '第05回 式・演算子・関数',
     6: '第06回 集計とグループ化',
     7: '第07回 副問合せ',
+    8: '第08回 テーブルの結合',
   },
   types: {
     cloze: '文章の空欄補充',
@@ -26,10 +28,10 @@ export default {
     minutes: 60,
     note: '本番の形式が分からないため、C/C++ と同じ5択30問で作っています',
     blueprint: [
-      { lecture: 2, n: 5 }, { lecture: 3, n: 6 }, { lecture: 4, n: 5 },
-      { lecture: 5, n: 5 }, { lecture: 6, n: 5 }, { lecture: 7, n: 4 },
+      { lecture: 2, n: 5 }, { lecture: 3, n: 5 }, { lecture: 4, n: 4 }, { lecture: 5, n: 4 },
+      { lecture: 6, n: 4 }, { lecture: 7, n: 4 }, { lecture: 8, n: 4 },
     ],
   },
   lessons,
-  groups,
+  groups: [...groups, ...l8],
 };

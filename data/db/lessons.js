@@ -230,4 +230,73 @@ SELECT AVG(t.total)
       { q: '副問合せが使えないのは？', choices: ['SELECT', 'UPDATE', 'INSERT', 'どれでも使える'], answer: 3, exp: 'どの命令でも使える。' },
     ],
   },
+  {
+    id: 'db-L15', lecture: 8, title: '結合（1）外部キーと JOIN',
+    blocks: [
+      'データは**複数のテーブルに分けて**格納するのが定石。人間には分かりにくいが、同じ情報をくり返し登録しなくてよく、安全・確実・高速に管理できる。',
+      { table: { cols: ['用語', '意味'], rows: [
+        ['リレーションシップ', '2つのテーブルの間の関連'],
+        ['外部キー', '他テーブルの行を指す値を入れる列'],
+        ['結合（join）', '複数テーブルから1つの結果表を得る'],
+      ] } },
+      { code: code`
+SELECT 日付, 名前 AS 費目, メモ
+  FROM 家計簿                       -- 左表（主役）
+  JOIN 費目                         -- 右表
+    ON 家計簿.費目ID = 費目.ID      -- 結合条件`, numbers: false },
+      '結合は左右を単純にくっつけるのではなく、**左表の各行について、結合条件に合う右表の行を探して1つずつつなぐ**。',
+    ],
+    questions: [
+      { q: '他のテーブルの行を指す値を入れる列は？', choices: ['主キー', '外部キー', '結合条件', '別名'], answer: 1, exp: '外部キー（foreign key）。' },
+      { q: '結合条件を書く句は？', choices: ['JOIN', 'ON', 'WHERE', 'AS'], answer: 1, exp: 'JOIN 右表 ON 結合条件。' },
+      { q: '結合の主役（左表）は？', choices: ['FROM 句の表', 'JOIN 句の表', '行の多い表', 'どちらも対等'], answer: 0, exp: 'FROM 句の表が左表。' },
+    ],
+  },
+  {
+    id: 'db-L16', lecture: 8, title: '結合（2）相手がいない・重複する',
+    blocks: [
+      { list: [
+        '右表につなぐ行が**2つ以上**ある → 左表の行がコピーされ、結果の行数が**増える**。',
+        '右表に相手が**ない**、または結合条件の列が **NULL** → その行は結果から**消える**（NULL はどの値とも等しくならない）。',
+      ] },
+      '消えると困るときは**外部結合**を使う。相手がない行の、反対側の列はすべて NULL になる。',
+      { table: { cols: ['書き方', '必ず全部出る表'], rows: [
+        ['JOIN（内部結合）', 'なし（相手がない行は消える）'],
+        ['LEFT JOIN', '左表（FROM の表）'],
+        ['RIGHT JOIN', '右表（JOIN の表）'],
+        ['FULL JOIN', '左右の両方'],
+      ] } },
+      { note: 'LEFT JOIN は LEFT OUTER JOIN と書いてもよい。' },
+    ],
+    questions: [
+      { q: '左表5行、相手がない行1つ・NULLの行1つ。JOIN の結果は（重複なし）？', choices: ['5行', '3行', '4行', '0行'], answer: 1, exp: '2行が消える。' },
+      { q: '同じ条件で LEFT JOIN だと？', choices: ['5行', '3行', '4行', '7行'], answer: 0, exp: '左表は全部出る。' },
+      { q: '右表で、つなぐ相手が2行ある左表の行は？', choices: ['2行になる', '消える', '1行だけつなぐ', 'エラー'], answer: 0, exp: '左表の行をコピーしてつなぐ。' },
+    ],
+  },
+  {
+    id: 'db-L17', lecture: 8, title: '結合（3）別名・3表・自己結合',
+    blocks: [
+      '同じ名前の列が両方にあるときは **テーブル名.列名** で区別する。**AS** で別名を付けると短く書ける。',
+      { code: code`
+SELECT 日付, K.メモ, H.メモ
+  FROM 家計簿 AS K
+  JOIN 費目 AS H ON K.費目ID = H.ID`, numbers: false },
+      { list: [
+        '**3表以上**：JOIN 〜 ON 〜 をくり返す。前から順に1つずつ結合される。',
+        '**副問合せの結果**とも結合できる：JOIN (SELECT …) AS 別名 ON …',
+        '**自己結合**（再帰結合）：同じテーブルに**異なる別名**を付けて結合する。',
+      ] },
+      { code: code`
+-- 社員とその上司の名前
+SELECT a.name, b.name AS jyoshi
+  FROM shain AS a
+  LEFT JOIN shain AS b ON a.jyoshi_id = b.number`, numbers: false },
+    ],
+    questions: [
+      { q: '自己結合で必要なのは？', choices: ['異なる別名', 'FULL JOIN', '副問合せ', 'GROUP BY'], answer: 0, exp: 'どちらの列か区別するため。' },
+      { q: '3つのテーブルの結合はどう処理される？', choices: ['一度に3つ', '前から順に1つずつ', '後ろから順に', 'できない'], answer: 1, exp: '前から順に1つずつ。' },
+      { q: 'JOIN の後に副問合せを書くときに必要なのは？', choices: ['別名', 'ORDER BY', 'DISTINCT', '何もいらない'], answer: 0, exp: 'AS 別名を付ける。' },
+    ],
+  },
 ];
