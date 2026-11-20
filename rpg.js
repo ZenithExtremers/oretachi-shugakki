@@ -371,8 +371,11 @@ export function makeRPG(ctx) {
     }
     function hitEnemy(dmg, label, big) {
       dmg = Math.max(1, Math.round(dmg));
-      st.ehp -= dmg; pop((label ? label + ' ' : '') + dmg, big ? 'hit big' : 'hit');
-      bgm.sfx(big ? 'crit' : 'hit');
+      // ヌルポには「ガッ！」（ネットのお約束「ぬるぽ」→「ガッ」）
+      const gah = foes[st.fi].name === 'ヌルポ';
+      st.ehp -= dmg;
+      pop((gah ? 'ガッ！ ' : '') + (label ? label + ' ' : '') + dmg, gah ? 'hit big gah' : big ? 'hit big' : 'hit');
+      bgm.sfx(gah ? 'gah' : big ? 'crit' : 'hit');
       const en = document.getElementById('rp-enemy'); if (en) { en.classList.remove('shake'); void en.offsetWidth; en.classList.add('shake'); }
       const fl = document.querySelector('.rp-field'); if (fl) { fl.classList.remove('flash'); void fl.offsetWidth; fl.classList.add('flash'); }
       drawHp();

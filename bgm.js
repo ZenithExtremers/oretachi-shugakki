@@ -104,6 +104,7 @@ export const bgm = {
     const seq = (ns, gap, type, vol, dur) => ns.forEach((m, i) => note(hz(m), t + i * gap, dur || gap * 1.6, type, vol));
     switch (name) {
       case 'hit': noise(t, 0.08, 0.25, 1500); note(hz(88), t, 0.08, 'square', 0.12); note(hz(76), t + 0.05, 0.1, 'square', 0.1); break;
+      case 'gah': noise(t, 0.1, 0.5, 700); note(hz(57), t, 0.05, 'square', 0.22); note(hz(43), t + 0.03, 0.14, 'square', 0.22); kick(t); break; // ガッ！
       case 'crit': noise(t, 0.12, 0.3, 1200); seq([84, 88, 91], 0.05, 'square', 0.12); break;
       case 'miss': note(hz(45), t, 0.25, 'sawtooth', 0.12); note(hz(40), t + 0.12, 0.3, 'sawtooth', 0.12); break;
       case 'ouch': noise(t, 0.2, 0.3, 300); note(hz(38), t, 0.2, 'square', 0.15); break;
