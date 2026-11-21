@@ -874,3 +874,5 @@ body.rp-night.rp-day {
 .rp-day .rp-after.ok b, .rp-day .rp-ups b, .rp-day .rp-gok { color: #15803d; }
 .rp-day .rp-after.ng b, .rp-day .rp-unlock { color: #be123c; }
 .rp-day .rp-sfoes span.unk, .rp-day .rp-zk.unk span { color: #94a3b8; }
+.rp-day .rp-zc button.ok { background: #4caf50; border-color: #4caf50; color: #fff; }
+.rp-day .rp-zc button.ng { background: #e53935; border-color: #e53935; color: #fff; }
