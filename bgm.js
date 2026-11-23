@@ -135,6 +135,9 @@ export const bgm = {
       case 'lose': seq([67, 63, 60, 55], 0.22, 'triangle', 0.18, 0.4); break;
       case 'gacha': for (let i = 0; i < 10; i++) noise(t + i * 0.06, 0.05, 0.12, 3000); seq([84, 88, 91, 96], 0.07, 'triangle', 0.18); break;
       case 'rare': seq([72, 76, 79, 84, 88, 91, 96], 0.07, 'square', 0.1, 0.3); break;
+      case 'charge': seq([48, 52, 55, 60, 64, 67, 72, 76, 79, 84], 0.11, 'sawtooth', 0.07); break; // 合体：5人が集まる
+      case 'boom': noise(t, 0.6, 0.6, 350); kick(t); note(hz(33), t, 0.9, 'sawtooth', 0.22); note(hz(45), t, 0.6, 'square', 0.12); break;
+      case 'pose': seq([72, 76, 79], 0.1, 'square', 0.12); note(hz(84), t + 0.32, 0.7, 'square', 0.13); note(hz(60), t + 0.32, 0.7, 'triangle', 0.2); kick(t + 0.32); break;
       case 'tap': note(hz(84), t, 0.05, 'square', 0.06); break;
       default: break;
     }

@@ -1314,3 +1314,47 @@ body.rp-night.rp-day {
 .rev-lesson .lesson-body { font-size: 14px; overflow-x: auto; }
 .rp-day .rev-lesson { background: rgba(255, 255, 255, .6); }
 .rp-day .rp-rx em.ok { color: #15803d; } .rp-day .rp-rx em.ng { color: #b91c1c; }
+
+/* ---------- 中間ボスの合体演出 ---------- */
+.rp-gattai { position: fixed; inset: 0; z-index: 200; background: radial-gradient(circle at 50% 42%, #1e1b4b 0%, #05030f 70%); overflow: hidden; display: grid; place-items: center; animation: gtIn .35s ease-out; cursor: pointer; }
+.rp-gattai.out { animation: gtOut .3s ease-in forwards; }
+@keyframes gtIn { from { opacity: 0; } }
+@keyframes gtOut { to { opacity: 0; } }
+.gt-rays { position: absolute; left: 50%; top: 42%; width: 260vmax; height: 260vmax; transform: translate(-50%, -50%); opacity: 0;
+  background: repeating-conic-gradient(from 0deg, rgba(250, 204, 21, .28) 0 6deg, transparent 6deg 18deg); animation: gtSpin 8s linear infinite; }
+.rp-gattai.reveal .gt-rays { opacity: 1; transition: opacity .4s; }
+@keyframes gtSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+.gt-ring { position: absolute; left: 50%; top: 42%; width: 0; height: 0; }
+.gt-p { position: absolute; width: 74px; height: 74px; margin: -37px 0 0 -37px; display: grid; place-items: center; font-size: 46px; border-radius: 50%;
+  background: rgba(255, 255, 255, .08); box-shadow: 0 0 18px rgba(250, 204, 21, .6);
+  transform: rotate(var(--a)) translateX(130px) rotate(calc(-1 * var(--a)));
+  animation: gtGather 1.45s cubic-bezier(.6, 0, .9, .4) var(--d) forwards; }
+.gt-p svg, .gt-boss svg { width: 100%; height: 100%; }
+@keyframes gtGather {
+  0% { transform: rotate(var(--a)) translateX(130px) rotate(calc(-1 * var(--a))) scale(.4); opacity: 0; }
+  25% { transform: rotate(var(--a)) translateX(130px) rotate(calc(-1 * var(--a))) scale(1); opacity: 1; filter: brightness(1); }
+  100% { transform: rotate(calc(var(--a) + 300deg)) translateX(0) rotate(calc(-1 * var(--a) - 300deg)) scale(.5); opacity: 1; filter: brightness(3); }
+}
+.rp-gattai.flash .gt-p { opacity: 0 !important; animation: none; }
+.rp-gattai.flash::after { content: ''; position: absolute; inset: 0; background: #fff; animation: gtFlash .7s ease-out forwards; pointer-events: none; }
+@keyframes gtFlash { from { opacity: 1; } to { opacity: 0; } }
+.gt-word { position: absolute; top: 42%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 72px; font-weight: 900; color: #fde047; letter-spacing: .06em; white-space: nowrap;
+  text-shadow: 3px 0 #7c2d12, -3px 0 #7c2d12, 0 3px #7c2d12, 0 -3px #7c2d12, 2px 2px #7c2d12, -2px -2px #7c2d12, 2px -2px #7c2d12, -2px 2px #7c2d12, 0 7px 0 #450a0a, 0 0 30px #f59e0b; }
+.rp-gattai.flash .gt-word { animation: gtWord .9s cubic-bezier(.2, 1.6, .4, 1) forwards; }
+.rp-gattai.reveal .gt-word { animation: gtWordUp .5s ease-in forwards; }
+@keyframes gtWord { 0% { transform: translate(-50%, -50%) scale(3); opacity: 0; } 60% { transform: translate(-50%, -50%) scale(.9); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+@keyframes gtWordUp { from { transform: translate(-50%, -50%) scale(1); opacity: 1; } to { transform: translate(-50%, -230%) scale(.55); opacity: 1; } }
+.gt-boss { position: absolute; top: 42%; left: 50%; width: 190px; height: 190px; display: grid; place-items: center; font-size: 130px; transform: translate(-50%, -50%) scale(0); filter: drop-shadow(0 0 26px #f59e0b); }
+.rp-gattai.reveal .gt-boss { animation: gtBoss .7s cubic-bezier(.2, 1.5, .4, 1) forwards, gtFloat 2s ease-in-out .7s infinite; }
+@keyframes gtBoss { from { transform: translate(-50%, -50%) scale(0) rotate(-25deg); } to { transform: translate(-50%, -50%) scale(1) rotate(0); } }
+@keyframes gtFloat { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -54%) scale(1.03); } }
+.gt-name { position: absolute; left: 16px; right: 16px; top: calc(42% + 118px); text-align: center; color: #fff; opacity: 0; transform: translateX(-40px); }
+.rp-gattai.reveal .gt-name { animation: gtName .5s ease-out .35s forwards; }
+@keyframes gtName { to { opacity: 1; transform: none; } }
+.gt-name small { display: block; color: #fde68a; font-weight: 700; font-size: 13px; letter-spacing: .1em; }
+.gt-name b { display: block; margin: 4px auto; padding: 6px 14px; max-width: 360px; font-size: 26px; font-weight: 900; background: linear-gradient(90deg, transparent, #b91c1c 15%, #b91c1c 85%, transparent); text-shadow: 0 2px 0 #450a0a; }
+.gt-name em { display: block; font-style: normal; font-size: 13px; opacity: .85; line-height: 1.5; }
+.gt-skip { position: absolute; top: calc(env(safe-area-inset-top) + 12px); right: 12px; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .4); background: rgba(0, 0, 0, .4); color: #fff; font: inherit; font-size: 13px; }
+.rp-battle.quake { animation: gtQuake .5s; }
+@keyframes gtQuake { 0%, 100% { transform: none; } 20% { transform: translate(-8px, 4px); } 40% { transform: translate(7px, -5px); } 60% { transform: translate(-5px, 3px); } 80% { transform: translate(4px, -2px); } }
+@media (prefers-reduced-motion: reduce) { .gt-p, .gt-rays { animation: none; } }

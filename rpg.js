@@ -1081,6 +1081,29 @@ export function makeRPG(ctx) {
       if (d === 2 && Math.random() < (f.boss ? MAT.bossDrop : MAT.drop)) { r.mats = (r.mats || 0) + 1; st.mats = (st.mats || 0) + 1; setTimeout(() => { toast(`${MAT.icon} ${MAT.name}を手に入れた！`); hsay('mat'); }, 1300); }
       save(); if (isNew) { setTimeout(() => toast(`📖 図鑑に「${f.name}」が登録された！`), 300); setTimeout(() => hsay('zukan'), 900); }
     }
+    // 合体演出：倒した5人が集まって光り、巨大な戦士になる（タップでスキップ）
+    function gattaiShow(F) {
+      return new Promise((done) => {
+        const parts = foes.filter((f) => !f.final && !f.gattai).slice(0, 5);
+        const el = document.createElement('div');
+        el.className = 'rp-gattai';
+        el.innerHTML = `<div class="gt-rays"></div>
+          <div class="gt-ring">${parts.map((f, k) => `<span class="gt-p" style="--a:${k * 72 - 90}deg;--d:${k * 0.12}s">${f.icon}</span>`).join('')}</div>
+          <div class="gt-word">合体！</div>
+          <div class="gt-boss">${F.icon}</div>
+          <div class="gt-name"><small>${parts.length}人の力がひとつに</small><b>${esc(F.name)}</b><em>${esc(F.desc || '')}</em></div>
+          <button class="gt-skip">スキップ ▶</button>`;
+        (document.getElementById('hk-ov') || document.body).appendChild(el);
+        const ts = []; let fin = false;
+        const end = () => { if (fin) return; fin = true; ts.forEach(clearTimeout); el.classList.add('out'); setTimeout(() => { el.remove(); done(); }, 300); };
+        const at = (ms, fn) => ts.push(setTimeout(fn, ms));
+        bgm.sfx('charge');
+        at(1500, () => { el.classList.add('flash'); bgm.sfx('boom'); document.querySelector('.rp-battle')?.classList.add('quake'); });
+        at(2300, () => { el.classList.add('reveal'); bgm.sfx('pose'); });
+        at(5200, end);
+        el.onclick = end;
+      });
+    }
     function afterTurn() {
       if (st.over) return;
       if (st.hp <= 0) return finish(false);
@@ -1098,6 +1121,7 @@ export function makeRPG(ctx) {
             st.wave++; st.active = [...st.waves[st.wave]]; comers = [...st.active];
           }
           if (!st.active.includes(st.fi)) st.fi = st.active[0];
+          if (comers.some((i) => foes[i].gattai)) { gattaiShow(foes[comers[0]]).then(() => { if (st.over) return; layout(); hsay('gattai'); nextQuestion(); }); return; }
           layout();
           if (comers.length) { pop(comers.some((i) => foes[i].gattai) ? '合体！' : isMid ? 'つぎの敵！' : waveTxt(), 'info'); if (comers.some((i) => foes[i].gattai)) hsay('gattai'); else if (comers.some((i) => foes[i].rare)) hsay('rare'); }
           nextQuestion();
