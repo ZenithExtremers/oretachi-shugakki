@@ -4,6 +4,7 @@
 
 import DECKS from './data/hima-words.js';
 import { makeRPG, CHARS } from './rpg.js';
+import { bgm } from './bgm.js';
 
 const KEY = 'oretachi:hima';
 const DEF = {
@@ -107,7 +108,7 @@ export function owlSVG(st = stage(), happy = false) {
 // キャラごとの口ぐせ（idle：ふだん／fed：知恵の実／poke：つつく）
 const LINES = {
   owl: { idle: ['ホー。', '講義、ちゃんと聞いてる？', 'ヒマなら勉強しよ', 'おなかすいた…', 'ノートとった？', 'あと何分？'], fed: ['うまい！', 'もっとちょうだい', '知識の味がする', 'ホッホー！'], poke: ['なに？', 'くすぐったい', '今いいとこなのに', '先生こっち見てるよ'] },
-  hero: { idle: ['よし、やるか。', '期末まであと少し。', '今日は何問いける？', 'ちょっと休憩…'], fed: ['いただきます！', 'エネルギー満タン！', 'これで頑張れる'], poke: ['なになに？', '起きてるって', 'ちゃんと聞いてるよ'] },
+  hero: { idle: ['はい、どうもー！今日は何をやっていきましょうか？', 'みなさん、テスト勉強、進んでますか？', 'いやー、休憩も大事ですよね〜', 'ちょっと一個いいですか？…勉強しましょう！'], fed: ['いただきます！…うまっ！これ、めちゃくちゃおいしいです！', 'これは…最高ですね！'], poke: ['うわっ！びっくりした〜！', 'ちょっ、くすぐったいです！'], up: ['レベル上がりました！いやー、うれしいですね〜！'], nofood: ['勉強して、🌰をゲットしていきたいと思います！'] },
   piyo: { idle: ['ぴよ。', 'ぴよぴよ…（眠い）', 'ノートの端っこ、ぴよ'], fed: ['ぴよ〜！', 'おいしいぴよ'], poke: ['ぴっ！', 'くすぐったいぴよ'] },
   chu: { idle: ['チュー。チーズない？', 'メモリのすみっこに住んでる', '小さいけど強いよ'], fed: ['チュー！', 'カリカリしてうまい'], poke: ['かじるぞ', 'チュッ！'] },
   kero: { idle: ['ケロっ、講義きいてる？', 'NULL はケロっとスルー', '雨の日が好き'], fed: ['ケロケロ〜', 'ごちそうさまケロ'], poke: ['ケロっ！', 'びっくりしたケロ'] },
@@ -127,7 +128,7 @@ const LINES = {
 };
 const NOFOOD = ['知恵の実がない…勉強してきて', '計算アタックや本編の正解で🌰知恵の実がもらえるよ'];
 const partner = () => (S.partner === 'owl' || S.partner === 'hero' || (S.rpg && S.rpg.owned && S.rpg.owned[S.partner]) ? S.partner : 'owl');
-const say = (k) => { const set = LINES[partner()] || LINES.owl; const a = k === 'nofood' ? NOFOOD : set[k] || LINES.owl[k]; const el = $('#hk-say'); if (el) el.textContent = a[rnd(a.length)]; };
+const say = (k) => { const set = LINES[partner()] || LINES.owl; const a = set[k] || (k === 'nofood' ? NOFOOD : LINES.owl[k]); const el = $('#hk-say'); if (el) el.textContent = a[rnd(a.length)]; };
 function renderTop() { const p = $('#hk-food'); if (p) p.textContent = '🌰 ' + S.food; }
 // いまのキャラの記録 { lv, exp } と表示名
 function partnerRec() {
@@ -157,10 +158,13 @@ function renderHome(happy) {
 function feed(n = 1) {
   if (S.food < n) { say('nofood'); return; }
   const id = partner(), { rec } = partnerRec();
+  const cap = rpg.memberInfo(id).cap; // レベル上限（★ごと＋限界突破）
+  if (rec.lv >= cap) { toast(`Lv.${cap} が上限。ガチャでかぶると上限+1（限界突破）`); return; }
   const beforeStage = stage(), beforeLv = rec.lv;
   S.food -= n; S.fed += n; rec.exp += FEED_EXP * n;
-  while (rec.exp >= needExp(rec.lv)) { rec.exp -= needExp(rec.lv); rec.lv++; }
-  save(); renderHome(true); say('fed');
+  while (rec.exp >= needExp(rec.lv) && rec.lv < cap) { rec.exp -= needExp(rec.lv); rec.lv++; }
+  if (rec.lv >= cap) rec.exp = 0;
+  save(); renderHome(true); say(rec.lv > beforeLv && LINES[id]?.up ? 'up' : 'fed');
   const nm = partnerRec().name;
   if (id === 'owl' && stage() > beforeStage) toast(`進化！${STAGE_NAME[stage()]}になった`);
   else if (rec.lv > beforeLv) toast(`レベルアップ！ ${nm} Lv.${rec.lv}`);
@@ -194,9 +198,9 @@ let rpg = null;
 
 export function viewHima($app, top, api) {
   leaveHima();
-  if (!rpg) rpg = makeRPG({ S, save, openOv, closeOv, body: () => body(), info: (t) => info(t), toast, setCleanup: (f) => { cleanup = f; }, renderTop: () => renderTop(), esc, shuffle, rnd, owlSVG, DECKS, addFood, api });
+  if (!rpg) rpg = makeRPG({ S, save, openOv, closeOv, body: () => body(), info: (t) => info(t), toast, setCleanup: (f) => { cleanup = f; }, renderTop: () => renderTop(), esc, shuffle, rnd, owlSVG, DECKS, addFood, api, onSound: () => sndLabels() });
   $app.innerHTML = `
-    ${top('ヒマコロシ', { back: '', right: '<span class="hk-pill" id="hk-food"></span>' })}
+    ${top('ヒマコロシ', { back: '', right: '<button class="hk-snd" data-snd aria-label="音の切り替え"></button><span class="hk-pill" id="hk-food"></span>' })}
     <main class="wrap hima" id="hk-main"></main>
     <nav class="hk-nav">${TABS.map(([k, i, n]) => `<button data-hk-tab="${k}" class="${k === tab ? 'on' : ''}"><span class="i">${i}</span>${n}</button>`).join('')}</nav>`;
   $root = $app;
@@ -216,11 +220,27 @@ export function viewHima($app, top, api) {
     renderTab();
   });
   $app.querySelector('#hk-main').addEventListener('click', onMainClick);
+  $app.querySelector('.top [data-snd]')?.addEventListener('click', toggleSound);
   renderTab();
 }
 
+// 音：ヒマコロシのどの画面でも1タップでサイレント ⇔ BGM（設定は冒険と共通）
+const TAB_SONG = { home: 'home', study: 'study', game: 'game', words: 'words' };
+function sndLabels() {
+  const on = rpg?.sound() === 'bgm';
+  document.querySelectorAll('[data-snd]').forEach((b) => { b.textContent = on ? '🎵' : '🔇'; b.title = on ? 'BGMモード（タップでサイレント）' : 'サイレント（タップでBGM）'; b.classList.toggle('on', on); });
+  const mb = document.querySelector('[data-rp="sound"]'); if (mb) mb.textContent = on ? '🎵 BGM' : '🔇 サイレント';
+}
+function toggleSound() {
+  const on = rpg.sound() !== 'bgm';
+  rpg.setSound(on ? 'bgm' : 'silent');
+  if (on) bgm.play(document.querySelector('.rp-battle') ? 'battle' : tab === 'quest' ? 'map' : TAB_SONG[tab]);
+  toast(on ? '🎵 BGMモード：音楽と効果音が鳴る' : '🔇 サイレントモード：音は鳴らない');
+  sndLabels();
+}
 function renderTab() {
   const m = $('#hk-main'); if (!m) return;
+  bgm.setEnabled(rpg.sound() === 'bgm'); sndLabels();
   window.scrollTo(0, 0);
   document.body.classList.toggle('rp-night', tab === 'quest');
   document.body.classList.toggle('rp-game', tab === 'quest');
@@ -228,7 +248,7 @@ function renderTab() {
   const th = document.documentElement.dataset.theme;
   document.body.classList.toggle('rp-day', tab === 'quest' && (th === 'light' || (!th && !matchMedia('(prefers-color-scheme: dark)').matches)));
   const h1 = $root?.querySelector('.top h1'); if (h1) h1.textContent = tab === 'quest' ? '冒険' : 'ヒマコロシ';
-  if (tab !== 'quest' && rpg) rpg.leave();
+  if (tab !== 'quest' && rpg) { rpg.leave(); bgm.play(TAB_SONG[tab]); }
   if (tab === 'quest') {
     m.onclick = null;
     rpg.renderQuestTab(m);
@@ -334,9 +354,11 @@ function openOv(title, inf = '') {
   if (!ov) {
     ov = document.createElement('div');
     ov.id = 'hk-ov'; ov.className = 'hk-ov';
-    ov.innerHTML = `<div class="hk-ohead"><button id="hk-close">← 戻る</button><span class="t" id="hk-otitle"></span><span class="hk-timer" id="hk-oinfo"></span></div><div class="hk-obody" id="hk-obody"></div>`;
+    ov.innerHTML = `<div class="hk-ohead"><button id="hk-close">← 戻る</button><span class="t" id="hk-otitle"></span><span class="hk-timer" id="hk-oinfo"></span><button class="hk-snd" data-snd aria-label="音の切り替え"></button></div><div class="hk-obody" id="hk-obody"></div>`;
     document.body.appendChild(ov);
     ov.querySelector('#hk-close').onclick = closeOv;
+    ov.querySelector('[data-snd]').onclick = toggleSound;
+    sndLabels();
   }
   $('#hk-otitle').textContent = title; $('#hk-oinfo').textContent = inf; $('#hk-obody').innerHTML = '';
   document.body.classList.add('hk-lock');

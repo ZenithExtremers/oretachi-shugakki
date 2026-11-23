@@ -20,6 +20,8 @@ function writeJSON(k, v) {
 const store = Object.assign({ settings: { shufflePast: false, shuffleOriginal: true, sound: true }, stats: {}, history: [], lessons: {} }, readJSON(KEY, {}));
 store.lessons ||= {};
 if (store.settings.sound === undefined) store.settings.sound = true;
+if (store.settings.spaced === undefined) store.settings.spaced = true;      // 正解した問題も3日後にもう一度
+if (store.settings.questReview === undefined) store.settings.questReview = true; // 冒険のボス戦で間違えた問題を復習へ
 sfx.enabled = store.settings.sound;
 store.settings.theme ||= 'auto';
 store.settings.zoom ||= 'm';
@@ -83,7 +85,10 @@ const isPast = (g) => g.source !== 'original';
 const choicesOf = (q) => q.choices || q.group.sharedChoices;
 const monoOf = (q) => q.mono || q.group.sharedMono;
 const stat = (qid) => store.stats[qid] || (store.stats[qid] = { c: 0, w: 0, r: false });
-const reviewIds = (s) => s.groups.flatMap((g) => g.questions).filter((q) => store.stats[q.id]?.r).map((q) => q.id);
+const DAY3 = 3 * 86400000;
+// 復習：間違えた問題 ＋（設定オンなら）正解してから3日たった問題
+const isDue = (st) => !!st && (st.r || (store.settings.spaced && st.due && st.due <= Date.now()));
+const reviewIds = (s) => s.groups.flatMap((g) => g.questions).filter((q) => isDue(store.stats[q.id])).map((q) => q.id);
 
 /* ---------- ルーター ---------- */
 let timer = null;
@@ -190,7 +195,7 @@ function viewSubject(s) {
         <button class="menu-btn" data-act="nav" data-to="s/${s.id}/field"><span class="ic">分</span><div><b>分野別</b><small>回・問題の型を選んで、1問ずつ解説つき</small></div></button>
         ${s.mock ? `<button class="menu-btn" data-act="mock"><span class="ic">模</span><div><b>${esc(s.mock.name)}</b><small>${s.mock.note ? esc(s.mock.note) : '本番と同じ配分'} ・ 最後にまとめて採点${s.mock.minutes ? ` ・ ${s.mock.minutes}分` : ''}</small></div></button>` : ''}
         <button class="menu-btn" ${(s.pastExams || []).length ? `data-act="nav" data-to="s/${s.id}/past"` : 'disabled'}><span class="ic">本</span><div><b>本番の問題</b><small>${esc((s.pastExams || []).map((p) => p.name).join('・') || 'まだありません')}</small></div></button>
-        <button class="menu-btn" data-act="review" ${rev ? '' : 'disabled'}><span class="ic">復</span><div><b>間違えた問題の復習</b><small>${rev ? '正解すると復習リストから消えます' : 'まだありません'}</small></div>${rev ? `<span class="badge">${rev}</span>` : ''}</button>
+        <button class="menu-btn" data-act="review" ${rev ? '' : 'disabled'}><span class="ic">復</span><div><b>復習</b><small>${rev ? '間違えた問題と、3日前に正解した問題。正解すると消えます' : 'まだありません'}</small></div>${rev ? `<span class="badge">${rev}</span>` : ''}</button>
       </div>
       <h3 class="sec">成績</h3>
       <div class="card">
@@ -329,7 +334,7 @@ function startField(s) {
   makeSession(s, { kind: 'field', mode: 'practice', title: '分野別' + (labels.length ? '：' + labels.join('・') : ''), groups: gs.map((g) => ({ g, qs: g.questions })) });
 }
 
-function startReview(s, qids, title = '間違えた問題の復習') {
+function startReview(s, qids, title = '復習') {
   const set = new Set(qids);
   const groups = s.groups
     .map((g) => ({ g, qs: g.questions.filter((q) => set.has(q.id)) }))
@@ -491,8 +496,14 @@ function answer(s, qid, oi) {
 function record(q, ok) {
   if (ok) rewardCorrect(q.id); // ヒマコロシの知恵の実（1問1日1回）
   const st = stat(q.id);
-  if (ok) { st.c++; st.r = false; } else { st.w++; st.r = true; }
-  st.t = Date.now();
+  const now = Date.now();
+  if (ok) {
+    st.c++;
+    if (st.r) st.r = false;
+    else if (st.due && st.due <= now) { st.due = 0; st.d3 = 1; } // 3日後の復習で正解 → 卒業
+    else if (!st.d3 && !st.due) st.due = now + DAY3;            // はじめて正解 → 3日後にもう一度
+  } else { st.w++; st.r = true; st.due = 0; }
+  st.t = now;
   save();
 }
 
@@ -674,7 +685,13 @@ const HIMA_API = {
       choices: perm.map((i) => choiceHTML(q, monoOf(q), ch[i])),
       answer: perm.indexOf(q.answer),
       exp: `正解は (${perm.indexOf(q.answer) + 1})。${inline(q.exp)}`,
+      qid: q.id,
     };
+  },
+  // 冒険のボス戦の結果：間違えたら本編の「間違えた問題の復習」へ（設定でオフにできる）
+  bossResult(qid, ok) {
+    if (ok || !store.settings.questReview || !qid) return;
+    const st = stat(qid); st.w++; st.r = true; st.due = 0; st.t = Date.now(); save();
   },
 };
 
@@ -713,6 +730,8 @@ function viewSettings() {
       </div>
       <h3 class="sec">選択肢の順番</h3>
       <div class="card">
+        <label class="switch"><span>正解した問題も3日後にもう一度<br><small class="muted">1回正解した問題が3日後に「復習」に出る（もう一度正解すれば卒業）</small></span><input type="checkbox" data-act="set" data-k="spaced" ${store.settings.spaced ? 'checked' : ''}></label>
+        <label class="switch"><span>冒険のボス戦で間違えた問題を復習へ<br><small class="muted">ヒマコロシの冒険のボス戦（本番形式5択）で間違えた問題</small></span><input type="checkbox" data-act="set" data-k="questReview" ${store.settings.questReview ? 'checked' : ''}></label>
         <label class="switch"><span>オリジナル問題の選択肢をシャッフル</span><input type="checkbox" data-act="set" data-k="shuffleOriginal" ${store.settings.shuffleOriginal ? 'checked' : ''}></label>
         <label class="switch"><span>本番の問題の選択肢もシャッフル<br><small class="muted">オフ＝本番と同じ並び</small></span><input type="checkbox" data-act="set" data-k="shufflePast" ${store.settings.shufflePast ? 'checked' : ''}></label>
       </div>
