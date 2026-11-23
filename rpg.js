@@ -118,7 +118,14 @@ function allEnemies(subj) {
 /* ---------- 計算 ---------- */
 const needExp = (lv) => lv * 50;
 const statOf = (base, lv) => Math.round(base * (1 + (lv - 1) * 0.12));
-const SUBJ = [['ccpp', 'C/C++'], ['db', 'DB'], ['sd', '設計']];
+const SUBJ = [['ccpp', 'C/C++'], ['db', 'DB'], ['sd', '設計'], ['toeic', 'TOEIC']];
+// 冒険の章（科目ごと）
+const CHAPTERS = [
+  { id: 'ccpp', name: 'C/C++プログラミング', sub: 'コンパイルの森', color: '#2563eb' },
+  { id: 'db', name: 'データベース', sub: 'テーブルの谷', color: '#0f766e' },
+  { id: 'sd', name: 'ソフトウェア設計', sub: '設計図の塔', color: '#7c3aed' },
+  { id: 'toeic', name: 'TOEIC', sub: 'ことばの港町', color: '#ea580c' },
+];
 
 export function makeRPG(ctx) {
   const { S, save, openOv, closeOv, body, info, toast, setCleanup, esc, shuffle, rnd, owlSVG, DECKS, addFood, api } = ctx;
@@ -180,7 +187,7 @@ export function makeRPG(ctx) {
   const darkOv = () => document.getElementById('hk-ov')?.classList.add('rp-ov');
 
   /* ---------- 冒険（ゲーム画面）：下のゲーム用タブで マップ・編成・ガチャ・図鑑・目標 ---------- */
-  let gtab = 'map', $m = null;
+  let gtab = 'map', $m = null, mapView = 'chapters'; // マップ：章の一覧 → ステージ
   const GTABS = [['map', '🗺️', 'マップ'], ['party', '👥', '編成'], ['gacha', '🎁', 'ガチャ'], ['zukan', '📖', '図鑑'], ['goals', '🎯', '目標']];
   async function renderQuestTab(m) {
     $m = m;
@@ -194,7 +201,7 @@ export function makeRPG(ctx) {
     };
     const pg = m.querySelector('#rp-page');
     window.scrollTo(0, 0);
-    if (gtab === 'map') renderMap(pg);
+    if (gtab === 'map') (mapView === 'chapters' ? renderChapters(pg) : renderMap(pg));
     else if (gtab === 'party') openParty(pg);
     else if (gtab === 'gacha') openGacha(pg);
     else if (gtab === 'zukan') renderZukan(pg);
@@ -203,6 +210,40 @@ export function makeRPG(ctx) {
   }
   const starsOf = (id) => [0, 1, 2].map((d) => R().stars[`${id}#${d}`] || 0);
   const starTxt = (n) => '★'.repeat(n) + '☆'.repeat(3 - n);
+  // 章の一覧：大きなバナーを縦に並べる。タップでその章のステージ選択へ
+  function renderChapters(m) {
+    const r = R(), t = team();
+    m.innerHTML = `
+      <div class="rp-chead">
+        <img class="rp-heroimg" src="icons/icon-192.png" alt="" data-rp="talk">
+        <div class="rp-herotxt"><button class="rp-name" data-rp="rename"><b>${esc(heroName())}</b><span>✏️</span></button>
+          <div class="rp-lv">Lv.${r.hero.lv}<span class="rp-exp"><i style="width:${(r.hero.exp / needExp(r.hero.lv)) * 100}%"></i></span></div></div>
+        <div class="rp-hudright"><span class="rp-coin">🪙 ${r.coins}</span><span class="rp-pow">戦闘力 <b>${teamPower(r.subj).toLocaleString()}</b></span></div>
+      </div>
+      <h3 class="rp-zsec">章を選ぶ</h3>
+      <div class="rp-chapters">${CHAPTERS.map((c, i) => {
+        const lecs = Object.keys(lectures[c.id] || {}), total = lecs.length * 3;
+        const done = lecs.reduce((a, k) => a + [1, 2, 3].filter((n) => r.clear[`${c.id}-${k}-${n}`]).length, 0);
+        const stars = lecs.reduce((a, k) => a + [1, 2, 3].reduce((b, n) => b + Math.max(...starsOf(`${c.id}-${k}-${n}`)), 0), 0);
+        const boss = ENEMIES[c.id].boss[lecs[lecs.length - 1]] || ['', '👑'];
+        return `<button class="rp-chap${r.subj === c.id ? ' last' : ''}" data-chap="${c.id}" style="--c:${c.color}">
+          <span class="rp-chno">第${i + 1}章</span>
+          <span class="rp-chbody"><b>${esc(c.name)}</b><small>${esc(c.sub)} ・ ${lecs.length}エリア</small>
+            <span class="rp-chbar"><i style="width:${total ? (done / total) * 100 : 0}%"></i></span>
+            <small>クリア ${done}/${total}　<i class="rp-stars">★</i> ${stars}/${total * 3}${done === total && total ? '　🏆 制覇' : ''}</small></span>
+          <span class="rp-chboss">${boss[1]}</span>
+        </button>`;
+      }).join('')}</div>
+      <p class="rp-tip">章を選ぶと、その章のステージに挑める。</p>`;
+    m.onclick = (e) => {
+      const c = e.target.closest('[data-chap]');
+      if (c) { e.stopPropagation(); bgm.sfx('tap'); R().subj = c.dataset.chap; save(); mapView = 'stages'; renderMap(m); window.scrollTo(0, 0); return; }
+      const b = e.target.closest('[data-rp]'); if (!b) return;
+      e.stopPropagation(); bgm.sfx('tap');
+      if (b.dataset.rp === 'rename') openRename();
+      else if (b.dataset.rp === 'talk') toast(`${heroName()}「${pick(HLINE.map)}」`);
+    };
+  }
   function renderMap(m) {
     const r = R();
     const t = team();
@@ -248,7 +289,7 @@ export function makeRPG(ctx) {
           <div class="rp-faces">${t.map((x) => iconHTML(x.id, 'sm')).join('')}${Array(4 - t.length).fill('<span class="rp-face sm empty">＋</span>').join('')}</div>
           <div class="rp-stat"><span class="rp-pow">戦闘力 <b>${teamPower(r.subj).toLocaleString()}</b></span><span>HP <b>${t.reduce((a, x) => a + x.hp, 0)}</b>　攻撃 <b>${t.reduce((a, x) => a + x.atk, 0)}</b></span></div>
         </div>
-        <div class="seg rp-seg" role="group">${SUBJ.map(([k, n]) => `<button data-rp="subj" data-k="${k}" aria-pressed="${r.subj === k}">${n}</button>`).join('')}</div>
+        <button class="rp-chback" data-rp="chapters">‹ 章の一覧<b>第${CHAPTERS.findIndex((c) => c.id === r.subj) + 1}章 ${esc((CHAPTERS.find((c) => c.id === r.subj) || {}).name || '')}</b></button>
       </div>
       <div class="rp-mapbox" id="rp-mapbox"><div class="rp-map" style="height:${H}px">
         <svg class="rp-road" viewBox="0 0 100 ${H}" preserveAspectRatio="none"><polyline points="${pts}" class="all"/>${donePts ? `<polyline points="${donePts}" class="done"/>` : ''}</svg>
@@ -272,6 +313,7 @@ export function makeRPG(ctx) {
       const a = b.dataset.rp;
       bgm.sfx('tap');
       if (a === 'subj') { R().subj = b.dataset.k; save(); renderMap(m); }
+      else if (a === 'chapters') { mapView = 'chapters'; renderChapters(m); }
       else if (a === 'rename') openRename();
       else if (a === 'talk') toast(`${heroName()}「${pick(HLINE.map)}」`);
       else if (a === 'sound') {
@@ -530,7 +572,7 @@ export function makeRPG(ctx) {
     const t = team();
     const maxHp = t.reduce((a, x) => a + x.hp, 0);
     const st = { foes, fi: 0, ehp: foes[0].hp, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0 };
-    const deck = DECKS.find((d) => d.id === subj).words;
+    const deck = (DECKS.find((d) => d.id === subj) || DECKS.find((d) => d.id === subj + lec) || DECKS[0]).words; // TOEIC はレベルごとの単語帳
     const no = (lectures[subj][lec].match(/^(第\S+?回)/) || [lectures[subj][lec]])[0];
     openOv(`${no} ${boss ? 'BOSS' : 'STAGE ' + n}${d ? ' ' + D.tag + D.name : ''}`); darkOv();
     setCleanup(() => { clearInterval(st.timer); bgm.play('map'); });
@@ -817,5 +859,5 @@ export function makeRPG(ctx) {
   // 音（ヒマコロシ全体で共通）：'silent' | 'bgm'
   const sound = () => R().sound;
   function setSound(v) { R().sound = v; save(); bgm.setEnabled(v === 'bgm'); }
-  return { renderQuestTab, leave, memberInfo, resetTab: () => { gtab = 'map'; }, sound, setSound };
+  return { renderQuestTab, leave, memberInfo, resetTab: () => { gtab = 'map'; mapView = 'chapters'; }, sound, setSound };
 }

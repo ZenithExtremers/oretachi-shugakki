@@ -928,3 +928,25 @@ body.rp-night.rp-day {
 /* ホームの科目タイル：名前は1行、下の数字は左右に分けて折り返さない */
 .stile-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .stile-sub { display: flex; justify-content: space-between; gap: 6px; white-space: nowrap; }
+
+/* ===== 冒険：章の一覧（大きなバナー）→ ステージ ===== */
+.rp-chead { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 12px; border-radius: 18px; border: 1px solid var(--line); background: linear-gradient(160deg, rgba(245, 197, 66, .12), rgba(255, 255, 255, .04)); }
+.rp-chead .rp-hudright { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.rp-chapters { display: grid; gap: 12px; }
+.rp-chap { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 104px; padding: 14px 14px 14px 0; border: 0; border-radius: 20px; overflow: hidden; cursor: pointer; text-align: left; color: #fff;
+  background: linear-gradient(120deg, var(--c), color-mix(in srgb, var(--c) 45%, #0b1026)); box-shadow: 0 6px 18px rgba(0, 0, 0, .25), inset 0 0 0 1.5px rgba(255, 255, 255, .18); }
+.rp-chap::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 85% 30%, rgba(255, 255, 255, .25), transparent 45%); pointer-events: none; }
+.rp-chap.last { box-shadow: 0 6px 18px rgba(0, 0, 0, .25), inset 0 0 0 2.5px #f5c542; }
+.rp-chap:active { transform: scale(.98); }
+.rp-chno { writing-mode: vertical-rl; align-self: stretch; display: grid; place-items: center; padding: 0 8px; background: rgba(0, 0, 0, .25); font-weight: 900; font-size: 13px; letter-spacing: .12em; }
+.rp-chbody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.rp-chbody b { font-size: 18px; font-weight: 900; text-shadow: 0 2px 4px rgba(0, 0, 0, .3); }
+.rp-chbody small { font-size: 11.5px; opacity: .92; }
+.rp-chbody .rp-stars { color: #fde68a; font-size: 12px; }
+.rp-chbar { height: 7px; border-radius: 99px; background: rgba(0, 0, 0, .3); overflow: hidden; margin: 4px 0 2px; }
+.rp-chbar i { display: block; height: 100%; background: linear-gradient(90deg, #fde68a, #f5c542); }
+.rp-chboss { font-size: 46px; line-height: 1; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .4)); flex: none; }
+.rp-chback { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(0, 0, 0, .2); color: var(--muted); font-size: 13px; cursor: pointer; }
+.rp-chback b { color: var(--text); font-size: 15px; }
+.rp-day .rp-chback { background: rgba(255, 255, 255, .7); }
+.rp-day .rp-chead { background: linear-gradient(160deg, rgba(255, 236, 170, .55), rgba(255, 255, 255, .9)); }
