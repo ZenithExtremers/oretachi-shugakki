@@ -136,10 +136,10 @@ const STAR_REW = [
   { p: 0.1, coins: 300, label: '🪙300' },
   { p: 0.25, food: 5, label: '🌰5' },
   { p: 0.4, ticket: 1, label: '🎟️ガチャチケット' },
-  { p: 0.5, mat: 1, label: '💎覚醒の結晶' },
+  { p: 0.5, char: true, label: '★★★章限定の仲間' },
   { p: 0.65, coins: 1000, label: '🪙1000' },
   { p: 0.8, mat: 1, ticket: 1, label: '💎結晶＋🎟️' },
-  { p: 1, char: true, title: true, label: '★★★限定の仲間＋称号' },
+  { p: 1, title: true, mat: 2, label: '称号＋💎結晶×2' },
 ];
 const CH_TITLE = { ccpp: 'C/C++マスター', db: 'データベースマスター', sd: '設計マスター', toeic: 'TOEICマスター' };
 const ALL_TITLE = '秋学期の覇者';
@@ -337,7 +337,7 @@ export function makeRPG(ctx) {
         <button class="rp-chback" data-rp="chapters">‹ 章の一覧<b>第${CHAPTERS.findIndex((c) => c.id === r.subj) + 1}章 ${esc((CHAPTERS.find((c) => c.id === r.subj) || {}).name || '')}</b></button>
       </div>
       <div class="rp-dtabs" role="tablist">${DIFF.map((x, i) => `<button data-rp="diff" data-d="${i}" class="d${i}${mapDiff === i ? ' on' : ''}">${x.tag}${x.name}${i ? `<small>報酬×${x.rew}</small>` : ''}</button>`).join('')}</div>
-      ${(() => { const [g, t] = chStars(r.subj), c = r.chRew?.[r.subj] || {}; return `<div class="rp-starbar"><div class="rp-sbtrack"><i style="width:${(g / t) * 100}%"></i>${STAR_REW.map((rw, i) => { const ok = g >= need(rw, t); return `<button class="rp-chest${c[i] ? ' got' : ok ? ' ready' : ''}" style="left:${rw.p * 100}%" data-rp="chest" data-i="${i}" title="★${need(rw, t)}：${esc(rw.label)}">${c[i] ? '✓' : rw.char ? '👑' : '🎁'}</button>`; }).join('')}</div><span class="rp-sbtxt"><i class="rp-stars">★</i> ${g}/${t}</span></div>`; })()}
+      ${(() => { const [g, t] = chStars(r.subj), c = r.chRew?.[r.subj] || {}; return `<div class="rp-starbar"><div class="rp-sbtrack"><i style="width:${(g / t) * 100}%"></i>${STAR_REW.map((rw, i) => { const ok = g >= need(rw, t); return `<button class="rp-chest${c[i] ? ' got' : ok ? ' ready' : ''}" style="left:${rw.p * 100}%" data-rp="chest" data-i="${i}" title="★${need(rw, t)}：${esc(rw.label)}">${c[i] ? '✓' : rw.char ? '🤝' : rw.title ? '👑' : '🎁'}</button>`; }).join('')}</div><span class="rp-sbtxt"><i class="rp-stars">★</i> ${g}/${t}</span></div>`; })()}
       <div class="rp-mapbox" id="rp-mapbox"><div class="rp-map" style="height:${H}px">
         <svg class="rp-road" viewBox="0 0 100 ${H}" preserveAspectRatio="none"><polyline points="${pts}" class="all"/>${donePts ? `<polyline points="${donePts}" class="done"/>` : ''}</svg>
         ${rows.map((x, i) => {
