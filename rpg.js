@@ -27,7 +27,8 @@ export const CHARS = {
   yuni: { name: 'ユニ', icon: '🦄', rar: 3, subj: 'all', hp: 110, atk: 24, skill: { kind: 'heal', pow: 1, cost: 5, name: 'にじの癒し' } },
   ryu: { name: 'リュウ', icon: '🐉', rar: 3, subj: 'all', hp: 120, atk: 30, skill: { kind: 'dmg', pow: 5, cost: 5, name: 'りゅうのいぶき' } },
 };
-const HERO = { name: '主人公', hp: 100, atk: 20, skill: { kind: 'hint', pow: 2, cost: 4, name: 'ひらめき' } };
+const HERO = { name: '主人公', hp: 100, atk: 20, skill: { kind: 'hint', pow: 2, cost: 4, name: 'ひとさし指のひらめき' } };
+const HERO_PROFILE = '「〜していきたいと思います！」が口ぐせの、明るく丁寧な実況冒険者。おいしいものと新しいことが大好きで、何にでも全力でリアクションする。人差し指を立てたら、ひらめきの合図。';
 const SKILL_DESC = {
   heal: (k) => `パーティのHPを${Math.round(k.pow * 100)}%回復`,
   dmg: (k) => `攻撃力×${k.pow} のダメージ`,
@@ -419,6 +420,7 @@ export function makeRPG(ctx) {
             <div class="rp-lv">Lv.${d.lv}${sel === 'hero' ? '' : `<small>/${capOf(sel)}</small>`}<span class="rp-exp"><i style="width:${o.lv >= capOf(sel) ? 100 : (o.exp / needExp(o.lv)) * 100}%"></i></span><small>${o.lv >= capOf(sel) ? '上限' : `${o.exp}/${needExp(o.lv)}`}</small></div></div>
             <button class="rp-x" data-close-detail aria-label="閉じる">✕</button></div>
           <div class="rp-tags"><em class="pw">戦闘力 ${power(sel)}</em><em>HP ${d.hp}</em><em>攻撃 ${d.atk}</em>${o.lb ? `<em>突破+${o.lb}</em>` : ''}<em>得意 ${d.subj == null ? 'なし' : d.subj === 'all' ? 'ぜんぶ' : SUBJ.find((x) => x[0] === d.subj)[1]}</em></div>
+          ${sel === 'hero' ? `<p class="rp-prof">${esc(HERO_PROFILE)}</p>` : ''}
           <p class="rp-skill">スキル「${esc(d.skill.name)}」：${SKILL_DESC[d.skill.kind](d.skill)}（正解${d.skill.cost}回でたまる）</p>
           <div class="rp-dbtns">
             ${sel === 'hero' ? '<span class="muted small">リーダーはいつも出撃</span>' : `<button class="rp-btn" data-toggle>${r.party.includes(sel) ? '編成から外す' : '編成に入れる'}</button>`}

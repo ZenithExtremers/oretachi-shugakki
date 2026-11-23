@@ -895,3 +895,4 @@ body.rp-night.rp-day {
 .rp-hline { display: flex; align-items: center; gap: 8px; justify-content: center; margin: 8px 0; font-weight: 700; font-size: 14px; }
 .rp-hline img { width: 32px; height: 32px; border-radius: 50%; flex: none; }
 .rp-day .rp-say { background: rgba(255, 255, 255, .97); color: #1e293b; }
+.rp-prof { margin: 8px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--muted); }
