@@ -1077,3 +1077,24 @@ body.rp-night.rp-day {
 .rp-gcount { color: rgba(255, 255, 255, .75); font-weight: 800; font-size: 13px; margin: 0; }
 .rp-gskipall { position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 14px; z-index: 2; border: 1.5px solid rgba(255, 255, 255, .6); background: rgba(0, 0, 0, .35); color: #fff; border-radius: 99px; padding: 8px 14px; font-weight: 800; font-size: 13px; cursor: pointer; }
 .rp-gcard .rp-rar { color: #fde047 !important; text-shadow: 0 0 8px rgba(253, 224, 71, .7); }
+
+/* ===== 中間ボス ===== */
+.rp-midspot { position: absolute; left: 50%; transform: translate(-50%, -50%); z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 2px; border: 0; background: none; cursor: pointer; color: var(--text); }
+.rp-midspot .c { width: 88px; height: 88px; border-radius: 50%; display: grid; place-items: center; font-size: 30px; background: rgba(0, 0, 0, .3); box-shadow: 0 0 0 4px #f43f5e, 0 0 24px rgba(244, 63, 94, .6); animation: rp-midpulse 1.4s infinite alternate; }
+.rp-midspot .c svg { width: 88px; height: 88px; }
+@keyframes rp-midpulse { to { box-shadow: 0 0 0 4px #f5c542, 0 0 30px rgba(245, 197, 66, .7); } }
+.rp-midspot b { font-size: 13px; font-weight: 900; color: #fff; background: #e11d48; border-radius: 99px; padding: 1px 10px; }
+.rp-midspot small { font-size: 11px; font-weight: 800; text-shadow: 0 1px 2px rgba(0, 0, 0, .5); }
+.rp-day .rp-midspot small { text-shadow: 0 1px 0 #fff; }
+.rp-midspot[disabled] { cursor: default; } .rp-midspot[disabled] .c { animation: none; box-shadow: 0 0 0 3px rgba(148, 163, 184, .6); }
+.rp-midspot.done .c { box-shadow: 0 0 0 4px #22c55e; animation: none; }
+.rp-enemy.art svg { width: 64px; height: 64px; display: block; }
+.rp-field.boss .rp-enemy.art svg { width: 70px; height: 70px; }
+.rp-zk span svg { width: 40px; height: 40px; display: block; }
+.rp-zbig svg { width: 64px; height: 64px; display: block; }
+.rp-sfoes.mid span svg { width: 36px; height: 36px; }
+.rp-midt { font-weight: 900; margin: 6px 0 0; }
+.rp-midrw { font-size: 13px; text-align: center; margin: 6px 0; }
+.rp-midrw b { color: var(--brand); }
+.rp-joined { display: flex; align-items: center; gap: 10px; justify-content: center; margin: 8px 0; padding: 8px; border-radius: 14px; background: rgba(245, 197, 66, .2); border: 1.5px solid #f5c542; }
+.rp-joined .rp-face { width: 52px; height: 52px; }

@@ -5,7 +5,7 @@
 import { bgm } from './bgm.js';
 import { ENEMIES } from './enemies.js';
 import { STAGE } from './enemies-stage.js';
-import { CHAR_ART } from './charart.js';
+import { CHAR_ART, MID_ART } from './charart.js';
 
 /* ---------- データ ---------- */
 // 仲間。subj が一致するステージでは攻撃力×1.5（'all' はどこでも×1.2）
@@ -32,6 +32,10 @@ export const CHARS = {
   kenja: { name: 'テーブル賢者', icon: '🧙', rar: 3, subj: 'db', hp: 140, atk: 24, limited: 'db', skill: { kind: 'heal', pow: 0.7, cost: 4, name: '正規化の祈り' } },
   kenchiku: { name: 'UML建築士', icon: '👷', rar: 3, subj: 'sd', hp: 125, atk: 27, limited: 'sd', skill: { kind: 'time', pow: 18, cost: 3, name: '設計図ひろげ' } },
   senchou: { name: 'ことばの船長', icon: '🧑‍✈️', rar: 3, subj: 'toeic', hp: 120, atk: 28, limited: 'toeic', skill: { kind: 'hint', pow: 2, cost: 3, name: '辞書の羅針盤' } },
+  // 中間ボスを★3でクリアすると仲間になる（ガチャには出ない）
+  liner: { name: 'グランドビルドライナー', icon: '🚂', rar: 3, subj: 'ccpp', hp: 150, atk: 34, limited: 'mid', skill: { kind: 'dmg', pow: 6, cost: 5, name: '合体ビルドバスター' } },
+  yankee: { name: '隣の部屋のヤンキー', icon: '😎', rar: 3, subj: 'db', hp: 160, atk: 26, limited: 'mid', skill: { kind: 'guard', pow: 4, cost: 3, name: 'ガン飛ばし' } },
+  spec: { name: '設計竜スペック', icon: '🐲', rar: 3, subj: 'sd', hp: 145, atk: 33, limited: 'mid', skill: { kind: 'dmg', pow: 5, cost: 4, name: '仕様書ブレス' } },
   ryu: { name: 'リュウ', icon: '🐉', rar: 3, subj: 'all', hp: 120, atk: 30, skill: { kind: 'dmg', pow: 5, cost: 5, name: 'りゅうのいぶき' } },
 };
 const HERO = { name: '主人公', hp: 100, atk: 20, skill: { kind: 'hint', pow: 2, cost: 4, name: 'ひとさし指のひらめき' } };
@@ -76,6 +80,8 @@ const HLINE = {
   thanks: ['ありがとうございました！'],
   today: ['今日はこれをやっていきたいと思います！'],
   mat: ['うわっ、結晶が出ました！これはうれしい！'],
+  mid: ['ここで中間ボスです！気合い入れていきたいと思います！'],
+  gattai: ['え、合体した！？これはヤバいです！'],
   heal: ['ありがとうございます、助かります！'],
   pinch: ['ちょっと待ってください、これヤバいです…！'],
   chance: ['きましたね〜！チャンスです！'],
@@ -120,6 +126,7 @@ function allEnemies(subj) {
   for (const [k, sts] of Object.entries(STAGE[subj] || {})) sts.forEach((tri, si) => tri.forEach((z, zi) => out.push({ kind: zi === 2 ? 'srare' : 'lec', lec: k, stage: si + 1, name: z[0], icon: z[1], desc: z[2] })));
   for (const z of E.common) out.push({ kind: 'common', name: z[0], icon: z[1], desc: z[2] });
   out.push({ kind: 'rare', name: E.rare[0], icon: E.rare[1], desc: E.rare[2] });
+  for (const f of midFoes(subj)) if (!f.rush) out.push({ kind: 'mid', name: f.name, icon: f.icon, desc: f.desc });
   return out.map((x) => ({ ...x, key: `${subj}|${x.name}` }));
 }
 
@@ -146,6 +153,28 @@ const STAR_REW = [
 ];
 const CH_TITLE = { ccpp: 'C/C++マスター', db: 'データベースマスター', sd: '設計マスター', toeic: 'TOEICマスター' };
 const ALL_TITLE = '秋学期の覇者';
+// 中間ボスステージ：範囲の最後の回のボスのあとに出る連戦。★3でクリアすると最後の敵が仲間になる（すべてオリジナル）
+const MID = {
+  ccpp: { after: '6', title: '線路戦隊ビルドライナー', reward: 'liner', foes: [
+    { art: 'red', name: 'ビルドレッド', lec: 1, desc: 'コンパイルを司る赤の戦士。{ } の対応を見ぬく。' },
+    { art: 'blue', name: 'ビルドブルー', lec: 2, desc: '変数と型を司る青の戦士。x= で値を入れる。' },
+    { art: 'yellow', name: 'ビルドイエロー', lec: 3, desc: 'ループを司る黄の戦士。↻ で何度でもくり返す。' },
+    { art: 'green', name: 'ビルドグリーン', lec: 4, desc: '配列を司る緑の戦士。[ ] の添字は0から数える。' },
+    { art: 'pink', name: 'ビルドピンク', lec: 6, desc: 'ポインタを司る桃の戦士。*p で指す先を読む。' },
+    { art: 'liner', name: 'グランドビルドライナー', final: true, gattai: true, desc: '5人が合体した巨大な列車の戦士。第1〜6回のすべてを使ってくる。' },
+  ] },
+  db: { after: '7', title: '夜行列車のトラブル', reward: 'yankee', foes: [
+    { art: 'ticket', name: '無賃乗車NULL', lec: 3, desc: '切符に何も書いていない（NULL）お化け。= では見つからない。' },
+    { art: 'suitcase', name: '荷物ごちゃまぜORDER', lec: 4, desc: '荷物をばらばらに並べるトランク。ORDER BY で並べ直そう。' },
+    { art: 'stationmaster', name: '終点の集計駅長', lec: 6, desc: '終点で乗客を GROUP BY でまとめて数える駅長。' },
+    { art: 'yankee', name: '隣の部屋のヤンキー', final: true, desc: '夜中にラジカセを鳴らす隣の部屋の住人。第2〜7回のすべてで勝負を挑んでくる。' },
+  ] },
+  sd: { after: '7', title: '設計図の塔 ボスラッシュ', reward: 'spec', foes: [
+    { boss: '1' }, { boss: '2' }, { boss: '4' }, { boss: '5' }, { boss: '6' }, { boss: '7' },
+    { art: 'spec', name: '設計竜スペック', final: true, desc: '設計図の翼をもつ竜。すべての UML を操る、塔のいちばん上の主。' },
+  ] },
+};
+const midFoes = (subj) => (MID[subj]?.foes || []).map((f) => (f.boss ? { name: ENEMIES[subj].boss[f.boss][0], icon: ENEMIES[subj].boss[f.boss][1], lec: +f.boss, desc: ENEMIES[subj].boss[f.boss][2], rush: true } : { ...f, icon: MID_ART[f.art] }));
 
 export function makeRPG(ctx) {
   const { S, save, openOv, closeOv, body, info, toast, setCleanup, esc, shuffle, rnd, owlSVG, DECKS, addFood, api } = ctx;
@@ -303,23 +332,24 @@ export function makeRPG(ctx) {
       const mt = v.match(/^(第\S+?回)\s*(.*)$/) || [null, v, ''];
       rows.push({ kind: 'sign', no: mt[1], title: mt[2], ci });
       [1, 2, 3].forEach((n) => { const id = `${r.subj}-${k}-${n}`; rows.push({ kind: 'node', k, n, ci, open: isOpen(r.subj, k, n, ci) && (mapDiff === 0 || (r.stars[`${id}#${mapDiff - 1}`] || 0) > 0), done: (r.stars[`${id}#${mapDiff}`] || 0) > 0 }); });
+      if (MID[r.subj]?.after === String(k)) { const id = `${r.subj}-mid-0`; rows.push({ kind: 'mid', k: 'mid', n: 0, ci, open: !!r.clear[`${r.subj}-${k}-3`] && (mapDiff === 0 || (r.stars[`${id}#${mapDiff - 1}`] || 0) > 0), done: (r.stars[`${id}#${mapDiff}`] || 0) > 0 }); }
     });
     const nodes = rows.filter((x) => x.kind === 'node');
     const here = nodes.find((x) => x.open && !x.done) || nodes[nodes.length - 1];
-    const RH = { node: 96, sign: 58 };
+    const RH = { node: 96, sign: 58, mid: 130 };
     let y = 40; const pos = [];
     for (let i = 0; i < rows.length; i++) {
       const x = rows[i];
       const h = RH[x.kind];
-      pos[i] = { y: y + h / 2, x: x.kind === 'sign' ? 50 : x.n === 3 ? 50 : x.n === 1 ? 28 : 72 };
+      pos[i] = { y: y + h / 2, x: x.kind !== 'node' ? 50 : x.n === 3 ? 50 : x.n === 1 ? 28 : 72 };
       y += h;
     }
     const H = y + 30;
     const Y = (i) => H - pos[i].y; // 下から積む
-    const pts = rows.map((x, i) => (x.kind === 'node' ? `${pos[i].x},${Y(i)}` : null)).filter(Boolean).join(' ');
-    const doneIdx = rows.map((x, i) => (x.kind === 'node' && x.done ? i : -1)).filter((i) => i >= 0);
+    const pts = rows.map((x, i) => (x.kind !== 'sign' ? `${pos[i].x},${Y(i)}` : null)).filter(Boolean).join(' ');
+    const doneIdx = rows.map((x, i) => (x.kind !== 'sign' && x.done ? i : -1)).filter((i) => i >= 0);
     const lastDone = doneIdx.length ? doneIdx[doneIdx.length - 1] : -1;
-    const donePts = rows.slice(0, lastDone + 2).map((x, i) => (x.kind === 'node' ? `${pos[i].x},${Y(i)}` : null)).filter(Boolean).join(' ');
+    const donePts = rows.slice(0, lastDone + 2).map((x, i) => (x.kind !== 'sign' ? `${pos[i].x},${Y(i)}` : null)).filter(Boolean).join(' ');
     const E = ENEMIES[r.subj];
     m.innerHTML = `
       <div class="rp-hud">
@@ -347,6 +377,8 @@ export function makeRPG(ctx) {
         ${rows.map((x, i) => {
           const top = Y(i);
           if (x.kind === 'sign') return `<div class="rp-sign" style="top:${top}px"><b>${esc(x.no)}</b><span>${esc(x.title)}</span></div>`;
+          if (x.kind === 'mid') { const M = MID[r.subj], sv = starsOf(`${r.subj}-mid-0`)[mapDiff]; return `<button class="rp-midspot${x.done ? ' done' : ''}" style="top:${top}px" data-rp="mid" ${x.open ? '' : 'disabled'}>
+            <span class="c">${x.open ? MID_ART[M.foes[M.foes.length - 1].art] : '🔒'}</span><b>中間ボス</b><small>${esc(M.title)}${x.done ? ` <i class="rp-stars">${starTxt(sv)}</i>` : ''}</small></button>`; }
           const isHere = x === here;
           const boss = x.n === 3;
           const sv = starsOf(`${r.subj}-${x.k}-${x.n}`)[mapDiff];
@@ -381,6 +413,7 @@ export function makeRPG(ctx) {
         toast(r2.sound === 'bgm' ? '🎵 BGMモード：音楽と効果音が鳴る' : '🔇 サイレントモード：音は鳴らない');
         renderMap(m);
       } else if (a === 'stage') openStage(m, R().subj, b.dataset.k, +b.dataset.n);
+      else if (a === 'mid') openMid(m, R().subj);
     };
     // いる場所まで自動でスクロール
     requestAnimationFrame(() => {
@@ -411,6 +444,28 @@ export function makeRPG(ctx) {
     };
   }
 
+  // 中間ボス：連戦の顔ぶれと、仲間になる条件を見て出撃
+  function openMid(m, subj) {
+    const r = R(), M = MID[subj], d = mapDiff, st = starsOf(`${subj}-mid-0`), fs = midFoes(subj);
+    const seen = (nm) => (r.zukan[`${subj}|${nm}`] || 0) > 0;
+    const rw = CHARS[M.reward];
+    const sh = document.createElement('div'); sh.className = 'rp-sheet';
+    sh.innerHTML = `<div class="rp-sheet-in">
+        <div class="rp-sheet-h"><b>中間ボス　<span class="rp-dtag d${d}">${DIFF[d].tag}${DIFF[d].name}</span></b><button class="rp-x" data-sx aria-label="閉じる">✕</button></div>
+        <p class="rp-midt">${esc(M.title)}（${fs.length}連戦）</p>
+        <div class="rp-sfoes mid">${fs.map((f) => `<span class="${seen(f.name) || f.rush ? '' : 'unk'}">${seen(f.name) || f.rush ? f.icon : '？'}</span>`).join('')}</div>
+        <div class="rp-sbest">この難易度の記録 <i class="rp-stars">${starTxt(st[d])}</i></div>
+        <p class="rp-midrw">${r.owned[M.reward] ? `✓ ${esc(rw.name)} は仲間になっている` : `★3でクリアすると <b>★★★${esc(rw.name)}</b> が仲間になる`}</p>
+        <p class="rp-starrule">問題は範囲の回の本番形式。★1 クリア　★2 HP半分以上　★3 ノーミス</p>
+        <button class="rp-btn gold big wide" data-go>出撃！</button></div>`;
+    m.appendChild(sh);
+    sh.onclick = (e) => {
+      e.stopPropagation();
+      if (e.target === sh || e.target.closest('[data-sx]')) { sh.remove(); return; }
+      if (e.target.closest('[data-go]')) { sh.remove(); startBattle(subj, 'mid', 0, d); }
+    };
+  }
+
   /* ---------- 図鑑：倒した敵が登録される ---------- */
   let zsubj = null, zsel = null;
   function renderZukan(m) {
@@ -420,7 +475,7 @@ export function makeRPG(ctx) {
     const cell = (x) => { const c = r.zukan[x.key] || 0; return `<button class="rp-zk${c ? '' : ' unk'}${x.kind === 'boss' ? ' boss' : ''}${x.kind === 'rare' || x.kind === 'srare' ? ' rare' : ''}${zsel === x.key ? ' sel' : ''}" data-z="${esc(x.key)}" ${c ? '' : 'disabled'}><span>${c ? x.icon : '？'}</span><small>${c ? esc(x.name) : '？？？'}</small></button>`; };
     const lecs = Object.keys(lectures[zsubj]);
     const sel = list.find((x) => x.key === zsel);
-    const where = (x) => (x.kind === 'boss' ? `${lecName(x.lec)} のボス` : x.kind === 'srare' ? `${lecName(x.lec)} STAGE ${x.stage} にたまに出る` : x.kind === 'lec' ? `${lecName(x.lec)} ${x.stage ? 'STAGE ' + x.stage : 'のステージ'}` : x.kind === 'rare' ? 'どのステージにもたまに出る' : 'どのステージにも出る');
+    const where = (x) => (x.kind === 'mid' ? `中間ボス「${MID[zsubj].title}」` : x.kind === 'boss' ? `${lecName(x.lec)} のボス` : x.kind === 'srare' ? `${lecName(x.lec)} STAGE ${x.stage} にたまに出る` : x.kind === 'lec' ? `${lecName(x.lec)} ${x.stage ? 'STAGE ' + x.stage : 'のステージ'}` : x.kind === 'rare' ? 'どのステージにもたまに出る' : 'どのステージにも出る');
     m.innerHTML = `
       <div class="rp-zhead"><b>📖 敵キャラ図鑑</b><span>登録 <b>${got}</b> / ${list.length}</span></div>
       <div class="rp-zbar"><i style="width:${(got / list.length) * 100}%"></i></div>
@@ -428,6 +483,7 @@ export function makeRPG(ctx) {
       ${sel ? `<div class="rp-zdetail"><span class="rp-zbig">${sel.icon}</span><div><b>${esc(sel.name)}</b>${sel.kind === 'boss' ? '<em>BOSS</em>' : sel.kind === 'rare' || sel.kind === 'srare' ? '<em class="rare">レア</em>' : ''}
         <p>${esc(sel.desc)}</p><small>${esc(where(sel))}・たおした数 ${r.zukan[sel.key]}</small></div><button class="rp-x" data-zx aria-label="閉じる">✕</button></div>` : '<p class="rp-tip">たおした敵が登録される。タップで説明が見られる。</p>'}
       <h3 class="rp-zsec">ボス</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'boss').map(cell).join('')}</div>
+      ${list.some((x) => x.kind === 'mid') ? `<h3 class="rp-zsec">中間ボス</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'mid').map(cell).join('')}</div>` : ''}
       <h3 class="rp-zsec">レア</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'rare' || x.kind === 'srare').map(cell).join('')}</div>
       ${lecs.filter((k) => ENEMIES[zsubj].lec[k]).map((k) => `<h3 class="rp-zsec">${esc(lecName(k))}</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'lec' && x.lec === k).map(cell).join('')}</div>`).join('')}
       <h3 class="rp-zsec">どこにでも出る</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'common').map(cell).join('')}</div>`;
@@ -654,8 +710,10 @@ export function makeRPG(ctx) {
 
   /* ---------- バトル ---------- */
   async function startBattle(subj, lec, n, d = 0) {
-    const ci = Object.keys(lectures[subj]).indexOf(String(lec));
-    const boss = n === 3;
+    const isMid = lec === 'mid';
+    const lecs = Object.keys(lectures[subj]);
+    const ci = isMid ? lecs.indexOf(MID[subj].after) : lecs.indexOf(String(lec));
+    const boss = n === 3 || isMid;
     const E = ENEMIES[subj], D = DIFF[d];
     const lvScale = 1 + ci * 0.4 + (n - 1) * 0.15;
     // 雑魚：その回専用（あれば2体）＋どこにでも出る雑魚 で3体。たまにレアが混ざる
@@ -670,8 +728,11 @@ export function makeRPG(ctx) {
       return z.map(([name, icon]) => { const rare = rares.includes(name); return { name, icon, rare, hp: Math.round(100 * lvScale * D.hp * (rare ? 0.7 : 1)), atk: Math.round(18 * lvScale * D.atk * (rare ? 0.5 : 1)) }; });
     };
     // 同時に場に出る敵の数：ノーマル1体、ハード2体、ゲキムズ3体（ボス戦はボス＋手下）
-    const slots = [1, 2, 3][d];
-    const foes = boss
+    const slots = isMid ? 1 : [1, 2, 3][d];
+    const rangeLecs = isMid ? lecs.slice(0, ci + 1) : [];
+    const foes = isMid
+      ? midFoes(subj).map((f) => ({ ...f, boss: true, art: f.rush ? null : f.icon, lec: f.lec || +rangeLecs[rnd(rangeLecs.length)], hp: Math.round(380 * lvScale * D.hp * (f.final ? 1.4 : 0.5)), atk: Math.round(35 * lvScale * D.atk * (f.final ? 1.2 : 0.8)) }))
+      : boss
       ? [{ name: E.boss[lec][0], icon: E.boss[lec][1], hp: Math.round(380 * lvScale * D.hp), atk: Math.round(35 * lvScale * D.atk), boss: true }, ...zakos().slice(0, slots - 1).map((f) => ({ ...f, hp: Math.round(f.hp * 0.8) }))]
       : zakos();
     foes.forEach((f) => { f.cur = f.hp; });
@@ -680,8 +741,8 @@ export function makeRPG(ctx) {
     const active0 = foes.slice(0, slots).map((_, i) => i);
     const st = { foes, active: active0, next: active0.length, fi: 0, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0 };
     const deck = (DECKS.find((d) => d.id === subj) || DECKS.find((d) => d.id === subj + lec) || DECKS[0]).words; // TOEIC はレベルごとの単語帳
-    const no = (lectures[subj][lec].match(/^(第\S+?回)/) || [lectures[subj][lec]])[0];
-    openOv(`${no} ${boss ? 'BOSS' : 'STAGE ' + n}${d ? ' ' + D.tag + D.name : ''}`); darkOv();
+    const no = isMid ? '中間ボス' : (lectures[subj][lec].match(/^(第\S+?回)/) || [lectures[subj][lec]])[0];
+    openOv(`${no} ${isMid ? `${foes.length}連戦` : boss ? 'BOSS' : 'STAGE ' + n}${d ? ' ' + D.tag + D.name : ''}`); darkOv();
     setCleanup(() => { clearInterval(st.timer); bgm.play('map'); });
     bgm.play(boss ? 'boss' : 'battle');
 
@@ -694,7 +755,7 @@ export function makeRPG(ctx) {
       if (st.active.length === 1) {
         const f = foes[st.fi];
         return `<div class="rp-field${f.boss ? ' boss' : ''}${f.rare ? ' rare' : ''}">
-              <div class="rp-enemy" id="rp-enemy">${f.icon}</div>
+              <div class="rp-enemy${f.art ? ' art' : ''}" id="rp-enemy">${f.icon}</div>
               <div class="rp-einfo">
                 <div class="rp-wave">${f.boss ? 'BOSS' : `ENEMY ${foes.length - left() + 1}/${foes.length}`}${f.rare ? '　🌟レア！' : ''}</div>
                 <div class="rp-ename">${esc(f.name)}</div>
@@ -800,7 +861,7 @@ export function makeRPG(ctx) {
       rollEvent();
       // Ready… GO!（問題が出てから時間が動く）
       qEl.innerHTML = '<div class="rp-ready"><span>READY…</span></div>';
-      const bqP = foes[st.fi].boss ? api.bossQuestion(subj, lec) : null;
+      const bqP = foes[st.fi].boss ? api.bossQuestion(subj, foes[st.fi].lec || lec) : null;
       await wait(st.event ? 900 : 550);
       if (st.over || !document.getElementById('rp-q')) return;
       qEl.innerHTML = '<div class="rp-ready go"><span>GO!</span></div>';
@@ -904,7 +965,7 @@ export function makeRPG(ctx) {
           if (!st.active.length) return finish(true);
           if (!st.active.includes(st.fi)) st.fi = st.active[0];
           layout();
-          if (comers.length) { pop('つぎの敵！', 'info'); if (comers.some((i) => foes[i].rare)) hsay('rare'); }
+          if (comers.length) { pop(comers.some((i) => foes[i].gattai) ? '合体！' : 'つぎの敵！', 'info'); if (comers.some((i) => foes[i].gattai)) hsay('gattai'); else if (comers.some((i) => foes[i].rare)) hsay('rare'); }
           nextQuestion();
         }, 650);
         return;
@@ -954,6 +1015,7 @@ export function makeRPG(ctx) {
         r.party.forEach((pid) => r.owned[pid] && grow(pid, r.owned[pid], CHARS[pid].name));
         addFood(food);
         bump('stage'); if (boss) bump('boss'); if (stars === 3) bump('star3'); if (d) bump('hard');
+        if (isMid && stars === 3 && !r.owned[MID[subj].reward]) { const id = MID[subj].reward; r.owned[id] = { lv: 1, exp: 0 }; if (r.party.length < 3) r.party.push(id); st.joined = id; }
       }
       save();
       const nextD = win && d < 2 && first ? DIFF[d + 1] : null;
@@ -965,6 +1027,7 @@ export function makeRPG(ctx) {
         <p class="rp-hline"><img src="icons/icon-192.png" alt=""><span>${esc(pick(HLINE[!win ? 'lose' : stars === 3 ? 'star3' : 'clear']))}</span></p>
         <p class="rp-endsub">${win ? `${esc(foes[foes.length - 1].name)}をたおした！${newBest && !first ? ' ★の記録更新！' : ''}` : `正解 ${st.correct}問。パーティを育ててまた挑戦しよう`}</p>
         ${win ? `<div class="rp-rewards"><span>🪙 ${coins}${first ? '<em>初クリア×2</em>' : ''}${st.rares ? `<em>レア+${st.rares * 150}</em>` : ''}</span><span>EXP ${exp}</span><span>🌰 ${food}</span>${st.mats ? `<span>${MAT.icon} ×${st.mats}</span>` : ''}</div>` : ''}
+        ${st.joined ? `<div class="rp-joined">${iconHTML(st.joined)}<b>★★★${esc(CHARS[st.joined].name)} が仲間になった！</b></div>` : isMid && win && !r.owned[MID[subj].reward] ? '<p class="rp-unlock">★3でクリアすると仲間になる！</p>' : ''}
         ${nextD ? `<p class="rp-unlock">${nextD.tag}${nextD.name}が解放された！</p>` : ''}
         ${ups.length ? `<div class="rp-ups"><b>LEVEL UP!</b>${ups.map((u) => `<span>${esc(u)}</span>`).join('')}</div>` : ''}
         <div class="row"><button class="rp-btn gold big" id="rp-again">${win ? 'もう一回' : 'リトライ'}</button><button class="rp-btn big" id="rp-back">マップへ</button></div></div>`;
@@ -978,7 +1041,7 @@ export function makeRPG(ctx) {
       const c = e.target.closest('#rp-q [data-c]'); if (c && !c.disabled) answer(+c.dataset.c, c);
     };
     layout();
-    setTimeout(() => hsay(foes[0].rare ? 'rare' : boss ? 'boss' : d === 2 ? 'geki' : d === 1 ? 'hard' : 'start'), 200);
+    setTimeout(() => hsay(isMid ? 'mid' : foes[0].rare ? 'rare' : boss ? 'boss' : d === 2 ? 'geki' : d === 1 ? 'hard' : 'start'), 200);
     nextQuestion();
   }
 
