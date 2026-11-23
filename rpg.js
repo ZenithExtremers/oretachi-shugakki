@@ -1088,7 +1088,7 @@ export function makeRPG(ctx) {
         const el = document.createElement('div');
         el.className = 'rp-gattai';
         el.innerHTML = `<div class="gt-rays"></div>
-          <div class="gt-ring">${parts.map((f, k) => `<span class="gt-p" style="--a:${k * 72 - 90}deg;--d:${k * 0.12}s">${f.icon}</span>`).join('')}</div>
+          <div class="gt-ring">${parts.map((f, k) => `<span class="gt-p" style="--a:${k * 72 - 90}deg;--d:${0.15 + k * 0.18}s">${f.icon}</span>`).join('')}</div>
           <div class="gt-word">合体！</div>
           <div class="gt-boss">${F.icon}</div>
           <div class="gt-name"><small>${parts.length}人の力がひとつに</small><b>${esc(F.name)}</b><em>${esc(F.desc || '')}</em></div>
@@ -1097,10 +1097,10 @@ export function makeRPG(ctx) {
         const ts = []; let fin = false;
         const end = () => { if (fin) return; fin = true; ts.forEach(clearTimeout); el.classList.add('out'); setTimeout(() => { el.remove(); done(); }, 300); };
         const at = (ms, fn) => ts.push(setTimeout(fn, ms));
-        bgm.sfx('charge');
-        at(1500, () => { el.classList.add('flash'); bgm.sfx('boom'); document.querySelector('.rp-battle')?.classList.add('quake'); });
-        at(2300, () => { el.classList.add('reveal'); bgm.sfx('pose'); });
-        at(5200, end);
+        at(1100, () => bgm.sfx('charge'));
+        at(4300, () => { el.classList.add('flash'); bgm.sfx('boom'); document.querySelector('.rp-battle')?.classList.add('quake'); });
+        at(5200, () => { el.classList.add('reveal'); bgm.sfx('pose'); });
+        at(8200, end);
         el.onclick = end;
       });
     }
