@@ -478,7 +478,7 @@ img.rp-face { object-fit: cover; background: #fff; }
 .rp-btn[disabled] { opacity: .4; box-shadow: none; }
 .rp-seg { background: rgba(0, 0, 0, .25); }
 /* すごろくマップ */
-.rp-mapbox { height: calc(100dvh - 420px - env(safe-area-inset-bottom)); min-height: 280px; overflow-y: auto; margin-top: 12px; border-radius: 18px; border: 1px solid var(--line); background: rgba(0, 0, 0, .18); overscroll-behavior: contain; }
+.rp-mapbox { height: calc(100dvh - 500px - env(safe-area-inset-bottom)); min-height: 300px; overflow-y: auto; margin-top: 12px; border-radius: 18px; border: 1px solid var(--line); background: rgba(0, 0, 0, .18); overscroll-behavior: contain; }
 .rp-map { position: relative; }
 .rp-road { position: absolute; inset: 0; width: 100%; height: 100%; }
 .rp-road polyline { fill: none; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
@@ -950,3 +950,35 @@ body.rp-night.rp-day {
 .rp-chback b { color: var(--text); font-size: 15px; }
 .rp-day .rp-chback { background: rgba(255, 255, 255, .7); }
 .rp-day .rp-chead { background: linear-gradient(160deg, rgba(255, 236, 170, .55), rgba(255, 255, 255, .9)); }
+
+/* ===== 章の中：難易度タブ・★の報酬バー・章バナーのふち・称号 ===== */
+.rp-dtabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
+.rp-dtabs button { display: flex; flex-direction: column; align-items: center; gap: 1px; min-height: 46px; border-radius: 12px; border: 1.5px solid var(--line); background: rgba(0, 0, 0, .18); color: var(--muted); font-weight: 800; font-size: 14px; cursor: pointer; }
+.rp-dtabs button small { font-size: 10px; font-weight: 700; opacity: .85; }
+.rp-dtabs button.on { color: #fff; border-color: transparent; }
+.rp-dtabs button.d0.on { background: linear-gradient(180deg, #3b82f6, #1d4ed8); }
+.rp-dtabs button.d1.on { background: linear-gradient(180deg, #f97316, #c2410c); }
+.rp-dtabs button.d2.on { background: linear-gradient(180deg, #a21caf, #4a044e); }
+.rp-day .rp-dtabs button:not(.on) { background: rgba(255, 255, 255, .75); }
+.rp-dtag { font-size: 12px; padding: 2px 8px; border-radius: 99px; color: #fff; vertical-align: middle; }
+.rp-dtag.d0 { background: #1d4ed8; } .rp-dtag.d1 { background: #c2410c; } .rp-dtag.d2 { background: #86198f; }
+.rp-sbest { font-size: 13px; text-align: center; margin: 4px 0; }
+.rp-sbest .rp-stars { font-size: 16px; letter-spacing: 1px; }
+.rp-starbar { display: flex; align-items: center; gap: 10px; margin: 16px 2px 2px; }
+.rp-sbtrack { position: relative; flex: 1; height: 10px; border-radius: 99px; background: rgba(0, 0, 0, .3); }
+.rp-day .rp-sbtrack { background: rgba(30, 41, 59, .14); }
+.rp-sbtrack > i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #fde68a, #f5c542); }
+.rp-chest { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .5); background: #3b2a6e; font-size: 14px; display: grid; place-items: center; cursor: pointer; padding: 0; color: #fff; }
+.rp-chest:last-child { transform: translate(-80%, -50%); }
+.rp-chest.ready { background: #f5c542; border-color: #fff; animation: rp-glow .8s infinite alternate; }
+.rp-chest.got { background: #16a34a; border-color: #bbf7d0; font-size: 13px; }
+.rp-day .rp-chest:not(.ready):not(.got) { background: #fff; border-color: #cbd5e1; }
+.rp-sbtxt { font-size: 12px; font-weight: 800; white-space: nowrap; }
+.rp-chap { position: relative; }
+.rp-chap .rp-dot { top: 10px; right: 10px; z-index: 2; }
+.rp-chap.silver { box-shadow: 0 6px 18px rgba(0, 0, 0, .25), inset 0 0 0 3px #cbd5e1; }
+.rp-chap.gold { box-shadow: 0 6px 18px rgba(0, 0, 0, .25), inset 0 0 0 3px #f5c542, 0 0 14px rgba(245, 197, 66, .5); }
+.rp-chap.rainbow { box-shadow: 0 6px 18px rgba(0, 0, 0, .25), 0 0 16px rgba(255, 255, 255, .5); }
+.rp-chap.rainbow::before { content: ''; position: absolute; inset: 0; border-radius: 20px; padding: 3px; background: linear-gradient(90deg, #f43f5e, #f59e0b, #22c55e, #3b82f6, #a855f7); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+.rp-title { display: inline-block; font-size: 10.5px; font-weight: 800; color: #2a1650; background: linear-gradient(90deg, #fde68a, #f5c542); border-radius: 6px; padding: 0 6px; margin-bottom: 2px; }
+.rp-ticket { margin-bottom: 8px; }
