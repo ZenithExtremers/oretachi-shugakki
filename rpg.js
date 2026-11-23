@@ -592,6 +592,9 @@ export function makeRPG(ctx) {
     const r = R(), keys = Object.keys(lectures[subj]);
     if (n > 1) return !!r.clear[`${subj}-${k}-${n - 1}`];
     if (ci === 0) return true;
+    if (r.clear[`${subj}-${k}-1`]) return true; // もう遊んだことのあるステージは閉じない
+    // 中間ボスの次の回は、中間ボスを倒してから
+    if (MID[subj]?.after === String(keys[ci - 1])) return !!r.clear[`${subj}-mid-0`];
     return !!r.clear[`${subj}-${keys[ci - 1]}-3`];
   }
 

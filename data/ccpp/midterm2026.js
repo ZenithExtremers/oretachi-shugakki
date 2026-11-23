@@ -194,7 +194,32 @@ int main()
   {
     id: 'ccpp-m26-g05b', source: S, lecture: 3, type: 'unexpected', no: '問18',
     title: '20までカウントアップ（続き）',
-    intro: '問16・17 のプログラムを正しく完成させたものとする。',
+    intro: '問16・17 のプログラムを正しく完成させたもの（下のコード）とする。',
+    code: code`
+// 20以下の正の整数値を読み込んで
+// その値から20までカウントアップする
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+    int x;
+
+    cout << "カウントアップします.\n";
+    do {
+        cout << "20以下の正の整数値:";
+        cin >> x;
+    } while (x <= 0 || x > 20);
+
+    while (x <= 20) {
+        cout << x << "\n";
+        x++;
+    }
+
+    return 0;
+}`,
+    run: [{ stdin: '-1\n18\n', contains: ['18\n19\n20\n'] }],
     questions: [
       {
         id: 'ccpp-m26-q18', q: 'x に -1 を入力したときの動作として適切なものはどれか。',
