@@ -201,7 +201,7 @@ let rpg = null, hist = null;
 
 export function viewHima($app, top, api) {
   leaveHima();
-  if (!hist) hist = makeHistory({ S, save, openOv, closeOv, body: () => body(), toast, esc, shuffle, addFood });
+  if (!hist) hist = makeHistory({ S, save, openOv, closeOv, body: () => body(), toast, esc, shuffle, addFood, setCleanup: (f) => { cleanup = f; } });
   if (!rpg) rpg = makeRPG({ S, save, openOv, closeOv, body: () => body(), info: (t) => info(t), toast, setCleanup: (f) => { cleanup = f; }, renderTop: () => renderTop(), esc, shuffle, rnd, owlSVG, DECKS, addFood, api, onSound: () => sndLabels() });
   $app.innerHTML = `
     ${top('ヒマコロシ', { back: '', right: '<button class="hk-snd" data-snd aria-label="音の切り替え"></button><span class="hk-pill" id="hk-food"></span>' })}

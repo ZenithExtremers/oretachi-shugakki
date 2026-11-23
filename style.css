@@ -1202,3 +1202,44 @@ body.rp-night.rp-day {
 .hs-dbar b { text-align: right; font-weight: 600; white-space: nowrap; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hs-real b, :root:not([data-theme="light"]) .hs-unl, :root:not([data-theme="light"]) .hs-hist.h { color: #c8d3b4; } }
 :root[data-theme="dark"] .hs-hist.h { color: #c8d3b4; }
+
+/* ===== 歴史「地図アニメ」 ===== */
+.hs-animecard { text-align: center; }
+.hs-animethumb { font-size: 64px; line-height: 1.2; }
+.hs-animecard b { display: block; font-size: 17px; margin: 4px 0; }
+.gm { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 900px; margin: 0 auto; }
+.gm-stage { position: relative; height: min(62vh, 560px); border-radius: 14px; overflow: hidden; border: 2px solid #0b1f3a; background: #1f4e8c; }
+.gm-svg { width: 100%; height: 100%; display: block; }
+.gm-sea { fill: #1f4e8c; }
+.gm-land path { stroke: #111; stroke-width: .5; vector-effect: non-scaling-stroke; transition: fill .9s; }
+.gm-front { fill: none; stroke: #d32f2f; stroke-width: 3; stroke-dasharray: 7 5; opacity: 0; transition: opacity .6s; }
+.gm-front.on { opacity: 1; }
+.gm-city circle { fill: #111; }
+.gm-city text { font-size: 12px; font-weight: 900; fill: #111; paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; }
+.gm-tie { stroke: #2e7d32; stroke-width: 2.5; stroke-dasharray: 5 4; opacity: 0; animation: gm-fade .5s forwards; }
+.gm-arrow { fill: none; stroke: #d32f2f; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: gm-draw .8s ease-out forwards; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .4)); }
+@keyframes gm-draw { to { stroke-dashoffset: 0; } }
+@keyframes gm-fade { to { opacity: .9; } }
+.gm-pop { opacity: 0; transform: scale(.3); animation: gm-pop .45s cubic-bezier(.2, 1.4, .4, 1) forwards; }
+@keyframes gm-pop { to { opacity: 1; transform: scale(1); } }
+.gm-il { font-size: 12px; font-weight: 900; text-anchor: middle; fill: #111; paint-order: stroke; stroke: #fff; stroke-width: 3.5px; stroke-linejoin: round; font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; }
+.gm-out { transition: opacity .4s; opacity: 0 !important; }
+.gm-top { position: absolute; top: 10px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; }
+.gm-band { padding: 4px 16px; border-radius: 4px; color: #fff; font-weight: 900; font-size: 15px; letter-spacing: .04em; box-shadow: 0 2px 6px rgba(0, 0, 0, .35); }
+.gm-band.g { background: #1b5e20; } .gm-band.p { background: #6a1b9a; }
+.gm-band.gm-in { animation: gm-band .4s ease-out; }
+@keyframes gm-band { from { transform: translateY(-8px); opacity: 0; } }
+.gm-year { padding: 2px 16px; background: #fff; color: #111; border: 2.5px solid #111; font-weight: 900; font-size: 22px; font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; }
+.gm-year.gm-flip { animation: gm-flip .35s ease-out; }
+@keyframes gm-flip { from { transform: rotateX(80deg); } }
+.gm-legend { position: absolute; left: 6px; bottom: 6px; right: 6px; display: flex; flex-wrap: wrap; gap: 3px 8px; font-size: 10px; font-weight: 800; color: #fff; pointer-events: none; }
+.gm-legend span { background: rgba(0, 0, 0, .45); padding: 1px 6px 1px 3px; border-radius: 4px; }
+.gm-legend i { display: inline-block; width: 9px; height: 9px; border: 1px solid #111; margin-right: 4px; vertical-align: -1px; }
+.gm-cap { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; min-height: 92px; }
+.gm-ct { font-size: 15px; } .gm-cd { margin: 4px 0 0; font-size: 13.5px; line-height: 1.7; }
+.gm-ctrl { display: flex; align-items: center; gap: 6px; }
+.gm-b { flex: none; width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--text); font-size: 17px; cursor: pointer; }
+.gm-play { background: var(--brand); color: #fff; border-color: var(--brand); }
+.gm-spd { width: 48px; font-size: 13px; font-weight: 800; }
+.gm-seek { flex: 1; min-width: 0; accent-color: #d32f2f; }
+.gm-note { font-size: 11px; color: var(--muted); margin: 0; text-align: center; }

@@ -4,6 +4,7 @@
 import { CHARS } from './data/history/story.js';
 import { NATIONS } from './data/history/leaders.js';
 import * as A from './data/history/archive.js';
+import { openMapAnime } from './history-map.js';
 
 const SIDE = { E: '協商国（連合国）', C: '同盟国', N: 'その他' };
 const COL = { E: '#7ea6d4', C: '#d98a76', N: '#cfcdc0', X: '#e8c36a', W: '#7ea6d4', L: '#d98a76', NEW: '#7cc3a3' };
@@ -12,12 +13,12 @@ const STAT = [['pow', '国力'], ['mor', '国民の士気'], ['dip', '外交'], 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 export function makeHistory(ctx) {
-  const { S, save, openOv, closeOv, body, toast, esc, shuffle, addFood } = ctx;
+  const { S, save, openOv, closeOv, body, toast, esc, shuffle, addFood, setCleanup } = ctx;
   const H = () => {
     if (!S.hist) S.hist = { st: {}, ld: {}, arch: {}, quiz: { ok: 0, n: 0 } };
     return S.hist;
   };
-  let sub = 'story';
+  let sub = 'anime';
   const unlock = (keys) => {
     const h = H(), got = [];
     for (const k of keys) if (!h.arch[k]) { h.arch[k] = 1; got.push(k.slice(2)); }
@@ -30,16 +31,23 @@ export function makeHistory(ctx) {
     const nArch = Object.keys(h.arch).length;
     m.innerHTML = `
       <div class="hs-hero"><div class="hs-yrs">1914 — 1918</div><b>歴史追体験：第一次世界大戦</b><small>あの4年間を、兵士・看護師・記者の目で、そして国の指導者として。</small></div>
-      <div class="seg hs-seg" role="group">${[['story', '📖 物語'], ['leader', '👑 指導者'], ['arch', `🏛️ 資料館 <small>${nArch}</small>`]].map(([k, n]) => `<button data-hs="${k}" aria-pressed="${sub === k}">${n}</button>`).join('')}</div>
+      <div class="seg hs-seg" role="group">${[['anime', '🎬 地図アニメ'], ['story', '📖 物語'], ['leader', '👑 指導者'], ['arch', `🏛️ 資料館 <small>${nArch}</small>`]].map(([k, n]) => `<button data-hs="${k}" aria-pressed="${sub === k}">${n}</button>`).join('')}</div>
       <div id="hs-sub"></div>`;
     m.onclick = (e) => {
       const b = e.target.closest('[data-hs]'); if (b) { sub = b.dataset.hs; render(m); window.scrollTo(0, 0); return; }
       const c = e.target.closest('[data-char]'); if (c) { openStory(c.dataset.char, c.dataset.restart === '1'); return; }
       const n = e.target.closest('[data-nation]'); if (n) { openLeader(n.dataset.nation, n.dataset.restart === '1'); return; }
-      const ar = e.target.closest('[data-arch]'); if (ar) { openArch(ar.dataset.arch); }
+      const ar = e.target.closest('[data-arch]'); if (ar) { openArch(ar.dataset.arch); return; }
+      if (e.target.closest('[data-anime]')) openMapAnime({ openOv, body, setCleanup });
     };
     const el = m.querySelector('#hs-sub');
-    if (sub === 'story') el.innerHTML = `<p class="hs-note">架空の4人が、史実の出来事の中を生きる物語。章ごとに選択と史実クイズがあり、出会った人物や戦いが資料館に登録される。</p>
+    if (sub === 'anime') el.innerHTML = `<div class="hs-card hs-animecard">
+        <div class="hs-animethumb">🗺️</div>
+        <b>1871 → 1919　地図で見る第一次世界大戦</b>
+        <p>ドイツ統一からヴェルサイユ条約まで、${'47'}の出来事を地図アニメで自動再生（約5分）。国の色の変化、同盟の握手、反乱、侵攻の矢印で、大戦への流れを追える。</p>
+        <button class="btn wide" data-anime>▶ 再生する</button></div>
+      <p class="hs-note">再生中は ⏮ ⏸ ⏭ と下のバーで、好きな年に移動できる。速さは 1× → 2× → 0.5×。</p>`;
+    else if (sub === 'story') el.innerHTML = `<p class="hs-note">架空の4人が、史実の出来事の中を生きる物語。章ごとに選択と史実クイズがあり、出会った人物や戦いが資料館に登録される。</p>
       ${CHARS.map((c) => { const p = h.st[c.id]; const ci = p ? p.ci : 0; return `<div class="hs-card">
         <div class="hs-ch"><span class="hs-flag">${c.icon}</span><div><b>${esc(c.name)}</b><small>${esc(c.who)}</small></div><span class="hs-tag s${c.side}">${SIDE[c.side]}</span></div>
         <p>${esc(c.intro)}</p>
