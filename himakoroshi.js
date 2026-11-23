@@ -6,6 +6,7 @@ import DECKS from './data/hima-words.js';
 import { makeRPG, CHARS } from './rpg.js';
 import { bgm } from './bgm.js';
 import { CHAR_ART } from './charart.js';
+import { makeHistory } from './history.js';
 
 const KEY = 'oretachi:hima';
 const DEF = {
@@ -195,11 +196,12 @@ function openPartnerPick() {
 /* ---------- 画面 ---------- */
 let tab = 'home';
 let $root = null;
-const TABS = [['home', '🦉', 'ホーム'], ['quest', '⚔️', '冒険'], ['study', '📚', '勉強'], ['game', '🎮', 'ゲーム'], ['words', '🗂️', '単語']];
-let rpg = null;
+const TABS = [['home', '🦉', 'ホーム'], ['quest', '⚔️', '冒険'], ['hist', '📜', '歴史'], ['study', '📚', '勉強'], ['game', '🎮', 'ゲーム'], ['words', '🗂️', '単語']];
+let rpg = null, hist = null;
 
 export function viewHima($app, top, api) {
   leaveHima();
+  if (!hist) hist = makeHistory({ S, save, openOv, closeOv, body: () => body(), toast, esc, shuffle, addFood });
   if (!rpg) rpg = makeRPG({ S, save, openOv, closeOv, body: () => body(), info: (t) => info(t), toast, setCleanup: (f) => { cleanup = f; }, renderTop: () => renderTop(), esc, shuffle, rnd, owlSVG, DECKS, addFood, api, onSound: () => sndLabels() });
   $app.innerHTML = `
     ${top('ヒマコロシ', { back: '', right: '<button class="hk-snd" data-snd aria-label="音の切り替え"></button><span class="hk-pill" id="hk-food"></span>' })}
@@ -227,7 +229,7 @@ export function viewHima($app, top, api) {
 }
 
 // 音：ヒマコロシのどの画面でも1タップでサイレント ⇔ BGM（設定は冒険と共通）
-const TAB_SONG = { home: 'home', study: 'study', game: 'game', words: 'words' };
+const TAB_SONG = { home: 'home', study: 'study', game: 'game', words: 'words', hist: 'study' };
 function sndLabels() {
   const on = rpg?.sound() === 'bgm';
   document.querySelectorAll('[data-snd]').forEach((b) => { b.textContent = on ? '🎵' : '🔇'; b.title = on ? 'BGMモード（タップでサイレント）' : 'サイレント（タップでBGM）'; b.classList.toggle('on', on); });
@@ -251,6 +253,7 @@ function renderTab() {
   document.body.classList.toggle('rp-day', tab === 'quest' && (th === 'light' || (!th && !matchMedia('(prefers-color-scheme: dark)').matches)));
   const h1 = $root?.querySelector('.top h1'); if (h1) h1.textContent = tab === 'quest' ? '冒険' : 'ヒマコロシ';
   if (tab !== 'quest' && rpg) { rpg.leave(); bgm.play(TAB_SONG[tab]); }
+  if (tab === 'hist') { m.onclick = null; hist.render(m); renderTop(); return; }
   if (tab === 'quest') {
     m.onclick = null;
     rpg.renderQuestTab(m);
@@ -370,7 +373,7 @@ function closeOv() {
   $('#hk-ov')?.remove();
   document.body.classList.remove('hk-lock');
   renderTop(); renderStudyBest(); renderGameBest();
-  if (tab === 'quest' && $('#hk-main')) renderTab();
+  if ((tab === 'quest' || tab === 'hist') && $('#hk-main')) renderTab();
 }
 // 画面を離れるとき（ルーターから呼ぶ）
 export function leaveHima() {
