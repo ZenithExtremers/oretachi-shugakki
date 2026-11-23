@@ -426,7 +426,9 @@ function renderQuestion(q) {
   let exp = '';
   if (reveal) {
     const ok = ans === q.answer;
-    exp = `<div class="exp ${ok ? 'ok' : 'ng'}"><span class="verdict">${ok ? '正解' : '不正解'}</span>正解は ${NUMS[perm.indexOf(q.answer)]}。${inline(q.exp)}</div>`;
+    const sent = isDue(store.stats[q.id]);
+    exp = `<div class="exp ${ok ? 'ok' : 'ng'}"><span class="verdict">${ok ? '正解' : '不正解'}</span>正解は ${NUMS[perm.indexOf(q.answer)]}。${inline(q.exp)}
+      <button class="rev-send${sent ? ' sent' : ''}" data-act="revsend" data-q="${q.id}" ${sent ? 'disabled' : ''}>${sent ? '👻 復讐リストに入っています' : '👻 復讐に送る'}</button></div>`;
   }
   const qcode = q.code ? renderCode(q.code, 'q-' + q.id, q.lang || g.lang || cur.lang, q.code.includes('\n')) : '';
   return `<div class="q" id="q-${q.id}"><div class="q-text"><span class="qn">問${qNumber(q.id)}</span>${text}</div>${qcode}<div class="choices">${btns}</div>${exp}</div>`;
@@ -662,6 +664,16 @@ function lessonFinishCheck(s, l) {
   box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
+// 自分で「復讐に送る」：正解した問題でも復習リスト（＝冒険の復讐）に入れる
+function sendRevenge(qid) { const st = stat(qid); st.r = true; st.due = 0; st.t = Date.now(); save(); }
+// 復讐の解説用：その回の基礎コースの説明（要点・コード例）
+function lessonDigest(s, lec) {
+  const ls = (s.lessons || []).filter((l) => String(l.lecture) === String(lec));
+  if (!ls.length) return '';
+  cur = s;
+  return `<div class="rev-lessons"><div class="rev-lh">📘 ${esc(s.lectures[lec] || '')} の基礎コース</div>${ls.map((l, i) => `<details class="rev-lesson"${i ? '' : ''}><summary>${esc(l.title)}</summary><div class="lesson-body">${l.blocks.map(renderBlock).join('')}</div></details>`).join('')}</div>`;
+}
+
 /* ---------- ヒマコロシ「冒険」に渡す道具 ---------- */
 const HIMA_API = {
   // 科目ごとの回の一覧 { ccpp: { 1: '第1回 …' }, … }
@@ -671,11 +683,20 @@ const HIMA_API = {
     return out;
   },
   // ボス戦の問題：その回の本番形式5択を1問（コード・表・図つき）
-  async bossQuestion(sid, lec) {
+  // used：同じバトルで出た問題（全部出るまで同じ問題は出さない）
+  async bossQuestion(sid, lec, used) {
     const s = await getSubject(sid);
     const qs = s.groups.filter((g) => String(g.lecture) === String(lec)).flatMap((g) => g.questions);
-    return HIMA_API.renderQ(s, qs[Math.floor(Math.random() * qs.length)]);
+    const rest = used ? qs.filter((q) => !used.has(q.id)) : qs;
+    if (used && !rest.length) qs.forEach((q) => used.delete(q.id));
+    const pool = rest.length ? rest : qs;
+    const q = pool[Math.floor(Math.random() * pool.length)];
+    if (used) used.add(q.id);
+    return HIMA_API.renderQ(s, q);
   },
+  // 冒険から「復讐に送る」
+  sendRevenge(qid) { if (qid) sendRevenge(qid); },
+  async lessonDigest(sid, lec) { return lessonDigest(await getSubject(sid), lec); },
   // 復讐：決まった1問を出す
   async questionById(sid, qid) {
     const s = await getSubject(sid);
@@ -800,6 +821,7 @@ document.addEventListener('click', async (e) => {
     case 'fsh': fieldSel.shuffle = el.checked; return;
     case 'fstart': return confirmReplace() && startField(s);
     case 'ans': return answer(s, el.dataset.q, +el.dataset.o);
+    case 'revsend': { sendRevenge(el.dataset.q); el.disabled = true; el.classList.add('sent'); el.textContent = '👻 復讐リストに送った'; toast('👻 冒険の「復讐」に送った'); return; }
     case 'prev': session.page--; saveSession(); return viewQuiz(s);
     case 'next': session.page++; saveSession(); window.scrollTo(0, 0); return viewQuiz(s);
     case 'palette': return openPalette(s);
