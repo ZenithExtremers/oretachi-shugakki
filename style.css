@@ -1098,3 +1098,4 @@ body.rp-night.rp-day {
 .rp-midrw b { color: var(--brand); }
 .rp-joined { display: flex; align-items: center; gap: 10px; justify-content: center; margin: 8px 0; padding: 8px; border-radius: 14px; background: rgba(245, 197, 66, .2); border: 1.5px solid #f5c542; }
 .rp-joined .rp-face { width: 52px; height: 52px; }
+.rp-tm.hit1 .rp-face { animation: rp-hit1 .25s; } @keyframes rp-hit1 { 50% { transform: translateY(-10px) scale(1.1); } }

@@ -716,30 +716,32 @@ export function makeRPG(ctx) {
     const boss = n === 3 || isMid;
     const E = ENEMIES[subj], D = DIFF[d];
     const lvScale = 1 + ci * 0.4 + (n - 1) * 0.15;
-    // 雑魚：その回専用（あれば2体）＋どこにでも出る雑魚 で3体。たまにレアが混ざる
-    // 雑魚：そのステージ専用の2体 ＋ その回の雑魚かどこにでも出る雑魚 で3体。たまにレア（ステージ専用のレアが多め）
+    // 雑魚：そのステージ専用の2体を中心に、その回の雑魚・どこにでも出る雑魚から選ぶ。たまにレア（ステージ専用のレアが多め）
     const SG = STAGE[subj]?.[lec] || [];
-    const zakos = () => {
+    // 1ウェーブに出る敵の数：ノーマル1体、ハード2体、ゲキムズ3体。雑魚ステージは3ウェーブ（ボス戦はボス＋手下の1ウェーブ）
+    const slots = isMid ? 1 : [1, 2, 3][d];
+    const zakos = (cnt) => {
       const tri = SG[boss ? rnd(SG.length || 1) : n - 1];
       const own = tri ? tri.slice(0, 2) : [];
-      const z = shuffle([...own, ...shuffle([...(E.lec[lec] || []), ...E.common]).slice(0, 3 - own.length)]);
+      const pool = shuffle([...own, ...own, ...shuffle([...(E.lec[lec] || []), ...E.common])]);
+      const z = []; for (let i = 0; i < cnt; i++) z.push(pool[i % pool.length]);
       const rares = [];
       if (Math.random() < (d ? 0.12 : 0.08)) { const rr = tri && Math.random() < 0.7 ? tri[2] : E.rare; z[rnd(z.length)] = rr; rares.push(rr[0]); }
-      return z.map(([name, icon]) => { const rare = rares.includes(name); return { name, icon, rare, hp: Math.round(100 * lvScale * D.hp * (rare ? 0.7 : 1)), atk: Math.round(18 * lvScale * D.atk * (rare ? 0.5 : 1)) }; });
+      const sc = slots > 1 ? 0.75 : 1; // 敵が多いぶん1体のHPは少し低め
+      return z.map(([name, icon]) => { const rare = rares.includes(name); return { name, icon, rare, hp: Math.round(100 * lvScale * D.hp * sc * (rare ? 0.7 : 1)), atk: Math.round(18 * lvScale * D.atk * (rare ? 0.5 : 1)) }; });
     };
-    // 同時に場に出る敵の数：ノーマル1体、ハード2体、ゲキムズ3体（ボス戦はボス＋手下）
-    const slots = isMid ? 1 : [1, 2, 3][d];
     const rangeLecs = isMid ? lecs.slice(0, ci + 1) : [];
     const foes = isMid
       ? midFoes(subj).map((f) => ({ ...f, boss: true, art: f.rush ? null : f.icon, lec: f.lec || +rangeLecs[rnd(rangeLecs.length)], hp: Math.round(380 * lvScale * D.hp * (f.final ? 1.4 : 0.5)), atk: Math.round(35 * lvScale * D.atk * (f.final ? 1.2 : 0.8)) }))
       : boss
-      ? [{ name: E.boss[lec][0], icon: E.boss[lec][1], hp: Math.round(380 * lvScale * D.hp), atk: Math.round(35 * lvScale * D.atk), boss: true }, ...zakos().slice(0, slots - 1).map((f) => ({ ...f, hp: Math.round(f.hp * 0.8) }))]
-      : zakos();
+      ? [{ name: E.boss[lec][0], icon: E.boss[lec][1], hp: Math.round(380 * lvScale * D.hp), atk: Math.round(35 * lvScale * D.atk), boss: true }, ...zakos(slots - 1).map((f) => ({ ...f, hp: Math.round(f.hp * 0.8) }))]
+      : [...zakos(slots), ...zakos(slots), ...zakos(slots)];
     foes.forEach((f) => { f.cur = f.hp; });
     const t = team();
     const maxHp = t.reduce((a, x) => a + x.hp, 0);
-    const active0 = foes.slice(0, slots).map((_, i) => i);
-    const st = { foes, active: active0, next: active0.length, fi: 0, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0 };
+    // ウェーブ：雑魚ステージは3ウェーブ、ボス戦は1ウェーブ、中間ボスは1体ずつ
+    const waves = isMid ? foes.map((_, i) => [i]) : boss ? [foes.map((_, i) => i)] : [0, 1, 2].map((w) => Array.from({ length: slots }, (_, k) => w * slots + k));
+    const st = { foes, waves, wave: 0, active: [...waves[0]], fi: 0, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0 };
     const deck = (DECKS.find((d) => d.id === subj) || DECKS.find((d) => d.id === subj + lec) || DECKS[0]).words; // TOEIC はレベルごとの単語帳
     const no = isMid ? '中間ボス' : (lectures[subj][lec].match(/^(第\S+?回)/) || [lectures[subj][lec]])[0];
     openOv(`${no} ${isMid ? `${foes.length}連戦` : boss ? 'BOSS' : 'STAGE ' + n}${d ? ' ' + D.tag + D.name : ''}`); darkOv();
@@ -749,7 +751,8 @@ export function makeRPG(ctx) {
     const atkOf = (x) => x.atk * (x.subj === subj ? 1.5 : x.subj === 'all' ? 1.2 : 1);
     const partyAtk = () => t.reduce((a, x) => a + atkOf(x), 0);
 
-    const left = () => st.active.filter((i) => foes[i].cur > 0).length + (foes.length - st.next);
+    const left = () => st.active.filter((i) => foes[i].cur > 0).length + st.waves.slice(st.wave + 1).reduce((a, w) => a + w.length, 0);
+    const waveTxt = () => (st.waves.length > 1 ? `WAVE ${st.wave + 1}/${st.waves.length}` : '');
     // 敵の場：1体ならこれまでどおり、2体以上ならカードを並べてタップで狙う敵を選ぶ
     function fieldHTML() {
       if (st.active.length === 1) {
@@ -757,7 +760,7 @@ export function makeRPG(ctx) {
         return `<div class="rp-field${f.boss ? ' boss' : ''}${f.rare ? ' rare' : ''}">
               <div class="rp-enemy${f.art ? ' art' : ''}" id="rp-enemy">${f.icon}</div>
               <div class="rp-einfo">
-                <div class="rp-wave">${f.boss ? 'BOSS' : `ENEMY ${foes.length - left() + 1}/${foes.length}`}${f.rare ? '　🌟レア！' : ''}</div>
+                <div class="rp-wave">${f.boss && !isMid ? 'BOSS' : waveTxt()}${f.rare ? '　🌟レア！' : ''}</div>
                 <div class="rp-ename">${esc(f.name)}</div>
                 <div class="rp-hpbar enemy"><i id="rp-ehp"></i><span id="rp-ehptxt"></span></div>
               </div>
@@ -765,7 +768,7 @@ export function makeRPG(ctx) {
             </div>`;
       }
       return `<div class="rp-field multi">
-              <div class="rp-wave">のこり ${left()}体 ・ タップで狙う敵を選ぶ${st.active.some((i) => foes[i].rare) ? '　🌟レア！' : ''}</div>
+              <div class="rp-wave">${waveTxt() ? waveTxt() + ' ・ ' : ''}のこり ${left()}体 ・ タップで狙う${st.active.some((i) => foes[i].rare) ? '　🌟レア！' : ''}</div>
               <div class="rp-foes c${st.active.length}">${st.active.map((i) => { const f = foes[i], tg = i === st.fi; return `<button class="rp-foe${tg ? ' tg' : ''}${f.boss ? ' boss' : ''}${f.rare ? ' rare' : ''}" data-tg="${i}">${tg ? '<em>🎯</em>' : ''}<span class="rp-enemy"${tg ? ' id="rp-enemy"' : ''}>${f.icon}</span><b>${esc(f.name)}</b><span class="rp-hpbar enemy sm"><i data-hp="${i}"></i></span></button>`; }).join('')}</div>
               <div class="rp-pop" id="rp-pop"></div>
             </div>`;
@@ -918,7 +921,16 @@ export function makeRPG(ctx) {
         anim(document.getElementById('rp-team'), 'atk'); // 仲間が飛びかかる
         await wait(380);
         if (st.over) return;
-        hitEnemy(partyAtk() * speed * mult * (1 + Math.min(st.combo - 1, 5) * 0.1), mult > 1 ? 'チャンス！' : st.combo > 1 ? `${st.combo}コンボ` : speed > 1.45 ? 'はやい！' : '', big);
+        // 仲間が1人ずつ攻撃。狙った敵が倒れたら、残りの攻撃は自動で次の敵へ
+        const bonus = speed * mult * (1 + Math.min(st.combo - 1, 5) * 0.1);
+        const lbl = mult > 1 ? 'チャンス！' : st.combo > 1 ? `${st.combo}コンボ` : speed > 1.45 ? 'はやい！' : '';
+        for (const [k, x] of t.entries()) {
+          if (st.over) return;
+          if (foes[st.fi].cur <= 0) { const nx = st.active.find((i) => foes[i].cur > 0); if (nx === undefined) break; st.fi = nx; drawField(); }
+          hitEnemy(atkOf(x) * bonus, k === 0 ? lbl : '', big, st.fi);
+          const tm = document.querySelectorAll('.rp-tm')[k]; if (tm) { tm.classList.remove('hit1'); void tm.offsetWidth; tm.classList.add('hit1'); }
+          await wait(150);
+        }
         hsay(st.combo >= 3 ? 'combo' : speed > 1.45 ? 'fast' : big ? 'big' : 'ok');
         t.forEach((x) => { st.gauge[x.id]++; });
         drawTeam();
@@ -960,12 +972,14 @@ export function makeRPG(ctx) {
         setTimeout(() => {
           if (st.over) return;
           st.active = st.active.filter((i) => foes[i].cur > 0);
-          const comers = [];
-          while (st.active.length < slots && st.next < foes.length) { comers.push(st.next); st.active.push(st.next++); }
-          if (!st.active.length) return finish(true);
+          let comers = [];
+          if (!st.active.length) { // ウェーブを全部倒したら次のウェーブ
+            if (st.wave + 1 >= st.waves.length) return finish(true);
+            st.wave++; st.active = [...st.waves[st.wave]]; comers = [...st.active];
+          }
           if (!st.active.includes(st.fi)) st.fi = st.active[0];
           layout();
-          if (comers.length) { pop(comers.some((i) => foes[i].gattai) ? '合体！' : 'つぎの敵！', 'info'); if (comers.some((i) => foes[i].gattai)) hsay('gattai'); else if (comers.some((i) => foes[i].rare)) hsay('rare'); }
+          if (comers.length) { pop(comers.some((i) => foes[i].gattai) ? '合体！' : isMid ? 'つぎの敵！' : waveTxt(), 'info'); if (comers.some((i) => foes[i].gattai)) hsay('gattai'); else if (comers.some((i) => foes[i].rare)) hsay('rare'); }
           nextQuestion();
         }, 650);
         return;
