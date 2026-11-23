@@ -1059,3 +1059,21 @@ body.rp-night.rp-day {
 .rp-gcard.r2 .f { border-color: #60a5fa; box-shadow: 0 0 12px rgba(96, 165, 250, .6); }
 .rp-gcard.r3 .f { border-color: #f5c542; background: radial-gradient(circle at 50% 30%, rgba(245, 197, 66, .45), rgba(255, 255, 255, .06)); box-shadow: 0 0 22px rgba(245, 197, 66, .85); }
 .rp-gskip { position: absolute; bottom: calc(24px + env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center; color: rgba(255, 255, 255, .6); font-size: 12px; }
+/* 1体ずつ登場する召喚演出 */
+.rp-gfx.open .rp-gate, .rp-gfx.open .rp-pillar { display: none; }
+.rp-gstage { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.rp-gfx.c3::after { content: ''; position: absolute; inset: 0; background: #fff; opacity: 0; animation: rp-flashw .5s; pointer-events: none; }
+.rp-gfx.c3 { background: radial-gradient(circle at 50% 45%, #7c5a0b, #120a02 70%); }
+.rp-gfx.c2 { background: radial-gradient(circle at 50% 45%, #1e3a8a, #05030f 70%); }
+.rp-gcard.one { animation: rp-flip .4s ease-out forwards; }
+.rp-gcard.one .f { padding: 22px 34px; }
+.rp-gcard.one .rp-face { width: 120px; height: 120px; }
+.rp-gcard.one .rp-emo { font-size: 72px; }
+.rp-gcard.one small { font-size: 18px; }
+.rp-gcard.one .rp-rar { font-size: 22px; }
+.rp-gcard.one em { font-size: 13px; }
+.rp-gcard.one.r3 .f { animation: rp-glow3 .8s infinite alternate; }
+@keyframes rp-glow3 { to { box-shadow: 0 0 40px rgba(245, 197, 66, 1), 0 0 80px rgba(245, 197, 66, .5); } }
+.rp-gcount { color: rgba(255, 255, 255, .75); font-weight: 800; font-size: 13px; margin: 0; }
+.rp-gskipall { position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 14px; z-index: 2; border: 1.5px solid rgba(255, 255, 255, .6); background: rgba(0, 0, 0, .35); color: #fff; border-radius: 99px; padding: 8px 14px; font-weight: 800; font-size: 13px; cursor: pointer; }
+.rp-gcard .rp-rar { color: #fde047 !important; text-shadow: 0 0 8px rgba(253, 224, 71, .7); }

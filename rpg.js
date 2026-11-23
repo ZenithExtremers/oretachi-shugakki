@@ -581,22 +581,37 @@ export function makeRPG(ctx) {
     const pool = poolOf(rar);
     return pool[rnd(pool.length)];
   }
-  // 召喚の演出（約1.5秒・タップでスキップ）：門が開く → 光の色でレア度を予告 → カードがめくれる
+  // 召喚の演出：門が開く → 光の色でレア度を予告 → 1体ずつ登場（タップで次の1体へ・右上の「スキップ」で全部とばす）
   function playGacha(res, done) {
     const top = Math.max(...res.map(([id]) => CHARS[id].rar));
     const promo = top === 3 && Math.random() < 0.3; // たまに青 → 金に昇格
     const ov = document.createElement('div');
-    ov.className = `rp-gfx r${top}${promo ? ' promo' : ''}${res.length > 1 ? ' ten' : ''}`;
-    ov.innerHTML = `<div class="rp-gate"><i></i><i></i></div><div class="rp-pillar"></div>${top === 3 ? '<div class="rp-confetti">' + Array.from({ length: 24 }, (_, i) => `<b style="left:${(i * 37) % 100}%;animation-delay:${(i % 8) * 0.06}s"></b>`).join('') + '</div>' : ''}
-      <div class="rp-gcards">${res.map(([id, isNew], i) => `<div class="rp-gcard r${CHARS[id].rar}" style="animation-delay:${0.9 + i * (res.length > 1 ? 0.06 : 0)}s"><div class="f">${iconHTML(id)}<span class="rp-rar">${RAR[CHARS[id].rar]}</span><small>${esc(CHARS[id].name)}</small>${isNew ? '<em>NEW!</em>' : ''}</div></div>`).join('')}</div>
-      <p class="rp-gskip">タップでスキップ</p>`;
+    ov.className = `rp-gfx r${top}${promo ? ' promo' : ''}`;
+    ov.innerHTML = `<div class="rp-gate"><i></i><i></i></div><div class="rp-pillar"></div><div class="rp-gstage"></div>
+      <button class="rp-gskipall" data-skipall>スキップ ▶▶</button><p class="rp-gskip">タップで次へ</p>`;
     document.body.appendChild(ov);
-    bgm.sfx('gacha'); if (top === 3) setTimeout(() => bgm.sfx('rare'), 700);
-    let ended = false;
-    const end = () => { if (ended) return; ended = true; ov.remove(); done(); };
-    ov.onclick = end;
-    setTimeout(() => { ov.classList.add('fin'); }, 1500);
-    setTimeout(end, top === 3 ? 2600 : 2100);
+    bgm.sfx('gacha');
+    const stage = ov.querySelector('.rp-gstage');
+    let idx = -1, timer = null, ended = false;
+    const end = () => { if (ended) return; ended = true; clearTimeout(timer); ov.remove(); done(); };
+    const show = () => {
+      clearTimeout(timer);
+      idx++;
+      if (idx >= res.length) return end();
+      const [id, isNew] = res[idx], rr = CHARS[id].rar;
+      ov.classList.remove('c1', 'c2', 'c3'); void ov.offsetWidth; ov.classList.add('c' + rr);
+      stage.innerHTML = `${rr === 3 ? '<div class="rp-confetti">' + Array.from({ length: 24 }, (_, i) => `<b style="left:${(i * 37) % 100}%;animation-delay:${(i % 8) * 0.06}s"></b>`).join('') + '</div>' : ''}
+        <div class="rp-gcard one r${rr}"><div class="f">${iconHTML(id)}<span class="rp-rar">${RAR[rr]}</span><small>${esc(CHARS[id].name)}</small>${isNew ? '<em>NEW!</em>' : '<em>上限+1</em>'}</div></div>
+        <p class="rp-gcount">${idx + 1} / ${res.length}</p>`;
+      if (rr === 3) bgm.sfx('rare'); else bgm.sfx('tap');
+      timer = setTimeout(show, rr === 3 ? 2400 : 1500); // 自動でも次へ進む
+    };
+    ov.onclick = (e) => {
+      if (e.target.closest('[data-skipall]')) { e.stopPropagation(); return end(); }
+      if (idx < 0) { clearTimeout(timer); ov.classList.add('open'); show(); return; } // 門の演出中のタップ → すぐ1体目
+      show();
+    };
+    timer = setTimeout(() => { ov.classList.add('open'); show(); }, 1250);
   }
   function openGacha(B) {
     let showRates = false;
