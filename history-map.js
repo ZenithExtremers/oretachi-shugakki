@@ -28,7 +28,7 @@ export function openMapAnime({ openOv, body, setCleanup }) {
       <polyline class="gm-front" points="${FRONT.map((p) => proj(p).join(',')).join(' ')}" vector-effect="non-scaling-stroke"/>
       <g class="gm-lines"></g><g class="gm-cities"></g><g class="gm-icons"></g></svg>
       <div class="gm-top"><div class="gm-band"></div><div class="gm-year"></div></div>
-      <div class="gm-legend"></div>
+      <button class="gm-legbtn" data-g="leg">🎨 凡例</button><div class="gm-legend" hidden></div>
     </div>
     <div class="gm-cap"><b class="gm-ct"></b><p class="gm-cd"></p></div>
     <div class="gm-ctrl">
@@ -41,7 +41,8 @@ export function openMapAnime({ openOv, body, setCleanup }) {
   const gLines = root.querySelector('.gm-lines'), gCities = root.querySelector('.gm-cities'), gIcons = root.querySelector('.gm-icons');
   const front = root.querySelector('.gm-front');
   // 都市（小さな黒い点と太めのラベル）
-  gCities.innerHTML = CITIES.map(([n, lo, la]) => { const [x, y] = proj([lo, la]); return `<g class="gm-city" data-x="${x}" data-y="${y}"><circle r="3"/><text x="6" y="-5">${esc(n)}</text></g>`; }).join('');
+  const MAJOR = ['ロンドン', 'パリ', 'ベルリン', 'ウィーン', 'ローマ', 'コンスタンティノープル', 'サンクトペテルブルク'];
+  gCities.innerHTML = CITIES.map(([n, lo, la]) => { const [x, y] = proj([lo, la]); return `<g class="gm-city${MAJOR.includes(n) ? ' major' : ''}" data-x="${x}" data-y="${y}"><circle r="3"/><text x="6" y="-5">${esc(n)}</text></g>`; }).join('');
   const cityEls = [...gCities.children];
 
   // カメラ：表示している範囲の中心と幅（地図の単位）
@@ -50,9 +51,10 @@ export function openMapAnime({ openOv, body, setCleanup }) {
   const ppu = () => svg.clientWidth / cam.w; // 1単位あたりの画面のピクセル
   function applyCam() {
     const W = svg.clientWidth || 1, H = svg.clientHeight || 1, h = (cam.w * H) / W;
-    svg.setAttribute('viewBox', `${cam.x - cam.w / 2} ${cam.y - h / 2} ${cam.w} ${h}`);
-    const s = 1 / ppu();
-    for (const c of cityEls) c.setAttribute('transform', `translate(${c.dataset.x} ${c.dataset.y}) scale(${s})`);
+    // 上に年と出来事名が重なるので、注目する場所は画面の中央より少し下に来るようにする
+    svg.setAttribute('viewBox', `${cam.x - cam.w / 2} ${cam.y - h * 0.4} ${cam.w} ${h}`);
+    const s = 1 / ppu(), zoom = MAP.w / cam.w;
+    for (const c of cityEls) { c.setAttribute('transform', `translate(${c.dataset.x} ${c.dataset.y}) scale(${s})`); c.style.display = zoom >= 1.8 || c.classList.contains('major') ? '' : 'none'; }
     for (const ic of gIcons.children) ic.setAttribute('transform', `translate(${ic.dataset.x} ${ic.dataset.y}) scale(${s}) rotate(${ic.dataset.r || 0})`);
   }
   function moveCam([lo, la, z], ms = 1100) {
@@ -146,12 +148,14 @@ export function openMapAnime({ openOv, body, setCleanup }) {
     if (!playing) return;
     timer = setTimeout(() => { if (idx < EVENTS.length - 1) show(idx + 1); else { playing = false; playB.textContent = '▶'; } }, 6500 / speed);
   }
+  root.querySelector('.gm-legbtn').onclick = (e) => { const l = root.querySelector('.gm-legend'); l.hidden = !l.hidden; e.currentTarget.classList.toggle('on', !l.hidden); };
   root.querySelector('.gm-ctrl').onclick = (e) => {
     const b = e.target.closest('[data-g]'); if (!b) return;
     const g = b.dataset.g;
     if (g === 'play') { if (!playing && idx >= EVENTS.length - 1) { playing = true; show(0); } else { playing = !playing; schedule(); } playB.textContent = playing ? '⏸' : '▶'; }
     else if (g === 'prev') show(idx - 1);
     else if (g === 'next') show(idx + 1);
+    else if (g === 'leg') { const l = root.querySelector('.gm-legend'); l.hidden = !l.hidden; b.classList.toggle('on', !l.hidden); }
     else if (g === 'spd') { speed = speed === 1 ? 2 : speed === 2 ? 0.5 : 1; b.textContent = `${speed}×`; schedule(); }
   };
   seek.oninput = () => show(+seek.value, { instant: true });
