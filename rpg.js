@@ -4,6 +4,7 @@
 // 保存は ヒマコロシの S.rpg（キー oretachi:hima）
 import { bgm } from './bgm.js';
 import { ENEMIES } from './enemies.js';
+import { STAGE } from './enemies-stage.js';
 
 /* ---------- データ ---------- */
 // 仲間。subj が一致するステージでは攻撃力×1.5（'all' はどこでも×1.2）
@@ -115,6 +116,7 @@ function allEnemies(subj) {
   const E = ENEMIES[subj], out = [];
   for (const [k, b] of Object.entries(E.boss)) out.push({ kind: 'boss', lec: k, name: b[0], icon: b[1], desc: b[2] });
   for (const [k, zs] of Object.entries(E.lec)) for (const z of zs) out.push({ kind: 'lec', lec: k, name: z[0], icon: z[1], desc: z[2] });
+  for (const [k, sts] of Object.entries(STAGE[subj] || {})) sts.forEach((tri, si) => tri.forEach((z, zi) => out.push({ kind: zi === 2 ? 'srare' : 'lec', lec: k, stage: si + 1, name: z[0], icon: z[1], desc: z[2] })));
   for (const z of E.common) out.push({ kind: 'common', name: z[0], icon: z[1], desc: z[2] });
   out.push({ kind: 'rare', name: E.rare[0], icon: E.rare[1], desc: E.rare[2] });
   return out.map((x) => ({ ...x, key: `${subj}|${x.name}` }));
@@ -389,7 +391,8 @@ export function makeRPG(ctx) {
   function openStage(m, subj, k, n) {
     const r = R(), id = `${subj}-${k}-${n}`, st = starsOf(id), boss = n === 3, E = ENEMIES[subj], d = mapDiff;
     const no = (lectures[subj][k].match(/^(第\S+?回)/) || [lectures[subj][k]])[0];
-    const foes = boss ? [E.boss[k]] : [...(E.lec[k] || []), ...E.common];
+    const tri = STAGE[subj]?.[k]?.[n - 1];
+    const foes = boss ? [E.boss[k]] : [...(tri ? tri.slice(0, 2) : []), ...(E.lec[k] || []), ...E.common];
     const seen = (nm) => (r.zukan[`${subj}|${nm}`] || 0) > 0;
     const sh = document.createElement('div'); sh.className = 'rp-sheet';
     sh.innerHTML = `<div class="rp-sheet-in">
@@ -412,18 +415,18 @@ export function makeRPG(ctx) {
     const r = R(); zsubj = zsubj || r.subj;
     const list = allEnemies(zsubj), got = list.filter((x) => r.zukan[x.key]).length;
     const lecName = (k) => (lectures[zsubj][k] || `第${k}回`);
-    const cell = (x) => { const c = r.zukan[x.key] || 0; return `<button class="rp-zk${c ? '' : ' unk'}${x.kind === 'boss' ? ' boss' : ''}${x.kind === 'rare' ? ' rare' : ''}${zsel === x.key ? ' sel' : ''}" data-z="${esc(x.key)}" ${c ? '' : 'disabled'}><span>${c ? x.icon : '？'}</span><small>${c ? esc(x.name) : '？？？'}</small></button>`; };
+    const cell = (x) => { const c = r.zukan[x.key] || 0; return `<button class="rp-zk${c ? '' : ' unk'}${x.kind === 'boss' ? ' boss' : ''}${x.kind === 'rare' || x.kind === 'srare' ? ' rare' : ''}${zsel === x.key ? ' sel' : ''}" data-z="${esc(x.key)}" ${c ? '' : 'disabled'}><span>${c ? x.icon : '？'}</span><small>${c ? esc(x.name) : '？？？'}</small></button>`; };
     const lecs = Object.keys(lectures[zsubj]);
     const sel = list.find((x) => x.key === zsel);
-    const where = (x) => (x.kind === 'boss' ? `${lecName(x.lec)} のボス` : x.kind === 'lec' ? `${lecName(x.lec)} のステージ` : x.kind === 'rare' ? 'どのステージにもたまに出る' : 'どのステージにも出る');
+    const where = (x) => (x.kind === 'boss' ? `${lecName(x.lec)} のボス` : x.kind === 'srare' ? `${lecName(x.lec)} STAGE ${x.stage} にたまに出る` : x.kind === 'lec' ? `${lecName(x.lec)} ${x.stage ? 'STAGE ' + x.stage : 'のステージ'}` : x.kind === 'rare' ? 'どのステージにもたまに出る' : 'どのステージにも出る');
     m.innerHTML = `
       <div class="rp-zhead"><b>📖 敵キャラ図鑑</b><span>登録 <b>${got}</b> / ${list.length}</span></div>
       <div class="rp-zbar"><i style="width:${(got / list.length) * 100}%"></i></div>
       <div class="seg rp-seg mt" role="group">${SUBJ.map(([k, n]) => `<button data-zs="${k}" aria-pressed="${zsubj === k}">${n}</button>`).join('')}</div>
-      ${sel ? `<div class="rp-zdetail"><span class="rp-zbig">${sel.icon}</span><div><b>${esc(sel.name)}</b>${sel.kind === 'boss' ? '<em>BOSS</em>' : sel.kind === 'rare' ? '<em class="rare">レア</em>' : ''}
+      ${sel ? `<div class="rp-zdetail"><span class="rp-zbig">${sel.icon}</span><div><b>${esc(sel.name)}</b>${sel.kind === 'boss' ? '<em>BOSS</em>' : sel.kind === 'rare' || sel.kind === 'srare' ? '<em class="rare">レア</em>' : ''}
         <p>${esc(sel.desc)}</p><small>${esc(where(sel))}・たおした数 ${r.zukan[sel.key]}</small></div><button class="rp-x" data-zx aria-label="閉じる">✕</button></div>` : '<p class="rp-tip">たおした敵が登録される。タップで説明が見られる。</p>'}
       <h3 class="rp-zsec">ボス</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'boss').map(cell).join('')}</div>
-      <h3 class="rp-zsec">レア</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'rare').map(cell).join('')}</div>
+      <h3 class="rp-zsec">レア</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'rare' || x.kind === 'srare').map(cell).join('')}</div>
       ${lecs.filter((k) => ENEMIES[zsubj].lec[k]).map((k) => `<h3 class="rp-zsec">${esc(lecName(k))}</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'lec' && x.lec === k).map(cell).join('')}</div>`).join('')}
       <h3 class="rp-zsec">どこにでも出る</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'common').map(cell).join('')}</div>`;
     m.onclick = (e) => {
@@ -608,18 +611,26 @@ export function makeRPG(ctx) {
     const E = ENEMIES[subj], D = DIFF[d];
     const lvScale = 1 + ci * 0.4 + (n - 1) * 0.15;
     // 雑魚：その回専用（あれば2体）＋どこにでも出る雑魚 で3体。たまにレアが混ざる
+    // 雑魚：そのステージ専用の2体 ＋ その回の雑魚かどこにでも出る雑魚 で3体。たまにレア（ステージ専用のレアが多め）
+    const SG = STAGE[subj]?.[lec] || [];
     const zakos = () => {
-      const lz = shuffle([...(E.lec[lec] || [])]).slice(0, 2);
-      const z = shuffle([...lz, ...shuffle([...E.common]).slice(0, 3 - lz.length)]);
-      if (Math.random() < (d ? 0.12 : 0.08)) z[rnd(z.length)] = E.rare;
-      return z.map(([name, icon]) => { const rare = name === E.rare[0]; return { name, icon, rare, hp: Math.round(100 * lvScale * D.hp * (rare ? 0.7 : 1)), atk: Math.round(18 * lvScale * D.atk * (rare ? 0.5 : 1)) }; });
+      const tri = SG[boss ? rnd(SG.length || 1) : n - 1];
+      const own = tri ? tri.slice(0, 2) : [];
+      const z = shuffle([...own, ...shuffle([...(E.lec[lec] || []), ...E.common]).slice(0, 3 - own.length)]);
+      const rares = [];
+      if (Math.random() < (d ? 0.12 : 0.08)) { const rr = tri && Math.random() < 0.7 ? tri[2] : E.rare; z[rnd(z.length)] = rr; rares.push(rr[0]); }
+      return z.map(([name, icon]) => { const rare = rares.includes(name); return { name, icon, rare, hp: Math.round(100 * lvScale * D.hp * (rare ? 0.7 : 1)), atk: Math.round(18 * lvScale * D.atk * (rare ? 0.5 : 1)) }; });
     };
+    // 同時に場に出る敵の数：ノーマル1体、ハード2体、ゲキムズ3体（ボス戦はボス＋手下）
+    const slots = [1, 2, 3][d];
     const foes = boss
-      ? [{ name: E.boss[lec][0], icon: E.boss[lec][1], hp: Math.round(380 * lvScale * D.hp), atk: Math.round(35 * lvScale * D.atk), boss: true }]
+      ? [{ name: E.boss[lec][0], icon: E.boss[lec][1], hp: Math.round(380 * lvScale * D.hp), atk: Math.round(35 * lvScale * D.atk), boss: true }, ...zakos().slice(0, slots - 1).map((f) => ({ ...f, hp: Math.round(f.hp * 0.8) }))]
       : zakos();
+    foes.forEach((f) => { f.cur = f.hp; });
     const t = team();
     const maxHp = t.reduce((a, x) => a + x.hp, 0);
-    const st = { foes, fi: 0, ehp: foes[0].hp, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0 };
+    const active0 = foes.slice(0, slots).map((_, i) => i);
+    const st = { foes, active: active0, next: active0.length, fi: 0, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0 };
     const deck = (DECKS.find((d) => d.id === subj) || DECKS.find((d) => d.id === subj + lec) || DECKS[0]).words; // TOEIC はレベルごとの単語帳
     const no = (lectures[subj][lec].match(/^(第\S+?回)/) || [lectures[subj][lec]])[0];
     openOv(`${no} ${boss ? 'BOSS' : 'STAGE ' + n}${d ? ' ' + D.tag + D.name : ''}`); darkOv();
@@ -629,20 +640,33 @@ export function makeRPG(ctx) {
     const atkOf = (x) => x.atk * (x.subj === subj ? 1.5 : x.subj === 'all' ? 1.2 : 1);
     const partyAtk = () => t.reduce((a, x) => a + atkOf(x), 0);
 
-    function layout() {
-      const f = foes[st.fi];
-      body().innerHTML = `
-        <div class="rp-battle">
-          <div class="rp-head">
-            <div class="rp-field${f.boss ? ' boss' : ''}${f.rare ? ' rare' : ''}">
+    const left = () => st.active.filter((i) => foes[i].cur > 0).length + (foes.length - st.next);
+    // 敵の場：1体ならこれまでどおり、2体以上ならカードを並べてタップで狙う敵を選ぶ
+    function fieldHTML() {
+      if (st.active.length === 1) {
+        const f = foes[st.fi];
+        return `<div class="rp-field${f.boss ? ' boss' : ''}${f.rare ? ' rare' : ''}">
               <div class="rp-enemy" id="rp-enemy">${f.icon}</div>
               <div class="rp-einfo">
-                <div class="rp-wave">${f.boss ? 'BOSS' : `ENEMY ${st.fi + 1}/${foes.length}`}${f.rare ? '　🌟レア！' : ''}</div>
+                <div class="rp-wave">${f.boss ? 'BOSS' : `ENEMY ${foes.length - left() + 1}/${foes.length}`}${f.rare ? '　🌟レア！' : ''}</div>
                 <div class="rp-ename">${esc(f.name)}</div>
                 <div class="rp-hpbar enemy"><i id="rp-ehp"></i><span id="rp-ehptxt"></span></div>
               </div>
               <div class="rp-pop" id="rp-pop"></div>
-            </div>
+            </div>`;
+      }
+      return `<div class="rp-field multi">
+              <div class="rp-wave">のこり ${left()}体 ・ タップで狙う敵を選ぶ${st.active.some((i) => foes[i].rare) ? '　🌟レア！' : ''}</div>
+              <div class="rp-foes c${st.active.length}">${st.active.map((i) => { const f = foes[i], tg = i === st.fi; return `<button class="rp-foe${tg ? ' tg' : ''}${f.boss ? ' boss' : ''}${f.rare ? ' rare' : ''}" data-tg="${i}">${tg ? '<em>🎯</em>' : ''}<span class="rp-enemy"${tg ? ' id="rp-enemy"' : ''}>${f.icon}</span><b>${esc(f.name)}</b><span class="rp-hpbar enemy sm"><i data-hp="${i}"></i></span></button>`; }).join('')}</div>
+              <div class="rp-pop" id="rp-pop"></div>
+            </div>`;
+    }
+    function drawField() { const w = document.getElementById('rp-fw'); if (w) { w.innerHTML = fieldHTML(); drawHp(); } }
+    function layout() {
+      body().innerHTML = `
+        <div class="rp-battle">
+          <div class="rp-head">
+            <div id="rp-fw">${fieldHTML()}</div>
             <div class="rp-team" id="rp-team"></div>
             <div class="rp-hpbar party"><i id="rp-php"></i><span id="rp-phptxt"></span></div>
             <div class="rp-timebar"><i id="rp-time"></i></div>
@@ -664,8 +688,9 @@ export function makeRPG(ctx) {
     function drawHp() {
       const f = foes[st.fi];
       const e = document.getElementById('rp-ehp'), et = document.getElementById('rp-ehptxt'), p = document.getElementById('rp-php'), pt = document.getElementById('rp-phptxt');
-      if (e) e.style.width = Math.max(0, (st.ehp / f.hp) * 100) + '%';
-      if (et) et.textContent = `${Math.max(0, Math.round(st.ehp))} / ${f.hp}`;
+      if (e) e.style.width = Math.max(0, (f.cur / f.hp) * 100) + '%';
+      if (et) et.textContent = `${Math.max(0, Math.round(f.cur))} / ${f.hp}`;
+      document.querySelectorAll('[data-hp]').forEach((el) => { const g = foes[+el.dataset.hp]; el.style.width = Math.max(0, (g.cur / g.hp) * 100) + '%'; });
       if (p) { p.style.width = Math.max(0, (st.hp / st.maxHp) * 100) + '%'; p.classList.toggle('low', st.hp / st.maxHp < 0.3); }
       if (pt) pt.textContent = `HP ${Math.max(0, Math.round(st.hp))} / ${st.maxHp}${st.guard ? `　🛡️×${st.guard}` : ''}`;
     }
@@ -683,19 +708,22 @@ export function makeRPG(ctx) {
       s.style.left = 30 + Math.random() * 40 + '%';
       p.appendChild(s); setTimeout(() => s.remove(), 1000);
     }
-    function hitEnemy(dmg, label, big) {
+    function hitEnemy(dmg, label, big, idx = st.fi) {
       dmg = Math.max(1, Math.round(dmg));
       // ヌルポには「ガッ！」（ネットのお約束「ぬるぽ」→「ガッ」）
-      const gah = foes[st.fi].name === 'ヌルポ';
-      st.ehp -= dmg;
+      const gah = foes[idx].name === 'ヌルポ';
+      foes[idx].cur -= dmg;
       pop((gah ? 'ガッ！ ' : '') + (label ? label + ' ' : '') + dmg, gah ? 'hit big gah' : big ? 'hit big' : 'hit');
       bgm.sfx(gah ? 'gah' : big ? 'crit' : 'hit');
-      const en = document.getElementById('rp-enemy'); if (en) { en.classList.remove('shake'); void en.offsetWidth; en.classList.add('shake'); }
+      const en = st.active.length > 1 ? document.querySelector(`[data-tg="${idx}"] .rp-enemy`) : document.getElementById('rp-enemy'); if (en) { en.classList.remove('shake'); void en.offsetWidth; en.classList.add('shake'); }
       const fl = document.querySelector('.rp-field'); if (fl) { fl.classList.remove('flash'); void fl.offsetWidth; fl.classList.add('flash'); }
       drawHp();
     }
     function hitParty(mult = 1) {
-      let d = foes[st.fi].atk * (0.85 + Math.random() * 0.3) * mult;
+      // 場にいる敵がみんなで反撃（2体以上のときは1体あたり7割）
+      const live = st.active.filter((i) => foes[i].cur > 0);
+      const base = live.length > 1 ? live.reduce((a, i) => a + foes[i].atk, 0) * 0.7 : foes[st.fi].atk;
+      let d = base * (0.85 + Math.random() * 0.3) * mult;
       if (st.guard) { d /= 2; st.guard--; }
       st.hp -= Math.round(d);
       bgm.sfx('ouch');
@@ -800,29 +828,36 @@ export function makeRPG(ctx) {
       }
       // 自分のペースで「つぎへ」
       const qEl = document.getElementById('rp-q'); if (!qEl) return;
-      const label = st.hp <= 0 ? '結果を見る' : st.ehp <= 0 ? (st.fi + 1 < foes.length ? 'たおした！ つぎの敵へ ▶' : 'たおした！ ▶') : 'つぎへ ▶';
+      const label = st.hp <= 0 ? '結果を見る' : foes[st.fi].cur <= 0 ? (left() > 0 ? 'たおした！ つぎへ ▶' : 'たおした！ ▶') : 'つぎへ ▶';
       qEl.insertAdjacentHTML('beforeend', `${line}<button class="rp-btn gold wide mt" id="rp-next">${label}</button>`);
       const nb = document.getElementById('rp-next');
       nb.onclick = () => { nb.disabled = true; afterTurn(); };
       nb.scrollIntoView({ block: 'nearest' });
     }
 
+    function koBook(f) { // 図鑑に登録・目標・素材
+      const r = R(), key = `${subj}|${f.name}`; const isNew = !r.zukan[key]; r.zukan[key] = (r.zukan[key] || 0) + 1; if (f.rare) st.rares++; if (!f.boss) bump('zako');
+      if (d === 2 && Math.random() < (f.boss ? MAT.bossDrop : MAT.drop)) { r.mats = (r.mats || 0) + 1; st.mats = (st.mats || 0) + 1; setTimeout(() => { toast(`${MAT.icon} ${MAT.name}を手に入れた！`); hsay('mat'); }, 1300); }
+      save(); if (isNew) { setTimeout(() => toast(`📖 図鑑に「${f.name}」が登録された！`), 300); setTimeout(() => hsay('zukan'), 900); }
+    }
     function afterTurn() {
       if (st.over) return;
       if (st.hp <= 0) return finish(false);
-      if (st.ehp <= 0) {
-        const en = document.getElementById('rp-enemy');
-        if (en) en.classList.add('ko');
+      const dead = st.active.filter((i) => foes[i].cur <= 0);
+      if (dead.length) {
+        dead.forEach((i) => { const en = st.active.length > 1 ? document.querySelector(`[data-tg="${i}"] .rp-enemy`) : document.getElementById('rp-enemy'); if (en) en.classList.add('ko'); koBook(foes[i]); });
         bgm.sfx('ko');
-        // 図鑑に登録・目標
-        { const f = foes[st.fi], r = R(), key = `${subj}|${f.name}`; const isNew = !r.zukan[key]; r.zukan[key] = (r.zukan[key] || 0) + 1; if (f.rare) st.rares++; if (!f.boss) bump('zako');
-          if (d === 2 && Math.random() < (f.boss ? MAT.bossDrop : MAT.drop)) { r.mats = (r.mats || 0) + 1; st.mats = (st.mats || 0) + 1; setTimeout(() => { toast(`${MAT.icon} ${MAT.name}を手に入れた！`); hsay('mat'); }, 1300); }
-          save(); if (isNew) { setTimeout(() => toast(`📖 図鑑に「${f.name}」が登録された！`), 300); setTimeout(() => hsay('zukan'), 900); } }
         st.busy = true;
         setTimeout(() => {
           if (st.over) return;
-          if (st.fi + 1 < foes.length) { st.fi++; st.ehp = foes[st.fi].hp; layout(); pop('つぎの敵！', 'info'); if (foes[st.fi].rare) hsay('rare'); nextQuestion(); }
-          else finish(true);
+          st.active = st.active.filter((i) => foes[i].cur > 0);
+          const comers = [];
+          while (st.active.length < slots && st.next < foes.length) { comers.push(st.next); st.active.push(st.next++); }
+          if (!st.active.length) return finish(true);
+          if (!st.active.includes(st.fi)) st.fi = st.active[0];
+          layout();
+          if (comers.length) { pop('つぎの敵！', 'info'); if (comers.some((i) => foes[i].rare)) hsay('rare'); }
+          nextQuestion();
         }, 650);
         return;
       }
@@ -834,7 +869,11 @@ export function makeRPG(ctx) {
       st.gauge[id] = 0;
       const k = x.skill;
       if (k.kind === 'heal') { st.hp = Math.min(st.maxHp, st.hp + st.maxHp * k.pow); pop('回復！', 'heal'); bgm.sfx('heal'); drawHp(); }
-      else if (k.kind === 'dmg') { bgm.sfx('skill'); hitEnemy(atkOf(x) * k.pow, k.name, true); if (st.ehp <= 0 && !st.busy) { st.busy = true; clearInterval(st.timer); document.querySelectorAll('#rp-q [data-c]').forEach((b) => { b.disabled = true; }); setTimeout(afterTurn, 600); } }
+      else if (k.kind === 'dmg') {
+        bgm.sfx('skill');
+        if (st.active.length > 1) st.active.forEach((i) => hitEnemy(atkOf(x) * k.pow * 0.7, '全体攻撃', true, i)); // 敵が2体以上なら全体攻撃
+        else hitEnemy(atkOf(x) * k.pow, k.name, true);
+        if (st.active.some((i) => foes[i].cur <= 0) && !st.busy) { st.busy = true; clearInterval(st.timer); document.querySelectorAll('#rp-q [data-c]').forEach((b) => { b.disabled = true; }); setTimeout(afterTurn, 600); } }
       else if (k.kind === 'time') { st.bonusT += k.pow; st.left += k.pow; st.total += k.pow; pop(`+${k.pow}秒`, 'info'); bgm.sfx('skill'); }
       else if (k.kind === 'guard') { st.guard += k.pow; pop('ガード！', 'info'); bgm.sfx('skill'); drawHp(); }
       else if (k.kind === 'healguard') { st.hp = st.maxHp; st.guard += 2; pop('全回復＆ガード！', 'heal'); bgm.sfx('heal'); drawHp(); }
@@ -887,6 +926,7 @@ export function makeRPG(ctx) {
 
     body().onclick = (e) => {
       const sk = e.target.closest('[data-skill]'); if (sk && !sk.disabled) return useSkill(sk.dataset.skill);
+      const tg = e.target.closest('[data-tg]'); if (tg && !st.over) { const i = +tg.dataset.tg; if (foes[i].cur > 0 && i !== st.fi) { st.fi = i; bgm.sfx('tap'); drawField(); } return; }
       const c = e.target.closest('#rp-q [data-c]'); if (c && !c.disabled) answer(+c.dataset.c, c);
     };
     layout();
