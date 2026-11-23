@@ -303,7 +303,7 @@ export function makeRPG(ctx) {
         <img class="rp-heroimg" src="icons/icon-192.png" alt="" data-rp="talk">
         <div class="rp-herotxt">${heroTitle() ? `<span class="rp-title">${esc(heroTitle())}</span>` : ''}<button class="rp-name" data-rp="rename"><b>${esc(heroName())}</b><span>✏️</span></button>
           <div class="rp-lv">Lv.${r.hero.lv}<span class="rp-exp"><i style="width:${(r.hero.exp / needExp(r.hero.lv)) * 100}%"></i></span></div></div>
-        <div class="rp-hudright"><span class="rp-coin">🪙 ${r.coins}</span><span class="rp-powrow"><span class="rp-pow">戦闘力 <b>${teamPower(r.subj).toLocaleString()}</b></span><button class="rp-btn rp-partyb" data-party>👥 編成</button></span></div>
+        <div class="rp-hudright"><span class="rp-coin">🪙 ${r.coins}</span><span class="rp-powrow"><button class="rp-btn rp-partyb" data-party>👥 編成</button><span class="rp-pow">戦闘力 <b>${teamPower(r.subj).toLocaleString()}</b></span></span></div>
       </div>
       <h3 class="rp-zsec">章を選ぶ</h3>
       <div class="rp-chapters">${CHAPTERS.map((c, i) => {
@@ -374,7 +374,7 @@ export function makeRPG(ctx) {
         </div>
         <div class="rp-hudparty">
           <div class="rp-faces">${t.map((x) => iconHTML(x.id, 'sm')).join('')}${Array(4 - t.length).fill('<span class="rp-face sm empty">＋</span>').join('')}</div>
-          <div class="rp-stat"><span class="rp-powrow"><span class="rp-pow">戦闘力 <b>${teamPower(r.subj).toLocaleString()}</b></span><button class="rp-btn rp-partyb" data-party>👥 編成</button></span><span>HP <b>${t.reduce((a, x) => a + x.hp, 0)}</b>　攻撃 <b>${t.reduce((a, x) => a + x.atk, 0)}</b></span></div>
+          <div class="rp-stat"><span class="rp-powrow"><button class="rp-btn rp-partyb" data-party>👥 編成</button><span class="rp-pow">戦闘力 <b>${teamPower(r.subj).toLocaleString()}</b></span></span><span>HP <b>${t.reduce((a, x) => a + x.hp, 0)}</b>　攻撃 <b>${t.reduce((a, x) => a + x.atk, 0)}</b></span></div>
         </div>
         <button class="rp-chback" data-rp="chapters">‹ 章の一覧<b>第${CHAPTERS.findIndex((c) => c.id === r.subj) + 1}章 ${esc((CHAPTERS.find((c) => c.id === r.subj) || {}).name || '')}</b></button>
       </div>
