@@ -82,6 +82,9 @@ const HLINE = {
   mat: ['うわっ、結晶が出ました！これはうれしい！'],
   mid: ['ここで中間ボスです！気合い入れていきたいと思います！'],
   gattai: ['え、合体した！？これはヤバいです！'],
+  rev: ['あのときの借り、返させてもらいます！', 'リベンジ、やっていきたいと思います！'],
+  revok: ['復讐成功です！いやー、スッキリしました！'],
+  revng: ['くっ…また負けました…次こそは！'],
   heal: ['ありがとうございます、助かります！'],
   pinch: ['ちょっと待ってください、これヤバいです…！'],
   chance: ['きましたね〜！チャンスです！'],
@@ -186,6 +189,8 @@ export function makeRPG(ctx) {
     if (!r.sound) r.sound = 'silent'; // 'silent' | 'bgm'（講義中に使うので最初はサイレント）
     if (!r.stars) { r.stars = {}; for (const id of Object.keys(r.clear)) r.stars[`${id}#0`] = 1; } // 前のデータのクリアは★1から
     if (!r.zukan) r.zukan = {};
+    if (!r.wmiss) r.wmiss = {}; // 冒険の単語4択で間違えた単語（復讐の対象）
+    if (!r.rev) r.rev = { n: 0, log: [] }; // 晴らした恨み
     if (r.heroLb === undefined) { r.heroLb = Math.max(0, Math.ceil((r.hero.lv - 50) / MAT.plus)); r.mats = r.mats || 0; r.heroSkill = 0; }
     if (!r.capv) { for (const [id, o] of Object.entries(r.owned)) { const b = RCAP[CHARS[id]?.rar] || 99; o.lb = Math.max(o.lb || 0, o.lv - b); } r.capv = 1; } // 前のデータで上限を超えている分は限界突破あつかい
     return r;
@@ -238,7 +243,7 @@ export function makeRPG(ctx) {
 
   /* ---------- 冒険（ゲーム画面）：下のゲーム用タブで マップ・編成・ガチャ・図鑑・目標 ---------- */
   let gtab = 'map', $m = null, mapView = 'chapters', mapDiff = 0; // マップ：章の一覧 → ステージ（難易度タブ）
-  const GTABS = [['map', '🗺️', 'マップ'], ['party', '👥', '編成'], ['gacha', '🎁', 'ガチャ'], ['zukan', '📖', '図鑑'], ['goals', '🎯', '目標']];
+  const GTABS = [['map', '🗺️', 'マップ'], ['party', '👥', '編成'], ['gacha', '🎁', 'ガチャ'], ['revenge', '👻', '復讐'], ['zukan', '📖', '図鑑'], ['goals', '🎯', '目標']];
   async function renderQuestTab(m) {
     $m = m;
     if (!lectures) lectures = await api.lectures();
@@ -255,6 +260,7 @@ export function makeRPG(ctx) {
     else if (gtab === 'party') openParty(pg);
     else if (gtab === 'gacha') openGacha(pg);
     else if (gtab === 'zukan') renderZukan(pg);
+    else if (gtab === 'revenge') renderRevenge(pg);
     else renderGoals(pg);
     bgm.play('map');
   }
@@ -463,6 +469,57 @@ export function makeRPG(ctx) {
       e.stopPropagation();
       if (e.target === sh || e.target.closest('[data-sx]')) { sh.remove(); return; }
       if (e.target.closest('[data-go]')) { sh.remove(); startBattle(subj, 'mid', 0, d); }
+    };
+  }
+
+  /* ---------- 復讐：間違えた問題・単語が「怨念版」の敵になって襲ってくる ---------- */
+  let revCache = null;
+  async function revengeItems() {
+    const r = R();
+    const main = (await api.revengeList?.()) || [];
+    const words = Object.entries(r.wmiss).map(([k, o]) => ({ word: o.w, deck: o.d, w: o.n, t: o.t, key: k }));
+    const items = [...main.map((x) => ({ ...x, kind: 'q' })), ...words.map((x) => ({ ...x, kind: 'w' }))];
+    items.sort((a, b) => b.w - a.w || b.t - a.t);
+    if (items.length) items[0].nemesis = true; // いちばん多く負けた相手が宿敵
+    return items;
+  }
+  function revFoe(it) {
+    const subjOfDeck = (d) => (d.startsWith('toeic') ? 'toeic' : d);
+    const sj = it.kind === 'q' ? it.sid : subjOfDeck(it.deck);
+    const E = ENEMIES[sj];
+    let bossName = '忘れた単語', icon = '👻';
+    if (E) {
+      const lec = it.kind === 'q' ? String(it.lec) : it.deck.startsWith('toeic') ? it.deck.slice(5) : Object.keys(E.boss)[0];
+      const b = E.boss[lec] || Object.values(E.boss)[0];
+      bossName = b[0]; icon = b[1];
+    }
+    const hp = Math.round(120 * (1 + (it.w - 1) * 0.35)), atk = Math.round(20 * (1 + (it.w - 1) * 0.25) * (it.nemesis ? 1.3 : 1));
+    return { name: `怨・${bossName}`, icon, onnen: true, boss: it.kind === 'q', qid: it.qid, sid: it.sid, lec: it.lec, word: it.word, deck: it.deck, w: Math.max(1, it.w), t: it.t, nemesis: !!it.nemesis,
+      label: it.kind === 'q' ? `${it.title}（${it.sname}）` : `単語「${it.word[0]}」`, hp, atk };
+  }
+  async function renderRevenge(m) {
+    m.innerHTML = '<p class="rp-tip">恨みを数えています…</p>';
+    const items = revCache = await revengeItems();
+    if ($m && gtab !== 'revenge') return;
+    const r = R(), nq = items.filter((x) => x.kind === 'q').length, nw = items.length - nq, nem = items[0];
+    const nm = (it) => (it.kind === 'q' ? `${esc(it.title)}<small>${esc(it.sname)} ・ ${esc(it.q)}</small>` : `単語「${esc(it.word[0])}」<small>${esc(it.word[1])}</small>`);
+    m.innerHTML = `
+      <div class="rp-revhead"><b>👻 復讐</b><span>過去に負けた問題が、怨念になって襲ってくる。正解すれば一撃で晴らせる。</span></div>
+      ${items.length ? `
+        <div class="rp-revcount"><span>本編の問題 <b>${nq}</b></span><span>単語 <b>${nw}</b></span><span>晴らした恨み <b>${r.rev.n}</b></span></div>
+        <div class="rp-nemesis"><span class="rp-nemi">${revFoe(nem).icon}</span><div><em>☠️ 宿敵</em><b>${nm(nem)}</b><small>${nem.w}回負けた ・ 倒すと🪙+100</small></div></div>
+        <button class="rp-btn gold big wide" data-rev="5">⚔️ 復讐する（${Math.min(5, items.length)}体）</button>
+        ${items.length >= 10 ? `<button class="rp-btn big wide rp-rush" data-rev="rush">😈 怨念ボスラッシュ（${Math.min(30, items.length)}体連続・全問正解で称号「復讐の鬼」）</button>` : `<p class="rp-tip">恨みが10個たまると「怨念ボスラッシュ」が解放される（あと${10 - items.length}）</p>`}
+        <h3 class="rp-zsec">恨みのリスト</h3>
+        <div class="rp-revlist">${items.slice(0, 40).map((it) => `<div class="rp-revitem${it.nemesis ? ' nem' : ''}"><span class="rp-revic">${revFoe(it).icon}</span><div>${nm(it)}</div><em>${it.w}敗</em></div>`).join('')}</div>`
+      : `<div class="rp-revpeace"><span>🕊️</span><b>恨みはすべて晴らした。平和です。</b><small>本編や冒険で間違えた問題・単語が、ここに復讐の相手として現れる。</small></div>`}
+      ${r.rev.log.length ? `<h3 class="rp-zsec">リベンジ図鑑（晴らした恨み）</h3><div class="rp-revlist done">${r.rev.log.slice(0, 20).map((x) => `<div class="rp-revitem"><span class="rp-revic">✅</span><div>${esc(x.name)}<small>${x.w}敗からの復讐 ・ ${new Date(x.at).getMonth() + 1}/${new Date(x.at).getDate()}</small></div></div>`).join('')}</div>` : ''}`;
+    m.onclick = (e) => {
+      const b = e.target.closest('[data-rev]'); if (!b) return;
+      e.stopPropagation(); bgm.sfx('tap');
+      const rush = b.dataset.rev === 'rush';
+      const pick = rush ? revCache.slice(0, 30) : [revCache.find((x) => x.nemesis), ...shuffle(revCache.filter((x) => !x.nemesis)).slice(0, 4)].filter(Boolean);
+      startBattle(R().subj, 'rev', 0, 0, { foes: shuffle(pick.map(revFoe)).map((f) => ({ ...f, cur: f.hp })), rush });
     };
   }
 
@@ -709,17 +766,17 @@ export function makeRPG(ctx) {
   }
 
   /* ---------- バトル ---------- */
-  async function startBattle(subj, lec, n, d = 0) {
-    const isMid = lec === 'mid';
-    const lecs = Object.keys(lectures[subj]);
-    const ci = isMid ? lecs.indexOf(MID[subj].after) : lecs.indexOf(String(lec));
+  async function startBattle(subj, lec, n, d = 0, rev = null) {
+    const isMid = lec === 'mid', isRev = !!rev;
+    const lecs = Object.keys(lectures[subj] || {});
+    const ci = isRev ? 0 : isMid ? lecs.indexOf(MID[subj].after) : lecs.indexOf(String(lec));
     const boss = n === 3 || isMid;
     const E = ENEMIES[subj], D = DIFF[d];
     const lvScale = 1 + ci * 0.4 + (n - 1) * 0.15;
     // 雑魚：そのステージ専用の2体を中心に、その回の雑魚・どこにでも出る雑魚から選ぶ。たまにレア（ステージ専用のレアが多め）
     const SG = STAGE[subj]?.[lec] || [];
     // 1ウェーブに出る敵の数：ノーマル1体、ハード2体、ゲキムズ3体。雑魚ステージは3ウェーブ（ボス戦はボス＋手下の1ウェーブ）
-    const slots = isMid ? 1 : [1, 2, 3][d];
+    const slots = isMid || isRev ? 1 : [1, 2, 3][d];
     const zakos = (cnt) => {
       const tri = SG[boss ? rnd(SG.length || 1) : n - 1];
       const own = tri ? tri.slice(0, 2) : [];
@@ -731,7 +788,8 @@ export function makeRPG(ctx) {
       return z.map(([name, icon]) => { const rare = rares.includes(name); return { name, icon, rare, hp: Math.round(100 * lvScale * D.hp * sc * (rare ? 0.7 : 1)), atk: Math.round(18 * lvScale * D.atk * (rare ? 0.5 : 1)) }; });
     };
     const rangeLecs = isMid ? lecs.slice(0, ci + 1) : [];
-    const foes = isMid
+    const foes = isRev ? rev.foes
+      : isMid
       ? midFoes(subj).map((f) => ({ ...f, boss: true, art: f.rush ? null : f.icon, lec: f.lec || +rangeLecs[rnd(rangeLecs.length)], hp: Math.round(380 * lvScale * D.hp * (f.final ? 1.4 : 0.5)), atk: Math.round(35 * lvScale * D.atk * (f.final ? 1.2 : 0.8)) }))
       : boss
       ? [{ name: E.boss[lec][0], icon: E.boss[lec][1], hp: Math.round(380 * lvScale * D.hp), atk: Math.round(35 * lvScale * D.atk), boss: true }, ...zakos(slots - 1).map((f) => ({ ...f, hp: Math.round(f.hp * 0.8) }))]
@@ -740,11 +798,12 @@ export function makeRPG(ctx) {
     const t = team();
     const maxHp = t.reduce((a, x) => a + x.hp, 0);
     // ウェーブ：雑魚ステージは3ウェーブ、ボス戦は1ウェーブ、中間ボスは1体ずつ
-    const waves = isMid ? foes.map((_, i) => [i]) : boss ? [foes.map((_, i) => i)] : [0, 1, 2].map((w) => Array.from({ length: slots }, (_, k) => w * slots + k));
-    const st = { foes, waves, wave: 0, active: [...waves[0]], fi: 0, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0 };
-    const deck = (DECKS.find((d) => d.id === subj) || DECKS.find((d) => d.id === subj + lec) || DECKS[0]).words; // TOEIC はレベルごとの単語帳
-    const no = isMid ? '中間ボス' : (lectures[subj][lec].match(/^(第\S+?回)/) || [lectures[subj][lec]])[0];
-    openOv(`${no} ${isMid ? `${foes.length}連戦` : boss ? 'BOSS' : 'STAGE ' + n}${d ? ' ' + D.tag + D.name : ''}`); darkOv();
+    const waves = isMid || isRev ? foes.map((_, i) => [i]) : boss ? [foes.map((_, i) => i)] : [0, 1, 2].map((w) => Array.from({ length: slots }, (_, k) => w * slots + k));
+    const st = { foes, waves, wave: 0, active: [...waves[0]], fi: 0, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: isRev ? 60 : Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0 };
+    const deckObj = DECKS.find((d) => d.id === subj) || DECKS.find((d) => d.id === subj + lec) || DECKS[0]; // TOEIC はレベルごとの単語帳
+    const deck = deckObj.words, deckId = deckObj.id;
+    const no = isRev ? (rev.rush ? '怨念ボスラッシュ' : '復讐') : isMid ? '中間ボス' : (lectures[subj][lec].match(/^(第\S+?回)/) || [lectures[subj][lec]])[0];
+    openOv(isRev ? `${no}（${foes.length}体）` : `${no} ${isMid ? `${foes.length}連戦` : boss ? 'BOSS' : 'STAGE ' + n}${d ? ' ' + D.tag + D.name : ''}`); darkOv();
     setCleanup(() => { clearInterval(st.timer); bgm.play('map'); });
     bgm.play(boss ? 'boss' : 'battle');
 
@@ -757,10 +816,10 @@ export function makeRPG(ctx) {
     function fieldHTML() {
       if (st.active.length === 1) {
         const f = foes[st.fi];
-        return `<div class="rp-field${f.boss ? ' boss' : ''}${f.rare ? ' rare' : ''}">
-              <div class="rp-enemy${f.art ? ' art' : ''}" id="rp-enemy">${f.icon}</div>
+        return `<div class="rp-field${f.boss ? ' boss' : ''}${f.rare ? ' rare' : ''}${f.onnen ? ' onnen' : ''}">
+              <div class="rp-enemy${f.art ? ' art' : ''}${f.onnen ? ' onnen' : ''}" id="rp-enemy" style="${f.onnen ? `--sz:${Math.min(1.45, 1 + (f.w - 1) * 0.12)}` : ''}">${f.icon}</div>
               <div class="rp-einfo">
-                <div class="rp-wave">${f.boss && !isMid ? 'BOSS' : waveTxt()}${f.rare ? '　🌟レア！' : ''}</div>
+                <div class="rp-wave">${f.onnen ? `${f.nemesis ? '☠️ 宿敵 ・ ' : ''}この${f.word ? '単語' : '問題'}に${f.w}回負けた${f.t ? ` ・ 最後は${new Date(f.t).getMonth() + 1}/${new Date(f.t).getDate()}` : ''}` : f.boss && !isMid ? 'BOSS' : waveTxt()}${f.rare ? '　🌟レア！' : ''}</div>
                 <div class="rp-ename">${esc(f.name)}</div>
                 <div class="rp-hpbar enemy"><i id="rp-ehp"></i><span id="rp-ehptxt"></span></div>
               </div>
@@ -864,7 +923,8 @@ export function makeRPG(ctx) {
       rollEvent();
       // Ready… GO!（問題が出てから時間が動く）
       qEl.innerHTML = '<div class="rp-ready"><span>READY…</span></div>';
-      const bqP = foes[st.fi].boss ? api.bossQuestion(subj, foes[st.fi].lec || lec) : null;
+      const F = foes[st.fi];
+      const bqP = F.qid ? api.questionById(F.sid, F.qid) : F.boss ? api.bossQuestion(subj, F.lec || lec) : null;
       await wait(st.event ? 900 : 550);
       if (st.over || !document.getElementById('rp-q')) return;
       qEl.innerHTML = '<div class="rp-ready go"><span>GO!</span></div>';
@@ -878,10 +938,11 @@ export function makeRPG(ctx) {
         qEl.innerHTML = `<div class="rp-bq">${bq.body}<div class="q-text">${bq.q}</div>${bq.qcode}</div>
           <div class="choices">${bq.choices.map((c, i) => `<button class="choice" data-c="${i}"><span class="num">(${i + 1})</span><span class="txt">${c}</span></button>`).join('')}</div>`;
       } else {
-        const pool = shuffle([...deck]); const c = pool[0]; const flip = rnd(2) === 1;
+        const wd = F.word ? (DECKS.find((x) => x.id === F.deck) || { words: [F.word] }).words : deck;
+        const pool = F.word ? [F.word, ...shuffle(wd.filter((x) => x[0] !== F.word[0]))] : shuffle([...wd]); const c = pool[0]; const flip = F.word ? false : rnd(2) === 1;
         const q = flip ? c[1] : c[0], a = flip ? c[0] : c[1];
         const opts = shuffle([a, ...pool.slice(1, 4).map((x) => (flip ? x[0] : x[1]))]);
-        st.q = { answer: opts.indexOf(a), exp: `<b>${esc(c[0])}</b>：${esc(c[1])}`, n: 4 };
+        st.q = { answer: opts.indexOf(a), exp: `<b>${esc(c[0])}</b>：${esc(c[1])}`, n: 4, word: c, deck: F.deck || deckId };
         qEl.innerHTML = `<div class="rp-zq${q.length > 14 ? ' long' : ''}">${esc(q)}</div>
           <div class="hk-choices word rp-zc">${opts.map((o, i) => `<button data-c="${i}">${esc(o)}</button>`).join('')}</div>`;
       }
@@ -906,7 +967,14 @@ export function makeRPG(ctx) {
       if (st.busy || st.over) return;
       st.busy = true; clearInterval(st.timer); st.turns++;
       const ok = i === st.q.answer;
-      if (st.q.boss) api.bossResult?.(st.q.qid, ok); // 間違えたら本編の復習へ
+      const F = foes[st.fi];
+      if (isRev) {
+        if (F.qid) api.revengeResult?.(F.sid, F.qid, ok); // 正解で復習リストから消え、間違えると負けた回数が増える
+        else { const r = R(), key = `${F.deck}|${F.word[0]}`; if (ok) delete r.wmiss[key]; else if (r.wmiss[key]) { r.wmiss[key].n++; r.wmiss[key].t = Date.now(); } save(); }
+      } else {
+        if (st.q.boss) api.bossResult?.(st.q.qid, ok); // 間違えたら本編の復習へ
+        if (!ok && !st.q.boss && st.q.word) { const r = R(), key = `${st.q.deck}|${st.q.word[0]}`; const o = r.wmiss[key] || { n: 0, d: st.q.deck, w: st.q.word }; o.n++; o.t = Date.now(); r.wmiss[key] = o; save(); } // 間違えた単語は復讐の対象に
+      }
       const ev = st.event; st.event = null;
       const btns = document.querySelectorAll('#rp-q [data-c]');
       btns.forEach((b) => { b.disabled = true; if (+b.dataset.c === st.q.answer) b.classList.add('ok'); });
@@ -921,6 +989,14 @@ export function makeRPG(ctx) {
         anim(document.getElementById('rp-team'), 'atk'); // 仲間が飛びかかる
         await wait(380);
         if (st.over) return;
+        if (isRev) { // 復讐：正解すれば一撃で晴らす
+          hitEnemy(F.cur, '復讐成功！', true, st.fi);
+          const coins = F.w * 20 + (F.nemesis ? 100 : 0); R().coins += coins; st.revCoins = (st.revCoins || 0) + coins;
+          const r = R(); r.rev.n++; r.rev.log.unshift({ name: F.label, w: F.w, at: Date.now() }); r.rev.log = r.rev.log.slice(0, 60); save();
+          st.revOk = (st.revOk || 0) + 1; hsay('revok'); pop(`🪙+${coins}`, 'info');
+          t.forEach((x) => { st.gauge[x.id]++; }); drawTeam();
+          line = `<div class="rp-after ok"><b>復讐成功！${F.nemesis ? '（宿敵撃破）' : ''}</b>${st.q.boss ? '' : `<span>${st.q.exp}</span>`}</div>`;
+        } else {
         // 仲間が1人ずつ攻撃。狙った敵が倒れたら、残りの攻撃は自動で次の敵へ
         const bonus = speed * mult * (1 + Math.min(st.combo - 1, 5) * 0.1);
         const lbl = mult > 1 ? 'チャンス！' : st.combo > 1 ? `${st.combo}コンボ` : speed > 1.3 ? 'はやい！' : '';
@@ -935,6 +1011,7 @@ export function makeRPG(ctx) {
         t.forEach((x) => { st.gauge[x.id]++; });
         drawTeam();
         line = `<div class="rp-after ok"><b>正解！</b>${st.q.boss ? '' : `<span>${st.q.exp}</span>`}</div>`;
+        }
       } else {
         st.combo = 0; st.miss++;
         bgm.sfx('miss');
@@ -942,7 +1019,8 @@ export function makeRPG(ctx) {
         await wait(380);
         if (st.over) return;
         hitParty(ev === 'charge' ? 2 : 1); pop(ev === 'charge' ? '大ダメージ！' : i < 0 ? '時間切れ' : 'ミス', 'miss');
-        if (!st.pinched || st.hp / st.maxHp >= 0.3) hsay(i < 0 ? 'timeout' : 'miss');
+        if (!st.pinched || st.hp / st.maxHp >= 0.3) hsay(isRev ? 'revng' : i < 0 ? 'timeout' : 'miss');
+        if (isRev) { F.cur = 0; F.fled = true; st.revNg = (st.revNg || 0) + 1; pop('また来るぞ…', 'miss'); } // 間違えたら逃げられる（また復讐リストに残る）
         line = st.q.boss
           ? `<div class="exp ng"><span class="verdict">${i < 0 ? '時間切れ' : '不正解'}</span>${st.q.exp}</div>`
           : `<div class="rp-after ng"><b>${i < 0 ? '時間切れ…' : 'ざんねん…'}</b><span>${st.q.exp}</span></div>`;
@@ -966,7 +1044,7 @@ export function makeRPG(ctx) {
       if (st.hp <= 0) return finish(false);
       const dead = st.active.filter((i) => foes[i].cur <= 0);
       if (dead.length) {
-        dead.forEach((i) => { const en = st.active.length > 1 ? document.querySelector(`[data-tg="${i}"] .rp-enemy`) : document.getElementById('rp-enemy'); if (en) en.classList.add('ko'); koBook(foes[i]); });
+        dead.forEach((i) => { const en = st.active.length > 1 ? document.querySelector(`[data-tg="${i}"] .rp-enemy`) : document.getElementById('rp-enemy'); if (en) en.classList.add(foes[i].fled ? 'flee' : 'ko'); if (!isRev) koBook(foes[i]); });
         bgm.sfx('ko');
         st.busy = true;
         setTimeout(() => {
@@ -1014,6 +1092,22 @@ export function makeRPG(ctx) {
     function finish(win) {
       st.over = true; clearInterval(st.timer);
       bgm.stop(); bgm.sfx(win ? 'win' : 'lose');
+      if (isRev) {
+        const ok = st.revOk || 0, all = foes.length, r = R();
+        const oni = rev.rush && ok === all;
+        if (oni) r.titles = [...new Set([...(r.titles || []), '復讐の鬼'])];
+        bump('correct', st.correct); save(); ctx.renderTop?.();
+        body().innerHTML = `<div class="rp-result${ok ? ' win' : ''}">
+          <div class="rp-endicon">${ok === all ? '😈' : ok ? '👻' : '💫'}</div>
+          <div class="rp-endtitle">${ok === all ? '完全復讐！' : win ? '復讐おわり' : 'GAME OVER'}</div>
+          <p class="rp-endsub">晴らした恨み ${ok} / ${all}${st.revNg ? `　逃げられた ${st.revNg}` : ''}</p>
+          <div class="rp-rewards"><span>🪙 ${st.revCoins || 0}<em>仕返しボーナス</em></span></div>
+          ${oni ? '<p class="rp-unlock">👑 称号「復讐の鬼」を手に入れた！</p>' : ''}
+          <p class="rp-starrule">正解した問題は本編の「復習」からも消えた。逃げられた敵は、また復讐リストに残る。</p>
+          <div class="row"><button class="rp-btn big" id="rp-back">もどる</button></div></div>`;
+        document.getElementById('rp-back').onclick = closeOv;
+        return;
+      }
       const r = R(), id = `${subj}-${lec}-${n}`, dk = `${id}#${d}`, first = win && !r.stars[dk];
       let coins = 0, exp = 0, food = 0, stars = 0, newBest = false;
       const ups = [];
@@ -1056,7 +1150,7 @@ export function makeRPG(ctx) {
       const c = e.target.closest('#rp-q [data-c]'); if (c && !c.disabled) answer(+c.dataset.c, c);
     };
     layout();
-    setTimeout(() => hsay(isMid ? 'mid' : foes[0].rare ? 'rare' : boss ? 'boss' : d === 2 ? 'geki' : d === 1 ? 'hard' : 'start'), 200);
+    setTimeout(() => hsay(isRev ? 'rev' : isMid ? 'mid' : foes[0].rare ? 'rare' : boss ? 'boss' : d === 2 ? 'geki' : d === 1 ? 'hard' : 'start'), 200);
     nextQuestion();
   }
 

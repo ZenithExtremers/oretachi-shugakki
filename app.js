@@ -673,9 +673,35 @@ const HIMA_API = {
   // ボス戦の問題：その回の本番形式5択を1問（コード・表・図つき）
   async bossQuestion(sid, lec) {
     const s = await getSubject(sid);
-    cur = s;
     const qs = s.groups.filter((g) => String(g.lecture) === String(lec)).flatMap((g) => g.questions);
-    const q = qs[Math.floor(Math.random() * qs.length)];
+    return HIMA_API.renderQ(s, qs[Math.floor(Math.random() * qs.length)]);
+  },
+  // 復讐：決まった1問を出す
+  async questionById(sid, qid) {
+    const s = await getSubject(sid);
+    const q = s.groups.flatMap((g) => g.questions).find((x) => x.id === qid);
+    return q ? HIMA_API.renderQ(s, q) : HIMA_API.bossQuestion(sid, s.groups[0].lecture);
+  },
+  // 復讐の対象：本編の「復習」に入っている問題（間違えた問題・3日後の問題）
+  async revengeList() {
+    const out = [];
+    for (const m of SUBJECTS) {
+      const s = await getSubject(m.id);
+      for (const g of s.groups) for (const q of g.questions) {
+        const st = store.stats[q.id];
+        if (isDue(st)) out.push({ sid: s.id, qid: q.id, lec: g.lecture, w: st.w || 0, t: st.t || 0, title: g.title, q: q.q.replace(/\*\*|`/g, '').slice(0, 40), sname: m.name });
+      }
+    }
+    return out;
+  },
+  // 復讐の結果：正解なら復習リストから消え、間違えたら負けた回数が増える
+  async revengeResult(sid, qid, ok) {
+    const s = await getSubject(sid);
+    const q = s.groups.flatMap((g) => g.questions).find((x) => x.id === qid);
+    if (q) record(q, ok);
+  },
+  renderQ(s, q) {
+    cur = s;
     const g = q.group, ch = choicesOf(q);
     const perm = shuffle(ch.map((_, i) => i));
     return {

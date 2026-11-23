@@ -1247,3 +1247,43 @@ body.rp-night.rp-day {
 .gm-legbtn.on { background: #111; color: #fff; }
 .gm-legend { bottom: 42px; background: rgba(0, 0, 0, .55); border-radius: 8px; padding: 6px; left: 8px; right: auto; max-width: 75%; }
 .gm-legend[hidden] { display: none; }
+
+/* ===== 冒険「復讐」：怨念版の敵 ===== */
+.rp-enemy.onnen { filter: grayscale(1) brightness(.35) drop-shadow(0 0 10px #a21caf) drop-shadow(0 0 4px #ef4444); font-size: calc(44px * var(--sz, 1)); }
+.rp-field.onnen { background: radial-gradient(circle at 20% 50%, rgba(162, 28, 175, .45), rgba(0, 0, 0, .35) 70%) !important; border-color: #a21caf !important; }
+.rp-field.onnen .rp-ename { color: #f0abfc; text-shadow: 0 0 8px rgba(240, 171, 252, .6); }
+.rp-field.onnen .rp-wave { color: #fca5a5; }
+.rp-day .rp-field.onnen .rp-ename { color: #86198f; text-shadow: none; }
+.rp-day .rp-field.onnen .rp-wave { color: #b91c1c; }
+.rp-enemy.flee { animation: rp-flee .6s forwards; }
+@keyframes rp-flee { to { transform: translateX(120px) scale(.6); opacity: 0; } }
+.rp-revhead { margin-top: 14px; padding: 14px; border-radius: 16px; background: linear-gradient(135deg, #2e1065, #4a044e); color: #fff; }
+.rp-revhead b { display: block; font-size: 20px; }
+.rp-revhead span { font-size: 12.5px; color: #f5d0fe; }
+.rp-revcount { display: flex; justify-content: space-around; margin: 10px 0; font-size: 12px; }
+.rp-revcount b { font-size: 18px; color: #c026d3; }
+.rp-nemesis { display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 10px; border-radius: 16px; border: 2px solid #a21caf; background: linear-gradient(135deg, rgba(162, 28, 175, .25), rgba(0, 0, 0, .2)); }
+.rp-nemi { font-size: 44px; filter: grayscale(1) brightness(.35) drop-shadow(0 0 8px #a21caf); }
+.rp-nemesis > div { flex: 1; min-width: 0; }
+.rp-nemesis em { font-style: normal; font-size: 11px; font-weight: 900; color: #fff; background: #a21caf; padding: 1px 8px; border-radius: 99px; }
+.rp-nemesis b { display: block; margin-top: 4px; font-size: 14px; }
+.rp-nemesis small, .rp-revitem small { display: block; font-size: 11px; color: var(--muted); font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-rush { margin-top: 8px; background: linear-gradient(180deg, #a21caf, #581c87) !important; color: #fff !important; border-color: #f0abfc !important; }
+.rp-revlist { display: grid; gap: 6px; }
+.rp-revitem { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255, 255, 255, .06); font-size: 13px; font-weight: 700; }
+.rp-day .rp-revitem { background: rgba(255, 255, 255, .85); }
+.rp-revitem > div { flex: 1; min-width: 0; }
+.rp-revitem em { font-style: normal; font-size: 12px; font-weight: 900; color: #c026d3; }
+.rp-revitem.nem { border-color: #a21caf; }
+.rp-revic { font-size: 22px; filter: grayscale(1) brightness(.4); }
+.rp-revlist.done .rp-revic { filter: none; }
+.rp-revpeace { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 30px 10px; }
+.rp-revpeace span { font-size: 56px; }
+.rp-revpeace small { color: var(--muted); }
+.rp-field.onnen .rp-wave { white-space: normal; letter-spacing: 0; line-height: 1.35; overflow-wrap: anywhere; }
+.rp-field.onnen .rp-einfo { overflow: hidden; }
+.rp-field { min-width: 0; max-width: 100%; }
+.rp-revlist { grid-template-columns: minmax(0, 1fr); }
+.rp-revitem, .rp-nemesis { min-width: 0; }
+.rp-revitem > div, .rp-nemesis > div { overflow: hidden; }
+.rp-revitem > div, .rp-nemesis b { overflow-wrap: anywhere; }
