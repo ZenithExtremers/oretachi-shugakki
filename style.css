@@ -1287,3 +1287,6 @@ body.rp-night.rp-day {
 .rp-revitem, .rp-nemesis { min-width: 0; }
 .rp-revitem > div, .rp-nemesis > div { overflow: hidden; }
 .rp-revitem > div, .rp-nemesis b { overflow-wrap: anywhere; }
+.rp-powrow { display: flex; align-items: center; gap: 8px; }
+.rp-partyb { min-height: 34px; padding: 4px 10px; font-size: 13px; border-radius: 99px; white-space: nowrap; }
+.rp-chead .rp-hudright { align-items: flex-end; }

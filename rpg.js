@@ -243,7 +243,7 @@ export function makeRPG(ctx) {
 
   /* ---------- 冒険（ゲーム画面）：下のゲーム用タブで マップ・編成・ガチャ・図鑑・目標 ---------- */
   let gtab = 'map', $m = null, mapView = 'chapters', mapDiff = 0; // マップ：章の一覧 → ステージ（難易度タブ）
-  const GTABS = [['map', '🗺️', 'マップ'], ['party', '👥', '編成'], ['gacha', '🎁', 'ガチャ'], ['revenge', '👻', '復讐'], ['zukan', '📖', '図鑑'], ['goals', '🎯', '目標']];
+  const GTABS = [['map', '🗺️', 'マップ'], ['gacha', '🎁', 'ガチャ'], ['revenge', '👻', '復讐'], ['zukan', '📖', '図鑑'], ['goals', '🎯', '目標']];
   async function renderQuestTab(m) {
     $m = m;
     if (!lectures) lectures = await api.lectures();
@@ -254,6 +254,8 @@ export function makeRPG(ctx) {
       const b = e.target.closest('[data-gtab]'); if (!b) return;
       bgm.sfx('tap'); gtab = b.dataset.gtab; renderQuestTab(m);
     };
+    // 編成は戦闘力の右のボタンから開く（下のタブには置かない）
+    m.addEventListener('click', (e) => { if (e.target.closest('[data-party]')) { e.stopPropagation(); bgm.sfx('tap'); gtab = 'party'; renderQuestTab(m); } }, true);
     const pg = m.querySelector('#rp-page');
     window.scrollTo(0, 0);
     if (gtab === 'map') (mapView === 'chapters' ? renderChapters(pg) : renderMap(pg));
@@ -301,7 +303,7 @@ export function makeRPG(ctx) {
         <img class="rp-heroimg" src="icons/icon-192.png" alt="" data-rp="talk">
         <div class="rp-herotxt">${heroTitle() ? `<span class="rp-title">${esc(heroTitle())}</span>` : ''}<button class="rp-name" data-rp="rename"><b>${esc(heroName())}</b><span>✏️</span></button>
           <div class="rp-lv">Lv.${r.hero.lv}<span class="rp-exp"><i style="width:${(r.hero.exp / needExp(r.hero.lv)) * 100}%"></i></span></div></div>
-        <div class="rp-hudright"><span class="rp-coin">🪙 ${r.coins}</span><span class="rp-pow">戦闘力 <b>${teamPower(r.subj).toLocaleString()}</b></span></div>
+        <div class="rp-hudright"><span class="rp-coin">🪙 ${r.coins}</span><span class="rp-powrow"><span class="rp-pow">戦闘力 <b>${teamPower(r.subj).toLocaleString()}</b></span><button class="rp-btn rp-partyb" data-party>👥 編成</button></span></div>
       </div>
       <h3 class="rp-zsec">章を選ぶ</h3>
       <div class="rp-chapters">${CHAPTERS.map((c, i) => {
@@ -372,7 +374,7 @@ export function makeRPG(ctx) {
         </div>
         <div class="rp-hudparty">
           <div class="rp-faces">${t.map((x) => iconHTML(x.id, 'sm')).join('')}${Array(4 - t.length).fill('<span class="rp-face sm empty">＋</span>').join('')}</div>
-          <div class="rp-stat"><span class="rp-pow">戦闘力 <b>${teamPower(r.subj).toLocaleString()}</b></span><span>HP <b>${t.reduce((a, x) => a + x.hp, 0)}</b>　攻撃 <b>${t.reduce((a, x) => a + x.atk, 0)}</b></span></div>
+          <div class="rp-stat"><span class="rp-powrow"><span class="rp-pow">戦闘力 <b>${teamPower(r.subj).toLocaleString()}</b></span><button class="rp-btn rp-partyb" data-party>👥 編成</button></span><span>HP <b>${t.reduce((a, x) => a + x.hp, 0)}</b>　攻撃 <b>${t.reduce((a, x) => a + x.atk, 0)}</b></span></div>
         </div>
         <button class="rp-chback" data-rp="chapters">‹ 章の一覧<b>第${CHAPTERS.findIndex((c) => c.id === r.subj) + 1}章 ${esc((CHAPTERS.find((c) => c.id === r.subj) || {}).name || '')}</b></button>
       </div>
@@ -620,6 +622,7 @@ export function makeRPG(ctx) {
       const d = sel ? member(sel) : null;
       const o = sel === 'hero' ? r.hero : sel ? r.owned[sel] : null;
       B.innerHTML = `
+        <button class="rp-chback rp-full" data-gtab="map">‹ マップに戻る<b>パーティ編成</b></button>
         <div class="rp-form rp-full">
           <div class="rp-formhead"><b>編成</b><span>戦闘力 <b>${teamPower(r.subj).toLocaleString()}</b><small>（${esc(SUBJNAME(r.subj))}）</small></span></div>
           <div class="rp-slots">
