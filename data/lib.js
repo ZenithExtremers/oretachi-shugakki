@@ -11,7 +11,7 @@ export function spread(groups) {
   let k = 0;
   for (const g of groups) for (const q of g.questions) {
     if (!q.choices || q.fixed) continue;
-    const n = q.choices.length, target = (k++ * 2 + 1) % n, shift = (target - q.answer + n) % n;
+    const n = q.choices.length, target = (k++ * 3 + 1) % n, shift = (target - q.answer + n) % n;
     q.choices = q.choices.map((_, i) => q.choices[(i - shift + n) % n]);
     q.answer = target;
   }

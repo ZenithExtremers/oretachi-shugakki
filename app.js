@@ -286,9 +286,9 @@ function makeSession(s, { kind, mode, title, groups, minutes = 0 }) {
   for (const { g, qs } of groups) {
     pages.push({ gid: g.id, qids: qs.map((q) => q.id) });
     const doShuffle = isPast(g) ? shufflePast : shuffleOrig;
-    const perm = () => (doShuffle ? shuffle([0, 1, 2, 3, 4]) : [0, 1, 2, 3, 4]);
-    if (g.sharedChoices) order[g.id] = perm();
-    for (const q of qs) if (!g.sharedChoices) order[q.id] = perm();
+    const perm = (n) => { const a = [...Array(n).keys()]; return doShuffle ? shuffle(a) : a; }; // 選択肢の数に合わせる（TOEIC は4択）
+    if (g.sharedChoices) order[g.id] = perm(g.sharedChoices.length);
+    for (const q of qs) if (!g.sharedChoices) order[q.id] = perm(q.choices.length);
   }
   session = {
     subject: s.id, kind, mode, title, minutes, pages, order,

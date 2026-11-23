@@ -1,3 +1,4 @@
+import { L1, L2, L3 } from './toeic/words.js';
 // ヒマコロシの単語帳（秋学期の科目の用語と意味）。講義資料の言い回しに合わせる。
 // [用語, 意味]。同じ単語帳の中で用語・意味が重ならないようにする（4択の選択肢になるため）
 export default [
@@ -155,4 +156,7 @@ export default [
       ['コンポジット状態', '内部に状態（サブ状態）を含む状態'],
     ],
   },
+  { id: 'toeic1', name: 'TOEIC Lv.1（500点）', mark: 'T1', color: '#ea580c', words: L1 },
+  { id: 'toeic2', name: 'TOEIC Lv.2（650点）', mark: 'T2', color: '#c2410c', words: L2 },
+  { id: 'toeic3', name: 'TOEIC Lv.3（800点）', mark: 'T3', color: '#9a3412', words: L3 },
 ];

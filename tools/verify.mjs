@@ -61,8 +61,8 @@ for (const meta of subjects) {
       const w = `${where}/${q.id}`;
       if (ids.has(q.id)) err(w, 'question id が重複'); ids.add(q.id);
       const ch = q.choices || g.sharedChoices;
-      if (!ch || ch.length !== 5) err(w, '選択肢が5つでない');
-      else if (new Set(ch.map((c) => (q.tableChoices || g.tableChoices ? norm(c) : c))).size !== 5) err(w, '選択肢に同じものがある');
+      if (!ch || ch.length !== (subj.choices || 5)) err(w, `選択肢が${subj.choices || 5}つでない`);
+      else if (new Set(ch.map((c) => (q.tableChoices || g.tableChoices ? norm(c) : c))).size !== ch.length) err(w, '選択肢に同じものがある');
       const qsql = q.sql || ((q.lang || g.lang) === 'sql' && (q.tableChoices || g.tableChoices) ? q.code : null);
       if (qsql && g.tables) {
         const got = checkSQL(w, g.tables, qsql, ch[q.answer]);

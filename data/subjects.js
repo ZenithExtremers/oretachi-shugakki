@@ -26,4 +26,12 @@ export default [
     color: '#7c3aed',
     module: './sd/index.js',
   },
+  {
+    id: 'toeic',
+    name: 'TOEIC',
+    mark: 'TOEIC',
+    sub: 'Part 5 短文穴埋め・単語集（レベル別）',
+    color: '#ea580c',
+    module: './toeic/index.js',
+  },
 ];
