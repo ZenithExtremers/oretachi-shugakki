@@ -5,6 +5,7 @@
 import { bgm } from './bgm.js';
 import { ENEMIES } from './enemies.js';
 import { STAGE } from './enemies-stage.js';
+import { CHAR_ART } from './charart.js';
 
 /* ---------- データ ---------- */
 // 仲間。subj が一致するステージでは攻撃力×1.5（'all' はどこでも×1.2）
@@ -167,6 +168,7 @@ export function makeRPG(ctx) {
   const iconHTML = (id, cls = '') => {
     if (id === 'hero') return `<img class="rp-face ${cls}" src="icons/icon-192.png" alt="">`;
     const c = CHARS[id];
+    if (CHAR_ART[id]) return `<span class="rp-face rp-artf ${cls}">${CHAR_ART[id]}</span>`; // オリジナルイラスト（章限定の仲間）
     return c.icon === 'owl' ? `<span class="rp-face rp-owl ${cls}">${owlSVG(2)}</span>` : `<span class="rp-face rp-emo ${cls}">${c.icon}</span>`;
   };
   const member = (id) => {
@@ -567,40 +569,71 @@ export function makeRPG(ctx) {
   }
 
   /* ---------- ガチャ ---------- */
-  function pullOne() {
-    const x = Math.random(), rar = x < 0.06 ? 3 : x < 0.32 ? 2 : 1;
-    const pool = Object.keys(CHARS).filter((id) => CHARS[id].rar === rar && !CHARS[id].limited);
+  // 確率：★★★ 6% ・ ★★ 26% ・ ★ 68%。天井：★★★が出ないまま50回目は★★★確定。10連は★★以上1体確定
+  const PITY = 50;
+  const poolOf = (rar) => Object.keys(CHARS).filter((id) => CHARS[id].rar === rar && !CHARS[id].limited);
+  function pullOne(minRar = 1) {
+    const r = R();
+    let x = Math.random(), rar = x < 0.06 ? 3 : x < 0.32 ? 2 : 1;
+    if ((r.pity || 0) + 1 >= PITY) rar = 3;
+    rar = Math.max(rar, minRar);
+    r.pity = rar === 3 ? 0 : (r.pity || 0) + 1;
+    const pool = poolOf(rar);
     return pool[rnd(pool.length)];
   }
+  // 召喚の演出（約1.5秒・タップでスキップ）：門が開く → 光の色でレア度を予告 → カードがめくれる
+  function playGacha(res, done) {
+    const top = Math.max(...res.map(([id]) => CHARS[id].rar));
+    const promo = top === 3 && Math.random() < 0.3; // たまに青 → 金に昇格
+    const ov = document.createElement('div');
+    ov.className = `rp-gfx r${top}${promo ? ' promo' : ''}${res.length > 1 ? ' ten' : ''}`;
+    ov.innerHTML = `<div class="rp-gate"><i></i><i></i></div><div class="rp-pillar"></div>${top === 3 ? '<div class="rp-confetti">' + Array.from({ length: 24 }, (_, i) => `<b style="left:${(i * 37) % 100}%;animation-delay:${(i % 8) * 0.06}s"></b>`).join('') + '</div>' : ''}
+      <div class="rp-gcards">${res.map(([id, isNew], i) => `<div class="rp-gcard r${CHARS[id].rar}" style="animation-delay:${0.9 + i * (res.length > 1 ? 0.06 : 0)}s"><div class="f">${iconHTML(id)}<span class="rp-rar">${RAR[CHARS[id].rar]}</span><small>${esc(CHARS[id].name)}</small>${isNew ? '<em>NEW!</em>' : ''}</div></div>`).join('')}</div>
+      <p class="rp-gskip">タップでスキップ</p>`;
+    document.body.appendChild(ov);
+    bgm.sfx('gacha'); if (top === 3) setTimeout(() => bgm.sfx('rare'), 700);
+    let ended = false;
+    const end = () => { if (ended) return; ended = true; ov.remove(); done(); };
+    ov.onclick = end;
+    setTimeout(() => { ov.classList.add('fin'); }, 1500);
+    setTimeout(end, top === 3 ? 2600 : 2100);
+  }
   function openGacha(B) {
+    let showRates = false;
+    const feat = poolOf(3).slice(0, 3);
     const draw = (res) => {
-      const r = R();
+      const r = R(), left = PITY - (r.pity || 0);
       B.innerHTML = `
-        <div class="rp-gacha rp-full"><div class="rp-gbox${res ? ' open' : ''}">🎁</div>
-          <p class="rp-rates">★★★ 6% ・ ★★ 26% ・ ★ 68%　かぶったら限界突破（レベル上限+1）</p>
-          ${r.tickets ? `<button class="rp-btn gold big wide rp-ticket" data-g="t">🎟️ チケットで1回<small>のこり ${r.tickets}枚</small></button>` : ''}
-          <div class="row"><button class="rp-btn gold big" data-g="1" ${r.coins < 100 ? 'disabled' : ''}>1回<small>🪙100</small></button><button class="rp-btn gold big" data-g="10" ${r.coins < 900 ? 'disabled' : ''}>10回<small>🪙900</small></button></div>
-          <p class="rp-have">持っている 🪙 <b>${r.coins}</b></p></div>
-        ${res ? `<div class="rp-gres">${res.map(([id, isNew], i) => `<span class="rp-gitem r${CHARS[id].rar}" style="animation-delay:${i * 0.08}s">${iconHTML(id)}<span class="rp-rar">${RAR[CHARS[id].rar]}</span><small>${esc(CHARS[id].name)}</small><em>${isNew ? 'NEW!' : '上限+1'}</em></span>`).join('')}</div>` : ''}`;
+        <div class="rp-gbanner"><div class="rp-gbt"><b>秋学期ガチャ</b><small>★★★ 6%　10連は★★以上1体確定</small></div>
+          <div class="rp-gfeat">${feat.map((id) => `<span>${iconHTML(id)}<small>${esc(CHARS[id].name)}</small></span>`).join('')}</div></div>
+        <div class="rp-pity"><span>★★★確定まで あと <b>${left}</b> 回</span><span class="rp-pbar"><i style="width:${((PITY - left) / PITY) * 100}%"></i></span></div>
+        ${r.tickets ? `<button class="rp-btn gold big wide rp-ticket" data-g="t">🎟️ チケットで1回<small>のこり ${r.tickets}枚</small></button>` : ''}
+        <div class="row rp-gbtns"><button class="rp-btn gold big" data-g="1" ${r.coins < 100 ? 'disabled' : ''}>1回<small>🪙100</small></button><button class="rp-btn gold big rp-g10" data-g="10" ${r.coins < 900 ? 'disabled' : ''}>10連<small>🪙900・★★以上確定</small></button></div>
+        <p class="rp-have">持っている 🪙 <b>${r.coins}</b>　<button class="rp-link" data-rates>${showRates ? '閉じる' : '提供割合・キャラ一覧'}</button></p>
+        ${showRates ? `<div class="rp-rates2">${[3, 2, 1].map((k) => `<div><b>${RAR[k]}　${k === 3 ? '6%' : k === 2 ? '26%' : '68%'}</b><span>${poolOf(k).map((id) => esc(CHARS[id].name)).join('・')}</span></div>`).join('')}<p class="muted small">かぶったら限界突破（レベル上限+1）。章限定の仲間はガチャには出ない。</p></div>` : ''}
+        ${res ? `<div class="rp-gres">${res.map(([id, isNew], i) => `<span class="rp-gitem r${CHARS[id].rar}" style="animation-delay:${i * 0.05}s">${iconHTML(id)}<span class="rp-rar">${RAR[CHARS[id].rar]}</span><small>${esc(CHARS[id].name)}</small><em>${isNew ? 'NEW!' : '上限+1'}</em></span>`).join('')}</div>` : ''}`;
     };
     draw();
     B.onclick = (e) => {
+      if (e.target.closest('[data-rates]')) { showRates = !showRates; draw(); return; }
       const b = e.target.closest('[data-g]'); if (!b || b.disabled) return;
       const r = R(), tk = b.dataset.g === 't', n = tk ? 1 : +b.dataset.g, cost = tk ? 0 : n === 10 ? 900 : 100;
       if (tk ? !r.tickets : r.coins < cost) return;
       if (tk) r.tickets--; else r.coins -= cost;
       r.pulls += n;
-      const res = [];
-      for (let i = 0; i < n; i++) {
-        const id = pullOne();
-        if (r.owned[id]) { r.owned[id].lb = (r.owned[id].lb || 0) + 1; res.push([id, false]); } // かぶり → 限界突破（上限+1）
-        else { r.owned[id] = { lv: 1, exp: 0 }; res.push([id, true]); if (r.party.length < 3) r.party.push(id); }
-      }
-      save(); draw(res);
-      const rare = res.some(([id]) => CHARS[id].rar === 3);
-      bgm.sfx('gacha'); if (rare) setTimeout(() => bgm.sfx('rare'), 500);
-      if (rare) toast(`${heroName()}「${pick(HLINE.gacha3)}」`);
-      else if (res.every(([id]) => CHARS[id].rar === 1)) toast(`${heroName()}「${pick(HLINE.gacha1)}」`);
+      const ids = [];
+      for (let i = 0; i < n; i++) ids.push(pullOne(n === 10 && i === 9 && !ids.some((x) => CHARS[x].rar >= 2) ? 2 : 1));
+      const res = ids.map((id) => {
+        if (r.owned[id]) { r.owned[id].lb = (r.owned[id].lb || 0) + 1; return [id, false]; } // かぶり → 限界突破（上限+1）
+        r.owned[id] = { lv: 1, exp: 0 }; if (r.party.length < 3) r.party.push(id); return [id, true];
+      });
+      save();
+      playGacha(res, () => {
+        draw(res);
+        const rare = res.some(([id]) => CHARS[id].rar === 3);
+        if (rare) toast(`${heroName()}「${pick(HLINE.gacha3)}」`);
+        else if (res.every(([id]) => CHARS[id].rar === 1)) toast(`${heroName()}「${pick(HLINE.gacha1)}」`);
+      });
     };
   }
 

@@ -5,6 +5,7 @@
 import DECKS from './data/hima-words.js';
 import { makeRPG, CHARS } from './rpg.js';
 import { bgm } from './bgm.js';
+import { CHAR_ART } from './charart.js';
 
 const KEY = 'oretachi:hima';
 const DEF = {
@@ -142,6 +143,7 @@ function partnerArt(happy) {
   if (id === 'owl') return owlSVG(stage(), happy);
   if (id === 'hero') return `<img class="hk-pimg${happy ? ' happy' : ''}" src="icons/icon-192.png" alt="">`;
   const c = CHARS[id];
+  if (CHAR_ART[id]) return `<span class="hk-pemo hk-partart${happy ? ' happy' : ''}">${CHAR_ART[id]}</span>`;
   return c.icon === 'owl' ? owlSVG(stage(), happy) : `<span class="hk-pemo${happy ? ' happy' : ''}">${c.icon}</span>`;
 }
 function renderHome(happy) {
@@ -181,7 +183,7 @@ function openPartnerPick() {
     <div class="hk-pick">${ids.map((id) => {
       if (!owned(id)) return '<span class="hk-pcell lock"><span class="hk-pface">？</span><small>未発見</small></span>';
       const info = id === 'owl' ? { name: 'フクロウ', lv: S.owl.lv } : rpg.memberInfo(id);
-      const face = id === 'owl' ? `<span class="hk-pface owl">${owlSVG(stage())}</span>` : id === 'hero' ? '<img class="hk-pface" src="icons/icon-192.png" alt="">' : `<span class="hk-pface">${CHARS[id].icon}</span>`;
+      const face = id === 'owl' ? `<span class="hk-pface owl">${owlSVG(stage())}</span>` : id === 'hero' ? '<img class="hk-pface" src="icons/icon-192.png" alt="">' : (CHAR_ART[id] ? `<span class="hk-pface hk-partart">${CHAR_ART[id]}</span>` : `<span class="hk-pface">${CHARS[id].icon}</span>`);
       return `<button class="hk-pcell${partner() === id ? ' on' : ''}" data-partner="${id}">${face}<small>${esc(info.name)}</small><em>Lv.${info.lv}</em></button>`;
     }).join('')}</div>`;
   body().onclick = (e) => {
