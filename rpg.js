@@ -222,7 +222,7 @@ export function makeRPG(ctx) {
   const SKW = { dmg: 25, heal: 120, time: 5, guard: 18, hint: 50, healguard: 160 };
   function power(id, subj = R().subj) {
     const m = member(id), k = m.skill;
-    const bonus = m.subj === subj ? 1.5 : m.subj === 'all' ? 1.2 : 1;
+    const bonus = m.subj === subj ? 1.3 : m.subj === 'all' ? 1.2 : 1;
     const sk = (k.kind === 'hint' ? SKW.hint : SKW[k.kind] * k.pow) * (3 / k.cost) * (1 + (m.lv - 1) * 0.05);
     return Math.round(m.hp / 2 + m.atk * 5 * bonus + sk);
   }
@@ -748,7 +748,7 @@ export function makeRPG(ctx) {
     setCleanup(() => { clearInterval(st.timer); bgm.play('map'); });
     bgm.play(boss ? 'boss' : 'battle');
 
-    const atkOf = (x) => x.atk * (x.subj === subj ? 1.5 : x.subj === 'all' ? 1.2 : 1);
+    const atkOf = (x) => x.atk * (x.subj === subj ? 1.3 : x.subj === 'all' ? 1.2 : 1); // 得意科目 ×1.3
     const partyAtk = () => t.reduce((a, x) => a + atkOf(x), 0);
 
     const left = () => st.active.filter((i) => foes[i].cur > 0).length + st.waves.slice(st.wave + 1).reduce((a, w) => a + w.length, 0);
@@ -915,15 +915,15 @@ export function makeRPG(ctx) {
       let line = '';
       if (ok) {
         st.combo++; st.correct++;
-        const speed = 1 + (Math.max(0, st.left) / st.total) * 0.6; // 1.0〜1.6
+        const speed = 1 + (Math.max(0, st.left) / st.total) * 0.4; // 答えの速さ ×1.0〜1.4
         const mult = ev === 'chance' ? 2 : 1;
-        const big = speed > 1.45 || st.combo >= 3 || mult > 1;
+        const big = speed > 1.3 || st.combo >= 3 || mult > 1;
         anim(document.getElementById('rp-team'), 'atk'); // 仲間が飛びかかる
         await wait(380);
         if (st.over) return;
         // 仲間が1人ずつ攻撃。狙った敵が倒れたら、残りの攻撃は自動で次の敵へ
         const bonus = speed * mult * (1 + Math.min(st.combo - 1, 5) * 0.1);
-        const lbl = mult > 1 ? 'チャンス！' : st.combo > 1 ? `${st.combo}コンボ` : speed > 1.45 ? 'はやい！' : '';
+        const lbl = mult > 1 ? 'チャンス！' : st.combo > 1 ? `${st.combo}コンボ` : speed > 1.3 ? 'はやい！' : '';
         for (const [k, x] of t.entries()) {
           if (st.over) return;
           if (foes[st.fi].cur <= 0) { const nx = st.active.find((i) => foes[i].cur > 0); if (nx === undefined) break; st.fi = nx; drawField(); }
@@ -931,7 +931,7 @@ export function makeRPG(ctx) {
           const tm = document.querySelectorAll('.rp-tm')[k]; if (tm) { tm.classList.remove('hit1'); void tm.offsetWidth; tm.classList.add('hit1'); }
           await wait(150);
         }
-        hsay(st.combo >= 3 ? 'combo' : speed > 1.45 ? 'fast' : big ? 'big' : 'ok');
+        hsay(st.combo >= 3 ? 'combo' : speed > 1.3 ? 'fast' : big ? 'big' : 'ok');
         t.forEach((x) => { st.gauge[x.id]++; });
         drawTeam();
         line = `<div class="rp-after ok"><b>正解！</b>${st.q.boss ? '' : `<span>${st.q.exp}</span>`}</div>`;
@@ -994,7 +994,8 @@ export function makeRPG(ctx) {
       if (k.kind === 'heal') { st.hp = Math.min(st.maxHp, st.hp + st.maxHp * k.pow); pop('回復！', 'heal'); bgm.sfx('heal'); drawHp(); }
       else if (k.kind === 'dmg') {
         bgm.sfx('skill');
-        if (st.active.length > 1) st.active.forEach((i) => hitEnemy(atkOf(x) * k.pow * 0.7, '全体攻撃', true, i)); // 敵が2体以上なら全体攻撃
+        const live = st.active.filter((i) => foes[i].cur > 0);
+        if (live.length > 1) live.forEach((i) => hitEnemy((atkOf(x) * k.pow) / live.length, '割り振り', true, i)); // 敵が2体以上なら、ダメージを敵の数で割り振る
         else hitEnemy(atkOf(x) * k.pow, k.name, true);
         if (st.active.some((i) => foes[i].cur <= 0) && !st.busy) { st.busy = true; clearInterval(st.timer); document.querySelectorAll('#rp-q [data-c]').forEach((b) => { b.disabled = true; }); setTimeout(afterTurn, 600); } }
       else if (k.kind === 'time') { st.bonusT += k.pow; st.left += k.pow; st.total += k.pow; pop(`+${k.pow}秒`, 'info'); bgm.sfx('skill'); }
