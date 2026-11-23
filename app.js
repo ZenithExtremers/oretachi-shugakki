@@ -143,10 +143,10 @@ async function viewHome() {
     const days = s.meta.examDate ? Math.ceil((new Date(s.meta.examDate + 'T00:00:00') - new Date(new Date().toDateString())) / 86400000) : null;
     return `<button class="stile" data-act="nav" data-to="s/${s.id}" style="--c:${s.meta.color}">
       <span class="stile-top"><span class="stile-mark">${esc(s.meta.mark || '')}</span>${days != null && days >= 0 ? `<span class="stile-days">${days === 0 ? '今日が本番！' : `期末まで <b>${days}</b>日`}</span>` : ''}</span>
-      <b class="stile-name">${esc(s.meta.name)}</b>
+      <b class="stile-name">${esc(s.meta.short || s.meta.name)}</b>
       <span class="stile-row"><span>正答率</span><b>${acc == null ? '—' : acc + '%'}</b></span>
       <span class="stile-bar"><i style="width:${acc || 0}%"></i></span>
-      <span class="stile-sub">解いた ${tried}/${qs.length}問 ・ 基礎 ${lessonsDone}/${s.lessons.length}</span>
+      <span class="stile-sub"><span>問題 ${tried}/${qs.length}</span><span>基礎 ${lessonsDone}/${s.lessons.length}</span></span>
     </button>`;
   };
   $app.innerHTML = `

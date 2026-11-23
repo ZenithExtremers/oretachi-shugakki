@@ -3,6 +3,7 @@ export default [
   {
     id: 'ccpp',
     name: 'C/C++プログラミング',
+    short: 'C/C++',
     mark: 'C++',
     sub: '中間・期末 本番形式（5択）',
     color: '#2563eb',

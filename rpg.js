@@ -28,6 +28,15 @@ export const CHARS = {
   ryu: { name: 'リュウ', icon: '🐉', rar: 3, subj: 'all', hp: 120, atk: 30, skill: { kind: 'dmg', pow: 5, cost: 5, name: 'りゅうのいぶき' } },
 };
 const HERO = { name: '主人公', hp: 100, atk: 20, skill: { kind: 'hint', pow: 2, cost: 4, name: 'ひとさし指のひらめき' } };
+// 主人公のスキル：50レベルごとに新しいスキルを覚え、編成画面で1つを選んで装備する
+const HERO_SKILLS = [
+  { lv: 1, kind: 'hint', pow: 2, cost: 4, name: 'ひとさし指のひらめき' },
+  { lv: 50, kind: 'dmg', pow: 6, cost: 4, name: 'セイキンショット！' },
+  { lv: 100, kind: 'healguard', pow: 1, cost: 5, name: 'ありがとうございました！' },
+  { lv: 150, kind: 'time', pow: 25, cost: 3, name: '今日はこれをやっていきます' },
+];
+// 主人公の上限開放の素材（ゲキムズで敵を倒すとたまに手に入る）
+const MAT = { name: '覚醒の結晶', icon: '💎', drop: 0.05, bossDrop: 0.2, plus: 5 };
 const HERO_PROFILE = '「〜していきたいと思います！」が口ぐせの、明るく丁寧な実況冒険者。おいしいものと新しいことが大好きで、何にでも全力でリアクションする。人差し指を立てたら、ひらめきの合図。';
 const SKILL_DESC = {
   heal: (k) => `パーティのHPを${Math.round(k.pow * 100)}%回復`,
@@ -35,6 +44,7 @@ const SKILL_DESC = {
   time: (k) => `制限時間を${k.pow}秒のばす`,
   guard: (k) => `次の${k.pow}回、受けるダメージ半分`,
   hint: () => '不正解の選択肢を2つ消す',
+  healguard: () => 'パーティのHPを全回復し、次の2回受けるダメージ半分',
 };
 const RAR = ['', '★', '★★', '★★★'];
 // レベル上限（★ごと）。ガチャでかぶると上限+1（限界突破）。主人公は上限なし（保留中）
@@ -55,6 +65,10 @@ const HLINE = {
   timeout: ['いやー、考えすぎちゃいましたね…'],
   skill: ['ここで…使っていきたいと思います！', 'セイキンショット！'],
   hint: ['ちょっと、ひとついいですか？'],
+  shot: ['セイキンショット！'],
+  thanks: ['ありがとうございました！'],
+  today: ['今日はこれをやっていきたいと思います！'],
+  mat: ['うわっ、結晶が出ました！これはうれしい！'],
   heal: ['ありがとうございます、助かります！'],
   pinch: ['ちょっと待ってください、これヤバいです…！'],
   chance: ['きましたね〜！チャンスです！'],
@@ -116,6 +130,7 @@ export function makeRPG(ctx) {
     if (!r.sound) r.sound = 'silent'; // 'silent' | 'bgm'（講義中に使うので最初はサイレント）
     if (!r.stars) { r.stars = {}; for (const id of Object.keys(r.clear)) r.stars[`${id}#0`] = 1; } // 前のデータのクリアは★1から
     if (!r.zukan) r.zukan = {};
+    if (r.heroLb === undefined) { r.heroLb = Math.max(0, Math.ceil((r.hero.lv - 50) / MAT.plus)); r.mats = r.mats || 0; r.heroSkill = 0; }
     if (!r.capv) { for (const [id, o] of Object.entries(r.owned)) { const b = RCAP[CHARS[id]?.rar] || 99; o.lb = Math.max(o.lb || 0, o.lv - b); } r.capv = 1; } // 前のデータで上限を超えている分は限界突破あつかい
     return r;
   };
@@ -130,13 +145,13 @@ export function makeRPG(ctx) {
   };
   const member = (id) => {
     const r = R();
-    if (id === 'hero') return { id, name: heroName(), lv: r.hero.lv, hp: statOf(HERO.hp, r.hero.lv), atk: statOf(HERO.atk, r.hero.lv), skill: HERO.skill, subj: null };
+    if (id === 'hero') return { id, name: heroName(), lv: r.hero.lv, hp: statOf(HERO.hp, r.hero.lv), atk: statOf(HERO.atk, r.hero.lv), skill: HERO_SKILLS[r.heroSkill || 0] || HERO.skill, subj: null };
     const c = CHARS[id], o = r.owned[id];
     return { id, name: c.name, lv: o.lv, hp: statOf(c.hp, o.lv), atk: statOf(c.atk, o.lv), skill: c.skill, subj: c.subj, rar: c.rar };
   };
   const team = () => ['hero', ...R().party.filter((id) => R().owned[id])].map(member);
   // レベル上限（主人公は上限なし）
-  const capOf = (id) => (id === 'hero' ? Infinity : (RCAP[CHARS[id].rar] || 50) + (R().owned[id]?.lb || 0));
+  const capOf = (id) => (id === 'hero' ? 50 + (R().heroLb || 0) * MAT.plus : (RCAP[CHARS[id].rar] || 50) + (R().owned[id]?.lb || 0));
   // 経験値を足す（上限で止まる）。上がったレベル数を返す
   function addExp(id, o, n) {
     const cap = capOf(id); let ups = 0;
@@ -147,7 +162,7 @@ export function makeRPG(ctx) {
     return ups;
   }
   // 戦闘力：HP÷2 ＋ 攻撃×5（今の科目が得意なら×1.5、全科目なら×1.2）＋ スキルの強さ
-  const SKW = { dmg: 25, heal: 120, time: 5, guard: 18, hint: 50 };
+  const SKW = { dmg: 25, heal: 120, time: 5, guard: 18, hint: 50, healguard: 160 };
   function power(id, subj = R().subj) {
     const m = member(id), k = m.skill;
     const bonus = m.subj === subj ? 1.5 : m.subj === 'all' ? 1.2 : 1;
@@ -420,8 +435,10 @@ export function makeRPG(ctx) {
             <div class="rp-lv">Lv.${d.lv}${sel === 'hero' ? '' : `<small>/${capOf(sel)}</small>`}<span class="rp-exp"><i style="width:${o.lv >= capOf(sel) ? 100 : (o.exp / needExp(o.lv)) * 100}%"></i></span><small>${o.lv >= capOf(sel) ? '上限' : `${o.exp}/${needExp(o.lv)}`}</small></div></div>
             <button class="rp-x" data-close-detail aria-label="閉じる">✕</button></div>
           <div class="rp-tags"><em class="pw">戦闘力 ${power(sel)}</em><em>HP ${d.hp}</em><em>攻撃 ${d.atk}</em>${o.lb ? `<em>突破+${o.lb}</em>` : ''}<em>得意 ${d.subj == null ? 'なし' : d.subj === 'all' ? 'ぜんぶ' : SUBJ.find((x) => x[0] === d.subj)[1]}</em></div>
-          ${sel === 'hero' ? `<p class="rp-prof">${esc(HERO_PROFILE)}</p>` : ''}
-          <p class="rp-skill">スキル「${esc(d.skill.name)}」：${SKILL_DESC[d.skill.kind](d.skill)}（正解${d.skill.cost}回でたまる）</p>
+          ${sel === 'hero' ? `<p class="rp-prof">${esc(HERO_PROFILE)}</p>
+          <div class="rp-hskills">${HERO_SKILLS.map((k, i) => { const got = r.hero.lv >= k.lv, on = (r.heroSkill || 0) === i; return `<button class="rp-hsk${on ? ' on' : ''}" data-hsk="${i}" ${got ? '' : 'disabled'}><b>${got ? esc(k.name) : '？？？'}</b><small>${got ? SKILL_DESC[k.kind](k) : `Lv.${k.lv} で覚える`}</small>${on ? '<i>装備中</i>' : ''}</button>`; }).join('')}</div>
+          <div class="rp-mat"><span>${MAT.icon} ${MAT.name} <b>×${r.mats || 0}</b><small>ゲキムズで敵を倒すとたまに手に入る</small></span><button class="rp-btn gold" data-mat ${r.mats ? '' : 'disabled'}>使う（上限+${MAT.plus}）</button></div>` : ''}
+          <p class="rp-skill"${sel === 'hero' ? ' hidden' : ''}>スキル「${esc(d.skill.name)}」：${SKILL_DESC[d.skill.kind](d.skill)}（正解${d.skill.cost}回でたまる）</p>
           <div class="rp-dbtns">
             ${sel === 'hero' ? '<span class="muted small">リーダーはいつも出撃</span>' : `<button class="rp-btn" data-toggle>${r.party.includes(sel) ? '編成から外す' : '編成に入れる'}</button>`}
             <button class="rp-btn gold" data-feed="1" ${S.food < 1 ? 'disabled' : ''}>🌰 あげる</button>
@@ -432,6 +449,8 @@ export function makeRPG(ctx) {
     B.onclick = (e) => {
       const r = R();
       const sb = e.target.closest('[data-sort]'); if (sb) { sort = sb.dataset.sort; draw(); return; }
+      const hk = e.target.closest('[data-hsk]'); if (hk && !hk.disabled) { r.heroSkill = +hk.dataset.hsk; save(); bgm.sfx('skill'); toast(`スキル「${HERO_SKILLS[r.heroSkill].name}」を装備した！`); draw(); return; }
+      if (e.target.closest('[data-mat]') && r.mats > 0) { r.mats--; r.heroLb = (r.heroLb || 0) + 1; save(); bgm.sfx('rare'); toast(`${MAT.icon} 上限開放！ ${heroName()} のレベル上限が ${capOf('hero')} になった`); draw(); return; }
       if (e.target.closest('[data-auto]')) { autoParty(); bgm.sfx('skill'); toast(`戦闘力 ${teamPower(r.subj).toLocaleString()} の編成にした！（${SUBJNAME(r.subj)}）`); draw(); return; }
       if (e.target.closest('[data-close-detail]')) { sel = null; draw(); return; }
       const pk = e.target.closest('[data-pick]'); if (pk) { sel = pk.dataset.pick; bgm.sfx('tap'); draw(); return; }
@@ -533,11 +552,11 @@ export function makeRPG(ctx) {
                 <div class="rp-hpbar enemy"><i id="rp-ehp"></i><span id="rp-ehptxt"></span></div>
               </div>
               <div class="rp-pop" id="rp-pop"></div>
-              <div class="rp-say" id="rp-say" hidden><img src="icons/icon-192.png" alt=""><span></span></div>
             </div>
             <div class="rp-team" id="rp-team"></div>
             <div class="rp-hpbar party"><i id="rp-php"></i><span id="rp-phptxt"></span></div>
             <div class="rp-timebar"><i id="rp-time"></i></div>
+            <div class="rp-say" id="rp-say"><img src="icons/icon-192.png" alt=""><span></span></div>
             <div class="rp-event" id="rp-event" hidden></div>
           </div>
           <div id="rp-q"></div>
@@ -565,8 +584,8 @@ export function makeRPG(ctx) {
     function hsay(k) {
       const el = document.getElementById('rp-say'); if (!el || !HLINE[k]) return;
       el.querySelector('span').textContent = pick(HLINE[k]);
-      el.hidden = false; el.classList.remove('in'); void el.offsetWidth; el.classList.add('in');
-      clearTimeout(sayT); sayT = setTimeout(() => { el.hidden = true; }, 2200);
+      el.classList.remove('in'); void el.offsetWidth; el.classList.add('in', 'show');
+      clearTimeout(sayT); sayT = setTimeout(() => { el.classList.remove('show'); }, 2600);
     }
     function pop(txt, cls) {
       const p = document.getElementById('rp-pop'); if (!p) return;
@@ -706,7 +725,9 @@ export function makeRPG(ctx) {
         if (en) en.classList.add('ko');
         bgm.sfx('ko');
         // 図鑑に登録・目標
-        { const f = foes[st.fi], r = R(), key = `${subj}|${f.name}`; const isNew = !r.zukan[key]; r.zukan[key] = (r.zukan[key] || 0) + 1; if (f.rare) st.rares++; if (!f.boss) bump('zako'); save(); if (isNew) { setTimeout(() => toast(`📖 図鑑に「${f.name}」が登録された！`), 300); setTimeout(() => hsay('zukan'), 900); } }
+        { const f = foes[st.fi], r = R(), key = `${subj}|${f.name}`; const isNew = !r.zukan[key]; r.zukan[key] = (r.zukan[key] || 0) + 1; if (f.rare) st.rares++; if (!f.boss) bump('zako');
+          if (d === 2 && Math.random() < (f.boss ? MAT.bossDrop : MAT.drop)) { r.mats = (r.mats || 0) + 1; st.mats = (st.mats || 0) + 1; setTimeout(() => { toast(`${MAT.icon} ${MAT.name}を手に入れた！`); hsay('mat'); }, 1300); }
+          save(); if (isNew) { setTimeout(() => toast(`📖 図鑑に「${f.name}」が登録された！`), 300); setTimeout(() => hsay('zukan'), 900); } }
         st.busy = true;
         setTimeout(() => {
           if (st.over) return;
@@ -726,13 +747,14 @@ export function makeRPG(ctx) {
       else if (k.kind === 'dmg') { bgm.sfx('skill'); hitEnemy(atkOf(x) * k.pow, k.name, true); if (st.ehp <= 0 && !st.busy) { st.busy = true; clearInterval(st.timer); document.querySelectorAll('#rp-q [data-c]').forEach((b) => { b.disabled = true; }); setTimeout(afterTurn, 600); } }
       else if (k.kind === 'time') { st.bonusT += k.pow; st.left += k.pow; st.total += k.pow; pop(`+${k.pow}秒`, 'info'); bgm.sfx('skill'); }
       else if (k.kind === 'guard') { st.guard += k.pow; pop('ガード！', 'info'); bgm.sfx('skill'); drawHp(); }
+      else if (k.kind === 'healguard') { st.hp = st.maxHp; st.guard += 2; pop('全回復＆ガード！', 'heal'); bgm.sfx('heal'); drawHp(); }
       else if (k.kind === 'hint') {
         const wrong = [...document.querySelectorAll('#rp-q [data-c]')].filter((b) => +b.dataset.c !== st.q.answer && !b.disabled);
         shuffle(wrong).slice(0, k.pow).forEach((b) => { b.disabled = true; b.classList.add('rp-gone'); });
         pop('ひらめき！', 'info'); bgm.sfx('skill');
       }
       toast(`${x.name}「${k.name}」`);
-      hsay(x.id === 'hero' ? 'hint' : k.kind === 'heal' ? 'heal' : 'skill');
+      hsay(x.id === 'hero' ? (k.kind === 'hint' ? 'hint' : k.kind === 'dmg' ? 'shot' : k.kind === 'healguard' ? 'thanks' : 'today') : k.kind === 'heal' ? 'heal' : 'skill');
       drawTeam();
     }
 
@@ -765,7 +787,7 @@ export function makeRPG(ctx) {
         <p class="rp-starrule">★1 クリア ${'✓'}　★2 HP半分以上 ${st.hp / st.maxHp >= 0.5 ? '✓' : '✗'}　★3 ノーミス ${st.miss === 0 ? '✓' : `✗（ミス${st.miss}）`}</p>` : ''}
         <p class="rp-hline"><img src="icons/icon-192.png" alt=""><span>${esc(pick(HLINE[!win ? 'lose' : stars === 3 ? 'star3' : 'clear']))}</span></p>
         <p class="rp-endsub">${win ? `${esc(foes[foes.length - 1].name)}をたおした！${newBest && !first ? ' ★の記録更新！' : ''}` : `正解 ${st.correct}問。パーティを育ててまた挑戦しよう`}</p>
-        ${win ? `<div class="rp-rewards"><span>🪙 ${coins}${first ? '<em>初クリア×2</em>' : ''}${st.rares ? `<em>レア+${st.rares * 150}</em>` : ''}</span><span>EXP ${exp}</span><span>🌰 ${food}</span></div>` : ''}
+        ${win ? `<div class="rp-rewards"><span>🪙 ${coins}${first ? '<em>初クリア×2</em>' : ''}${st.rares ? `<em>レア+${st.rares * 150}</em>` : ''}</span><span>EXP ${exp}</span><span>🌰 ${food}</span>${st.mats ? `<span>${MAT.icon} ×${st.mats}</span>` : ''}</div>` : ''}
         ${nextD ? `<p class="rp-unlock">${nextD.tag}${nextD.name}が解放された！</p>` : ''}
         ${ups.length ? `<div class="rp-ups"><b>LEVEL UP!</b>${ups.map((u) => `<span>${esc(u)}</span>`).join('')}</div>` : ''}
         <div class="row"><button class="rp-btn gold big" id="rp-again">${win ? 'もう一回' : 'リトライ'}</button><button class="rp-btn big" id="rp-back">マップへ</button></div></div>`;

@@ -888,11 +888,43 @@ body.rp-night.rp-day {
 .rp-tags em.pw { background: var(--brand-soft); color: var(--brand); }
 .rp-formhead small { font-size: 11px; color: var(--muted); margin-left: 4px; }
 .rp-auto { margin-top: 10px; min-height: 40px; font-size: 14px; }
-.rp-say { position: absolute; left: 8px; right: 8px; bottom: 6px; z-index: 5; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 14px; background: rgba(20, 16, 54, .94); color: #fff; border: 1.5px solid #f5c542; font-size: 13px; font-weight: 700; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); pointer-events: none; }
-.rp-say img { width: 28px; height: 28px; border-radius: 50%; flex: none; }
 .rp-say.in { animation: rp-sayin .25s ease-out; }
 @keyframes rp-sayin { from { transform: translateY(-6px) scale(.96); opacity: 0; } }
 .rp-hline { display: flex; align-items: center; gap: 8px; justify-content: center; margin: 8px 0; font-weight: 700; font-size: 14px; }
 .rp-hline img { width: 32px; height: 32px; border-radius: 50%; flex: none; }
-.rp-day .rp-say { background: rgba(255, 255, 255, .97); color: #1e293b; }
-.rp-prof { margin: 8px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--muted); }
+.rp-day .rp-say { background: #fff; color: #1e293b; }
+.rp-day .rp-prof { margin: 8px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--muted); }
+
+/* バトル：主人公の吹き出しは仲間の列の上（主人公の顔から出る）。上の部分をコンパクトに */
+.rp-head { padding: 8px 16px 6px; }
+.rp-field { padding: 6px 10px; gap: 10px; }
+.rp-enemy { font-size: 44px; }
+.rp-field.boss .rp-enemy { font-size: 52px; }
+.rp-ename { font-size: 16px; }
+.rp-team { margin-top: 6px; }
+.rp-tm { width: 64px; gap: 2px; }
+.rp-tm .rp-face { width: 36px; height: 36px; }
+.rp-tm .rp-face.rp-emo { font-size: 22px; }
+.rp-tm small { font-size: 10px; }
+.rp-hpbar.party { margin-top: 4px; }
+.rp-timebar { margin-top: 6px; }
+.rp-zq { margin: 12px 0 10px; }
+.rp-hskills { display: grid; gap: 6px; margin-top: 8px; }
+.rp-hsk { position: relative; text-align: left; border: 1.5px solid var(--line); background: rgba(255, 255, 255, .08); color: var(--text); border-radius: 12px; padding: 8px 10px; cursor: pointer; }
+.rp-hsk b { display: block; font-size: 13.5px; }
+.rp-hsk small { font-size: 11px; color: var(--muted); }
+.rp-hsk.on { border-color: #f5c542; background: rgba(245, 197, 66, .18); }
+.rp-hsk i { position: absolute; top: 8px; right: 10px; font-style: normal; font-size: 10px; font-weight: 800; color: #2a1650; background: #f5c542; border-radius: 99px; padding: 0 6px; }
+.rp-hsk:disabled { opacity: .5; cursor: default; }
+.rp-mat { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 8px 10px; border-radius: 12px; background: rgba(147, 197, 253, .14); }
+.rp-mat span { flex: 1; font-size: 13px; font-weight: 700; }
+.rp-mat small { display: block; font-size: 10.5px; font-weight: 400; color: var(--muted); }
+.rp-mat .rp-btn { min-height: 38px; padding: 6px 10px; font-size: 12.5px; white-space: nowrap; }
+.rp-day .rp-hsk { background: rgba(255, 255, 255, .85); }
+.rp-say { display: flex; align-items: center; gap: 8px; min-height: 34px; margin-top: 6px; padding: 3px 10px 3px 4px; border-radius: 99px; background: rgba(20, 16, 54, .9); color: #fff; border: 1.5px solid #f5c542; font-size: 12.5px; font-weight: 700; line-height: 1.3; opacity: 0; transition: opacity .25s; }
+.rp-say.show { opacity: 1; }
+.rp-say img { width: 26px; height: 26px; border-radius: 50%; flex: none; }
+
+/* ホームの科目タイル：名前は1行、下の数字は左右に分けて折り返さない */
+.stile-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stile-sub { display: flex; justify-content: space-between; gap: 6px; white-space: nowrap; }
