@@ -213,8 +213,8 @@ export function makeRPG(ctx) {
   let lectures = null; // { ccpp: {1:'第1回 …'}, … }
   const heroName = () => R().heroName;
   // 主人公のスキン（レベル50ごとに増える。編成の主人公の詳細で着替える）
-  const HERO_SKINS = [{ lv: 1, name: 'いつもの', src: 'icons/icon-192.png' }, { lv: 50, name: 'レッドスーツ', src: 'icons/hero-lv50.svg' }, { lv: 100, name: 'ボーダー', src: 'icons/hero-lv100.svg' }];
-  const heroSrc = () => { const r = R(), k = HERO_SKINS[r.heroSkin || 0]; return k && r.hero.lv >= k.lv ? k.src : HERO_SKINS[0].src; };
+  const HERO_SKINS = [{ lv: 1, name: 'いつもの', src: 'icons/icon-192.png' }, { lv: 50, name: 'レッドスーツ', src: 'icons/hero-lv50.svg' }, { lv: 100, name: '', src: null }, { lv: 150, name: 'ボーダー', src: 'icons/hero-lv150.svg' }]; // src: null は準備中（絵が来たら入れる）
+  const heroSrc = () => { const r = R(), k = HERO_SKINS[r.heroSkin || 0]; return k && k.src && r.hero.lv >= k.lv ? k.src : HERO_SKINS[0].src; };
 
   const iconHTML = (id, cls = '') => {
     if (id === 'hero') return `<img class="rp-face ${cls}" src="${heroSrc()}" alt="">`;
@@ -733,7 +733,7 @@ export function makeRPG(ctx) {
           <div class="rp-tags"><em class="pw">戦闘力 ${power(sel)}</em><em>HP ${d.hp}</em><em>攻撃 ${d.atk}</em>${o.lb ? `<em>突破+${o.lb}</em>` : ''}<em>得意 ${d.subj == null ? 'なし' : d.subj === 'all' ? 'ぜんぶ' : SUBJ.find((x) => x[0] === d.subj)[1]}</em></div>
           ${sel === 'hero' ? `<p class="rp-prof">${esc(HERO_PROFILE)}</p>
           <div class="rp-hskills">${HERO_SKILLS.map((k, i) => { const got = r.hero.lv >= k.lv, on = (r.heroSkill || 0) === i; return `<button class="rp-hsk${on ? ' on' : ''}" data-hsk="${i}" ${got ? '' : 'disabled'}><b>${got ? esc(k.name) : '？？？'}</b><small>${got ? SKILL_DESC[k.kind](k) : `Lv.${k.lv} で覚える`}</small>${on ? '<i>装備中</i>' : ''}</button>`; }).join('')}</div>
-          <div class="rp-skins"><b>👔 スキン</b><div>${HERO_SKINS.map((k, i) => { const got = r.hero.lv >= k.lv, on = (r.heroSkin || 0) === i; return `<button class="rp-skin${on ? ' on' : ''}" data-skin="${i}" ${got ? '' : 'disabled'}><img src="${k.src}" alt="" class="${got ? '' : 'sil'}"><small>${got ? esc(k.name) : `Lv.${k.lv}で解放`}</small>${on ? '<i>着用中</i>' : ''}</button>`; }).join('')}<button class="rp-skin" disabled><span class="rp-skinq">？</span><small>Lv.${HERO_SKINS[HERO_SKINS.length - 1].lv + 50}で解放（準備中）</small></button></div></div>
+          <div class="rp-skins"><b>👔 スキン</b><div>${HERO_SKINS.map((k, i) => { if (!k.src) return `<button class="rp-skin" disabled><span class="rp-skinq">？</span><small>Lv.${k.lv}で解放（準備中）</small></button>`; const got = r.hero.lv >= k.lv, on = (r.heroSkin || 0) === i; return `<button class="rp-skin${on ? ' on' : ''}" data-skin="${i}" ${got ? '' : 'disabled'}><img src="${k.src}" alt="" class="${got ? '' : 'sil'}"><small>${got ? esc(k.name) : `Lv.${k.lv}で解放`}</small>${on ? '<i>着用中</i>' : ''}</button>`; }).join('')}</div></div>
           <div class="rp-mat"><span>${MAT.icon} ${MAT.name} <b>×${r.mats || 0}</b><small>ゲキムズで敵を倒すとたまに手に入る</small></span><button class="rp-btn gold" data-mat ${r.mats ? '' : 'disabled'}>使う（上限+${MAT.plus}）</button></div>` : ''}
           ${CHARS[sel]?.prof ? `<p class="rp-prof">${esc(CHARS[sel].prof)}</p>` : ''}
           ${CHARS[sel]?.limited ? `<div class="rp-mat"><span>${MAT.icon} ${MAT.name} <b>×${r.mats || 0}</b><small>ガチャに出ない仲間は、${MAT.icon}で上限開放</small></span><button class="rp-btn gold" data-mat ${r.mats ? '' : 'disabled'}>使う（上限+${MAT.plus}）</button></div>` : ''}

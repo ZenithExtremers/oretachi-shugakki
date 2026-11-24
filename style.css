@@ -1503,3 +1503,7 @@ body.rp-night.rp-day {
 .rp-skin i { position: absolute; top: -8px; font-style: normal; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 6px; background: #f5c542; color: #2a1d00; }
 .rp-skin:disabled { cursor: default; opacity: .75; }
 .rp-day .rp-skin { border-color: rgba(30, 41, 59, .15); background: #fff; }
+.rp-skins > div { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.rp-skin { padding: 8px 2px 6px; }
+.rp-skin img, .rp-skinq { width: 48px; height: 48px; }
+.rp-skin small { font-size: 10px; }
