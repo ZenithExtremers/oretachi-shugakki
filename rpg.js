@@ -49,7 +49,7 @@ const HERO_SKILLS = [
   { lv: 1, kind: 'hint', pow: 2, cost: 4, name: 'ひとさし指のひらめき' },
   { lv: 50, kind: 'dmg', pow: 6, cost: 4, name: 'セイキンショット！' },
   { lv: 100, kind: 'healguard', pow: 1, cost: 5, name: 'Keep Your Head Up' },
-  { lv: 150, kind: 'stardust', pow: 7, cost: 3, name: 'オールスターダスト計画やりましょー！' },
+  { lv: 150, kind: 'stardust', pow: 7, cost: 5, name: 'オールスターダスト計画やりましょー！' },
 ];
 // 主人公の上限開放の素材（ゲキムズで敵を倒すとたまに手に入る）
 const MAT = { name: '覚醒の結晶', icon: '💎', drop: 0.05, bossDrop: 0.2, plus: 5 };
@@ -222,7 +222,8 @@ export function makeRPG(ctx) {
   };
   const member = (id) => {
     const r = R();
-    if (id === 'hero') return { id, name: heroName(), lv: r.hero.lv, hp: statOf(HERO.hp, r.hero.lv), atk: statOf(HERO.atk, r.hero.lv), skill: HERO_SKILLS[r.heroSkill || 0] || HERO.skill, subj: null };
+    if (id === 'hero') { const up = 1.5 ** [50, 100, 150].filter((l) => r.hero.lv >= l).length; // Lv.50・100・150 でステータス1.5倍
+      return { id, name: heroName(), lv: r.hero.lv, hp: Math.round(statOf(HERO.hp, r.hero.lv) * up), atk: Math.round(statOf(HERO.atk, r.hero.lv) * up), skill: HERO_SKILLS[r.heroSkill || 0] || HERO.skill, subj: null }; }
     const c = CHARS[id], o = r.owned[id];
     return { id, name: c.name, lv: o.lv, hp: c.fixHp ? c.hp : statOf(c.hp, o.lv), atk: statOf(c.atk, o.lv), skill: c.skill, subj: c.subj, rar: c.rar };
   };
