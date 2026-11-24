@@ -1363,3 +1363,59 @@ body.rp-night.rp-day {
 .rp-battle.quake { animation: gtQuake .5s; }
 @keyframes gtQuake { 0%, 100% { transform: none; } 20% { transform: translate(-8px, 4px); } 40% { transform: translate(7px, -5px); } 60% { transform: translate(-5px, 3px); } 80% { transform: translate(4px, -2px); } }
 @media (prefers-reduced-motion: reduce) { .gt-p, .gt-rays { animation: none; } }
+
+/* ---------- ★★★★（レジェンド） ---------- */
+.rp-rar.r4, .rp-cell.r4 .rp-rar, .rp-gitem.r4 .rp-rar { background: linear-gradient(90deg, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent !important; text-shadow: none !important; font-weight: 900; }
+.rp-cell.r4, .rp-gitem.r4, .rp-card.r4 { border: 2px solid transparent; background: linear-gradient(#1b1440, #1b1440) padding-box, linear-gradient(135deg, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa) border-box; box-shadow: 0 0 16px rgba(167, 139, 250, .55); }
+.rp-day .rp-cell.r4, .rp-day .rp-gitem.r4 { background: linear-gradient(#fff, #fff) padding-box, linear-gradient(135deg, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa) border-box; }
+.rp-art.r4 { animation: r4spin 6s linear infinite; }
+@keyframes r4spin { 0%, 100% { filter: drop-shadow(0 0 4px #f472b6); } 33% { filter: drop-shadow(0 0 5px #38bdf8); } 66% { filter: drop-shadow(0 0 5px #facc15); } }
+.rp-tm.r4 .rp-face { border-radius: 50%; animation: r4glow 2.4s linear infinite; }
+@keyframes r4glow { 0%, 100% { box-shadow: 0 0 0 2px #f472b6, 0 0 10px #f472b6; } 25% { box-shadow: 0 0 0 2px #facc15, 0 0 10px #facc15; } 50% { box-shadow: 0 0 0 2px #4ade80, 0 0 10px #4ade80; } 75% { box-shadow: 0 0 0 2px #38bdf8, 0 0 10px #38bdf8; } }
+.rp-gfx.r4 .rp-pillar { background: linear-gradient(180deg, transparent, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa, transparent); width: 160px; }
+.rp-gfx.r4 .rp-gate i { border-color: #a78bfa; box-shadow: inset 0 0 24px rgba(244, 114, 182, .5); }
+.rp-gfx.r4::before { content: ''; position: absolute; inset: 0; background: #fff; opacity: 0; animation: rp-flashw .6s .85s; }
+.rp-gfx.c4 { background: #000; }
+.rp-leg { position: fixed; inset: 0; display: grid; place-items: center; overflow: hidden; }
+.lg-rays { position: absolute; left: 50%; top: 42%; width: 260vmax; height: 260vmax; transform: translate(-50%, -50%); opacity: 0;
+  background: repeating-conic-gradient(from 0deg, rgba(244, 114, 182, .35) 0 5deg, rgba(250, 204, 21, .3) 5deg 10deg, rgba(74, 222, 128, .3) 10deg 15deg, rgba(56, 189, 248, .35) 15deg 20deg, transparent 20deg 30deg);
+  animation: lgRays .5s 1.4s forwards, gtSpin 10s linear 1.4s infinite; }
+@keyframes lgRays { to { opacity: 1; } }
+.lg-crack { position: absolute; left: 50%; top: 42%; width: 6px; height: 0; transform: translate(-50%, -50%) rotate(20deg); background: linear-gradient(#f472b6, #facc15, #4ade80, #38bdf8, #a78bfa); box-shadow: 0 0 20px #fff, 0 0 40px #a78bfa; animation: lgCrack 1.1s .2s ease-in forwards; }
+@keyframes lgCrack { 0% { height: 0; } 70% { height: 70vh; width: 6px; opacity: 1; } 100% { height: 140vh; width: 120vw; opacity: 0; } }
+.lg-word { position: absolute; top: 18%; left: 0; right: 0; text-align: center; font-size: 44px; font-weight: 900; letter-spacing: .25em; opacity: 0;
+  background: linear-gradient(90deg, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 12px rgba(255, 255, 255, .6));
+  animation: lgWord .7s 1.2s cubic-bezier(.2, 1.6, .4, 1) forwards; }
+@keyframes lgWord { from { opacity: 0; transform: scale(2.4); letter-spacing: .8em; } to { opacity: 1; transform: none; } }
+.lg-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 20px 22px; margin: 0 16px; max-width: 340px; border-radius: 18px; color: #fff; text-align: center; opacity: 0;
+  background: linear-gradient(rgba(20, 12, 50, .85), rgba(20, 12, 50, .85)) padding-box, linear-gradient(135deg, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa) border-box; border: 3px solid transparent; box-shadow: 0 0 40px rgba(167, 139, 250, .8);
+  animation: lgCard .7s 1.7s cubic-bezier(.2, 1.4, .4, 1) forwards; }
+@keyframes lgCard { from { opacity: 0; transform: scale(.3) rotate(-8deg); } to { opacity: 1; transform: none; } }
+.lg-face .rp-face { width: 140px; height: 140px; }
+.lg-card .rp-rar { font-size: 24px; }
+.lg-card b { font-size: 24px; font-weight: 900; }
+.lg-card small { font-size: 13px; opacity: .9; line-height: 1.5; }
+.lg-card em { font-style: normal; font-weight: 900; color: #fde047; }
+.rp-confetti.rb b:nth-child(5n) { background: #f472b6; } .rp-confetti.rb b:nth-child(5n+1) { background: #facc15; } .rp-confetti.rb b:nth-child(5n+2) { background: #4ade80; } .rp-confetti.rb b:nth-child(5n+3) { background: #38bdf8; } .rp-confetti.rb b:nth-child(5n+4) { background: #a78bfa; }
+.rp-rates2 .rr4 b { background: linear-gradient(90deg, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+/* ★★★★ のスキル発動カットイン */
+.rp-cutin { position: fixed; left: 0; right: 0; top: 30%; height: 130px; z-index: 150; pointer-events: none; overflow: hidden;
+  background: linear-gradient(90deg, rgba(244, 114, 182, .9), rgba(250, 204, 21, .9), rgba(74, 222, 128, .9), rgba(56, 189, 248, .9), rgba(167, 139, 250, .9));
+  clip-path: polygon(0 18%, 100% 0, 100% 82%, 0 100%); animation: ciIn 1.5s ease-in-out forwards; display: flex; align-items: center; gap: 12px; padding: 0 16px; }
+.rp-cutin .rp-face { width: 110px; height: 110px; flex: none; animation: ciFace 1.5s ease-out forwards; }
+.rp-cutin div { color: #fff; text-shadow: 0 2px 0 #1e1b4b, 0 0 10px #1e1b4b; min-width: 0; }
+.rp-cutin b { display: block; font-size: 24px; font-weight: 900; }
+.rp-cutin small { font-size: 13px; font-weight: 700; }
+@keyframes ciIn { 0% { transform: translateX(-110%); } 18%, 80% { transform: none; } 100% { transform: translateX(110%); opacity: 0; } }
+@keyframes ciFace { from { transform: scale(.6); } 30% { transform: scale(1.1); } to { transform: scale(1); } }
+/* ゲキムズのターン攻撃の表示 */
+.rp-cd { font-style: normal; font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 999px; background: rgba(15, 23, 42, .55); color: #fde68a; white-space: nowrap; }
+.rp-cd.soon { background: #dc2626; color: #fff; animation: cdBlink .6s infinite alternate; }
+@keyframes cdBlink { to { opacity: .6; } }
+.rp-foe .rp-cd { display: block; margin-top: 3px; padding: 1px 4px; font-size: 10.5px; overflow: hidden; text-overflow: ellipsis; }
+/* ホメオスタシス・イナーシャの効果中の表示 */
+.rp-buffs { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; font-size: 11.5px; font-weight: 800; }
+.rp-buffs span { padding: 1px 8px; border-radius: 999px; background: rgba(16, 185, 129, .25); border: 1px solid rgba(16, 185, 129, .6); }
+.rp-buffs span.in { background: rgba(100, 116, 139, .3); border-color: rgba(148, 163, 184, .7); }
+.rp-field.nuke { animation: nukeFx .9s ease-out; }
+@keyframes nukeFx { 0% { box-shadow: inset 0 0 0 0 #fde047; filter: brightness(3) saturate(2); } 40% { box-shadow: inset 0 0 60px 20px #f97316; } 100% { box-shadow: none; filter: none; } }

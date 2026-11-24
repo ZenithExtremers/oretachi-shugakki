@@ -146,3 +146,73 @@ ${eyes(56, '#facc15')}
 
 // 中間ボスで仲間になる3体（★3クリアで仲間に）も、同じイラストを使う
 Object.assign(CHAR_ART, { liner: MID_ART.liner, yankee: MID_ART.yankee, spec: MID_ART.spec });
+
+// ===== ★★★★（レジェンド）の仲間：勉強に出てくる用語がモチーフ。虹色のふちと二重の光の輪 =====
+const wrap4 = (id, c1, c2, body) => `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="rp-art r4">
+<defs>
+  <radialGradient id="au-${id}" cx="50%" cy="45%" r="55%"><stop offset="0" stop-color="${c1}"/><stop offset=".7" stop-color="${c2}"/><stop offset="1" stop-color="#0b1020"/></radialGradient>
+  <clipPath id="cl-${id}"><circle cx="60" cy="60" r="55"/></clipPath>
+  <linearGradient id="rb-${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f472b6"/><stop offset=".25" stop-color="#facc15"/><stop offset=".5" stop-color="#4ade80"/><stop offset=".75" stop-color="#38bdf8"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+  <linearGradient id="gd-${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".5" stop-color="#f5c542"/><stop offset="1" stop-color="#b7791f"/></linearGradient>
+</defs>
+<circle cx="60" cy="60" r="57" fill="url(#au-${id})"/>
+<g stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".7"><path d="M60 6v8M60 106v8M6 60h8M106 60h8M22 22l6 6M92 92l6 6M98 22l-6 6M28 92l-6 6"/></g>
+<g clip-path="url(#cl-${id})">${body}</g>
+<circle cx="60" cy="60" r="57" fill="none" stroke="url(#rb-${id})" stroke-width="5"/>
+<circle cx="60" cy="60" r="52" fill="none" stroke="url(#gd-${id})" stroke-width="1.5" opacity=".9"/>
+<path d="M60 0 l3 6 l-3 3 l-3 -3z" fill="#fff"/>
+</svg>`;
+
+Object.assign(CHAR_ART, {
+  // タキオン：光より速い粒子。水色の流線形の髪、光の尾、速度の線
+  tachyon: wrap4('tachyon', '#e0f2fe', '#0284c7', `
+<g stroke="#e0f2fe" stroke-width="3" stroke-linecap="round" opacity=".85"><path d="M2 40 h26M0 52 h20M4 76 h24M0 88 h16"/></g>
+<path d="M30 112 q4 -30 30 -32 q26 2 30 32z" fill="#f8fafc" stroke="${OL}" stroke-width="3"/>
+<path d="M48 82 l12 14 l12 -14" fill="none" stroke="#0284c7" stroke-width="4"/>
+<path d="M56 96 l-6 16 M64 96 l6 16" stroke="#38bdf8" stroke-width="3"/>
+<circle cx="62" cy="56" r="25" fill="#fde7d4" stroke="${OL}" stroke-width="3"/>
+${eyes(57, '#0ea5e9')}
+<path d="M54 70 q8 4 16 -1" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<path d="M36 50 q2 -26 30 -26 q20 0 26 18 l-10 -4 l4 10 l-12 -8 l-2 10 l-8 -10 l-6 10 l-4 -12 l-8 10z" fill="#38bdf8" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M36 46 l-26 -6 l24 12 l-22 2 l26 6z" fill="#7dd3fc" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+<g transform="translate(92 92)"><circle r="10" fill="#0ea5e9" stroke="${OL}" stroke-width="2"/><path d="M-5 -5 l6 5 l-6 5z M1 -5 l6 5 l-6 5z" fill="#fff"/></g>`),
+
+  // ニュクリ：原子核。燃える芯のまわりを電子の輪が回る。体はひびの入った殻（HP1）
+  nyukuri: wrap4('nyukuri', '#fed7aa', '#c2410c', `
+<ellipse cx="60" cy="58" rx="50" ry="16" fill="none" stroke="#fde047" stroke-width="2.5" transform="rotate(30 60 58)"/>
+<ellipse cx="60" cy="58" rx="50" ry="16" fill="none" stroke="#fde047" stroke-width="2.5" transform="rotate(-30 60 58)"/>
+<ellipse cx="60" cy="58" rx="50" ry="16" fill="none" stroke="#fde047" stroke-width="2.5" transform="rotate(90 60 58)"/>
+<circle cx="103" cy="33" r="4" fill="#fff"/><circle cx="17" cy="83" r="4" fill="#fff"/><circle cx="60" cy="9" r="4" fill="#fff"/>
+<path d="M34 112 q4 -28 26 -30 q22 2 26 30z" fill="#7c2d12" stroke="${OL}" stroke-width="3"/>
+<circle cx="60" cy="58" r="27" fill="#f97316" stroke="${OL}" stroke-width="3"/>
+<circle cx="60" cy="58" r="27" fill="none" stroke="#fde047" stroke-width="2" opacity=".7"/>
+<path d="M44 42 l6 8 l-4 6 M78 70 l-6 -4 l2 -8" stroke="#7c2d12" stroke-width="2" fill="none" stroke-linecap="round"/>
+${eyes(58, '#fef08a')}
+<path d="M50 70 q10 -4 20 0" stroke="${OL}" stroke-width="2.5" fill="none"/><path d="M53 70 l2 3 l2 -3 M63 70 l2 3 l2 -3" fill="#fff" stroke="${OL}" stroke-width="1.2"/>
+<path d="M48 34 q12 -12 24 0" stroke="#fde047" stroke-width="3" fill="none"/>`),
+
+  // ホメオスタシス：恒常性。体の中をいつも同じに保つ番人。ハートの胸当てと天秤、穏やかな目
+  homeo: wrap4('homeo', '#bbf7d0', '#047857', `
+<circle cx="60" cy="58" r="44" fill="none" stroke="#a7f3d0" stroke-width="2" stroke-dasharray="4 6"/>
+<path d="M28 112 q4 -32 32 -34 q28 2 32 34z" fill="#065f46" stroke="${OL}" stroke-width="3"/>
+<path d="M60 102 q-12 -8 -12 -15 q0 -6 6 -6 q4 0 6 4 q2 -4 6 -4 q6 0 6 6 q0 7 -12 15z" fill="#f43f5e" stroke="${OL}" stroke-width="2"/>
+<circle cx="60" cy="56" r="25" fill="#fde7d4" stroke="${OL}" stroke-width="3"/>
+<path d="M44 58 q6 -4 12 0 M64 58 q6 -4 12 0" stroke="${OL}" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M52 68 q8 5 16 0" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<path d="M34 50 q0 -26 26 -26 q26 0 26 26 q-8 -10 -26 -10 q-18 0 -26 10z" fill="#10b981" stroke="${OL}" stroke-width="2.5"/>
+<ellipse cx="60" cy="20" rx="18" ry="5" fill="none" stroke="url(#gd-homeo)" stroke-width="3"/>
+<g transform="translate(96 84)" stroke="${OL}" stroke-width="2"><path d="M0 -14 v22 M-12 -10 h24" fill="none"/><path d="M-16 -10 l4 10 l4 -10z M8 -10 l4 10 l4 -10z" fill="url(#gd-homeo)"/><path d="M-6 8 h12" /></g>`),
+
+  // イナーシャ：慣性の法則。一度動いたら止まらない、鋼の丸いよろい。進む方向に矢印
+  inertia: wrap4('inertia', '#e2e8f0', '#334155', `
+<g stroke="#cbd5e1" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M4 50 h18M2 64 h16M6 78 h18"/></g>
+<path d="M28 112 q4 -30 32 -32 q28 2 32 32z" fill="#475569" stroke="${OL}" stroke-width="3"/>
+<circle cx="60" cy="58" r="30" fill="#94a3b8" stroke="${OL}" stroke-width="3"/>
+<path d="M32 50 q28 -16 56 0" stroke="#e2e8f0" stroke-width="3" fill="none"/>
+<path d="M36 52 h48 v14 h-48z" fill="#0f172a" stroke="${OL}" stroke-width="2.5"/>
+<path d="M42 59 l12 -2 M78 59 l-12 -2" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="60" cy="30" r="4" fill="url(#gd-inertia)" stroke="${OL}" stroke-width="1.5"/>
+<circle cx="38" cy="78" r="3" fill="#e2e8f0" stroke="${OL}" stroke-width="1.2"/><circle cx="82" cy="78" r="3" fill="#e2e8f0" stroke="${OL}" stroke-width="1.2"/>
+<g transform="translate(94 92)"><path d="M-12 0 h16 v-7 l12 7 l-12 7 v-7" fill="#fbbf24" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/></g>
+<text x="60" y="104" text-anchor="middle" font-size="11" font-weight="900" fill="#e2e8f0" font-family="serif">F=ma</text>`),
+});
