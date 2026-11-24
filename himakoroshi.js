@@ -28,7 +28,7 @@ if (!S.owl) {
 }
 if (S.rpg && S.rpg.owned) S.rpg.owned.owl = S.owl;
 if (!S.partner) S.partner = 'owl'; // ホームに置くキャラ
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* 保存できない環境 */ } };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* 保存できない環境 */ } renderTop(); };
 
 const rnd = (n) => Math.floor(Math.random() * n);
 const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -131,7 +131,7 @@ const LINES = {
 const NOFOOD = ['知恵の実がない…勉強してきて', '計算アタックや本編の正解で🌰知恵の実がもらえるよ'];
 const partner = () => (S.partner === 'owl' || S.partner === 'hero' || (S.rpg && S.rpg.owned && S.rpg.owned[S.partner]) ? S.partner : 'owl');
 const say = (k) => { const set = LINES[partner()] || LINES.owl; const a = set[k] || (k === 'nofood' ? NOFOOD : LINES.owl[k]); const el = $('#hk-say'); if (el) el.textContent = a[rnd(a.length)]; };
-function renderTop() { const p = $('#hk-food'); if (p) p.textContent = '🌰 ' + S.food; }
+function renderTop() { const p = typeof document !== 'undefined' && document.getElementById('hk-food'); if (p) p.textContent = `🌰 ${S.food}　💎 ${S.rpg?.mats || 0}`; } // 知恵の実と覚醒の結晶
 // いまのキャラの記録 { lv, exp } と表示名
 function partnerRec() {
   const id = partner();

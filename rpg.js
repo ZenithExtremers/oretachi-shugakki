@@ -535,31 +535,97 @@ export function makeRPG(ctx) {
     };
   }
 
-  /* ---------- 図鑑：倒した敵が登録される ---------- */
-  let zsubj = null, zsel = null;
+  /* ---------- 図鑑：仲間図鑑と敵図鑑 ---------- */
+  let zmode = 'ally', zsubj = null, zfil = 'all', zsel = null;
+  // 図鑑の集めた割合の報酬（r.zrew に受け取り済みを記録）
+  const ZREW = {
+    ally: [{ p: 0.5, coins: 500, label: '🪙500' }, { p: 1, mats: 3, label: `${MAT.icon}×3` }],
+    enemy: [{ p: 0.5, coins: 300, label: '🪙300' }, { p: 1, coins: 500, ticket: 1, label: '🪙500＋🎟️' }],
+  };
+  const allyList = () => Object.keys(CHARS).map((id) => ({ id, key: id, ...CHARS[id] }));
+  function howToGet(id) {
+    const c = CHARS[id];
+    if (c.limited === 'mid') { const sj = Object.keys(MID).find((k) => MID[k].reward === id); return `中間ボス「${MID[sj].title}」を★3でクリア`; }
+    if (c.limited) return `${CHAPTERS.find((x) => x.id === c.limited)?.name || ''} の章の★集め（50%）`;
+    return c.rar === 4 ? 'ガチャでまれに出る（★★★★ 2%）' : `ガチャ（${RAR[c.rar]}）`;
+  }
   function renderZukan(m) {
-    const r = R(); zsubj = zsubj || r.subj;
-    const list = allEnemies(zsubj), got = list.filter((x) => r.zukan[x.key]).length;
+    const r = R(); zsubj = zsubj || r.subj; r.zrew = r.zrew || {};
+    const ally = zmode === 'ally';
     const lecName = (k) => (lectures[zsubj][k] || `第${k}回`);
-    const cell = (x) => { const c = r.zukan[x.key] || 0; return `<button class="rp-zk${c ? '' : ' unk'}${x.kind === 'boss' ? ' boss' : ''}${x.kind === 'rare' || x.kind === 'srare' ? ' rare' : ''}${zsel === x.key ? ' sel' : ''}" data-z="${esc(x.key)}" ${c ? '' : 'disabled'}><span>${c ? x.icon : '？'}</span><small>${c ? esc(x.name) : '？？？'}</small></button>`; };
-    const lecs = Object.keys(lectures[zsubj]);
-    const sel = list.find((x) => x.key === zsel);
-    const where = (x) => (x.kind === 'mid' ? `中間ボス「${MID[zsubj].title}」` : x.kind === 'boss' ? `${lecName(x.lec)} のボス` : x.kind === 'srare' ? `${lecName(x.lec)} STAGE ${x.stage} にたまに出る` : x.kind === 'lec' ? `${lecName(x.lec)} ${x.stage ? 'STAGE ' + x.stage : 'のステージ'}` : x.kind === 'rare' ? 'どのステージにもたまに出る' : 'どのステージにも出る');
+    // 一覧と絞り込み
+    const FIL = ally
+      ? [['all', 'すべて'], ['4', '★★★★'], ['3', '★★★'], ['2', '★★'], ['1', '★'], ['lim', '限定']]
+      : [['all', 'すべて'], ['boss', 'ボス'], ['mid', '中間ボス'], ['rare', 'レア'], ['zako', '雑魚']];
+    const full = ally ? allyList() : allEnemies(zsubj);
+    const has = (x) => (ally ? !!r.owned[x.id] : !!r.zukan[x.key]);
+    const pass = (x) => zfil === 'all' || (ally ? (zfil === 'lim' ? !!x.limited : String(x.rar) === zfil)
+      : zfil === 'boss' ? x.kind === 'boss' : zfil === 'mid' ? x.kind === 'mid' : zfil === 'rare' ? x.kind === 'rare' || x.kind === 'srare' : x.kind === 'lec' || x.kind === 'common');
+    const list = full.filter(pass);
+    const got = full.filter(has).length, rate = full.length ? got / full.length : 0;
+    const rkey = (i) => (ally ? `ally#${i}` : `${zsubj}#${i}`);
+    const icon = (x) => (ally ? iconHTML(x.id) : `<span class="rp-zi">${x.icon}</span>`);
+    const secret = (x) => ally && x.rar === 4 && !has(x); // ★★★★は出るまで影も見せない
+    const cell = (x) => `<button class="rp-zk${has(x) ? '' : ' unk'}${secret(x) ? ' secret' : ''}${!ally && x.kind === 'boss' ? ' boss' : ''}${!ally && (x.kind === 'rare' || x.kind === 'srare') ? ' rare' : ''}${ally ? ' r' + x.rar : ''}" data-z="${esc(x.key)}">
+        <span class="rp-zic">${secret(x) ? '<b>？</b>' : icon(x)}</span><small>${has(x) ? esc(x.name) : '？？？'}</small>${ally && !secret(x) ? `<i class="rp-zr">${RAR[x.rar]}</i>` : ''}</button>`;
+    // 敵図鑑は種類ごとの見出しでまとめる（絞り込みなしのとき）
+    const groups = ally
+      ? [[zfil === 'all' ? '' : '', list]]
+      : zfil !== 'all' ? [['', list]]
+      : [['ボス', list.filter((x) => x.kind === 'boss')], ['中間ボス', list.filter((x) => x.kind === 'mid')], ['レア', list.filter((x) => x.kind === 'rare' || x.kind === 'srare')],
+         ...Object.keys(lectures[zsubj]).map((k) => [lecName(k), list.filter((x) => x.kind === 'lec' && x.lec === k)]), ['どこにでも出る', list.filter((x) => x.kind === 'common')]];
     m.innerHTML = `
-      <div class="rp-zhead"><b>📖 敵キャラ図鑑</b><span>登録 <b>${got}</b> / ${list.length}</span></div>
-      <div class="rp-zbar"><i style="width:${(got / list.length) * 100}%"></i></div>
-      <div class="seg rp-seg mt" role="group">${SUBJ.map(([k, n]) => `<button data-zs="${k}" aria-pressed="${zsubj === k}">${n}</button>`).join('')}</div>
-      ${sel ? `<div class="rp-zdetail"><span class="rp-zbig">${sel.icon}</span><div><b>${esc(sel.name)}</b>${sel.kind === 'boss' ? '<em>BOSS</em>' : sel.kind === 'rare' || sel.kind === 'srare' ? '<em class="rare">レア</em>' : ''}
-        <p>${esc(sel.desc)}</p><small>${esc(where(sel))}・たおした数 ${r.zukan[sel.key]}</small></div><button class="rp-x" data-zx aria-label="閉じる">✕</button></div>` : '<p class="rp-tip">たおした敵が登録される。タップで説明が見られる。</p>'}
-      <h3 class="rp-zsec">ボス</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'boss').map(cell).join('')}</div>
-      ${list.some((x) => x.kind === 'mid') ? `<h3 class="rp-zsec">中間ボス</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'mid').map(cell).join('')}</div>` : ''}
-      <h3 class="rp-zsec">レア</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'rare' || x.kind === 'srare').map(cell).join('')}</div>
-      ${lecs.filter((k) => ENEMIES[zsubj].lec[k]).map((k) => `<h3 class="rp-zsec">${esc(lecName(k))}</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'lec' && x.lec === k).map(cell).join('')}</div>`).join('')}
-      <h3 class="rp-zsec">どこにでも出る</h3><div class="rp-zgrid">${list.filter((x) => x.kind === 'common').map(cell).join('')}</div>`;
+      <div class="seg rp-seg rp-zmode" role="group"><button data-zm="ally" aria-pressed="${ally}">🤝 仲間図鑑</button><button data-zm="enemy" aria-pressed="${!ally}">👾 敵図鑑</button></div>
+      ${ally ? '' : `<div class="seg rp-seg rp-seg4 mt" role="group">${SUBJ.map(([k, n]) => `<button data-zs="${k}" aria-pressed="${zsubj === k}">${n}</button>`).join('')}</div>`}
+      <div class="rp-zprog">
+        <div class="rp-zhead"><b>${ally ? '仲間' : SUBJNAME(zsubj) + 'の敵'}</b><span>登録 <b>${got}</b> / ${full.length}（${Math.floor(rate * 100)}%）</span></div>
+        <div class="rp-zbar"><i style="width:${rate * 100}%"></i>${ZREW[zmode].map((w) => `<em style="left:${w.p * 100}%"></em>`).join('')}</div>
+        <div class="rp-zrews">${ZREW[zmode].map((w, i) => { const done = r.zrew[rkey(i)], ok = rate >= w.p; return `<button class="rp-zrw${done ? ' done' : ok ? ' ok' : ''}" data-zrw="${i}" ${done || !ok ? 'disabled' : ''}>${done ? '✓ ' : ok ? '🎁 ' : ''}${w.p === 1 ? 'コンプ' : Math.round(w.p * 100) + '%'}：${w.label}${done ? '' : ok ? '　受け取る' : ''}</button>`; }).join('')}</div>
+      </div>
+      <div class="rp-zfil">${FIL.map(([k, n]) => `<button data-zf="${k}" aria-pressed="${zfil === k}">${n}</button>`).join('')}</div>
+      ${groups.filter(([, xs]) => xs.length).map(([h, xs]) => `${h ? `<h3 class="rp-zsec">${esc(h)}<small>${xs.filter(has).length}/${xs.length}</small></h3>` : '<div class="mt"></div>'}<div class="rp-zgrid">${xs.map(cell).join('')}</div>`).join('') || '<p class="rp-tip">この種類はいない</p>'}
+      <p class="rp-tip">${ally ? 'タップで詳しく。まだ仲間にいないキャラは影だけ見える（★★★★は出るまでひみつ）。' : 'たおした敵が登録される。タップで詳しく。'}</p>`;
+    // 詳しいカード（‹ › で前後へ）
+    function openCard(key) {
+      const order = list, i = order.findIndex((x) => x.key === key); if (i < 0) return;
+      const x = order[i], own = has(x), sc = secret(x);
+      let body;
+      if (ally) {
+        const lv = own ? r.owned[x.id].lv : 1, mm = own ? member(x.id) : { hp: x.fixHp ? x.hp : statOf(x.hp, 1), atk: statOf(x.atk, 1) };
+        body = sc ? `<div class="rp-zcbig secret">？</div><b class="rp-zcname">？？？</b><span class="rp-rar r4">★★★★</span><p>ガチャでまれに出る、伝説の仲間。出るまでひみつ。</p>`
+          : `<div class="rp-zcbig${own ? '' : ' sil'}">${iconHTML(x.id)}</div><b class="rp-zcname">${own ? esc(x.name) : '？？？'}</b><span class="rp-rar r${x.rar}">${RAR[x.rar]}</span>
+            ${own ? `<div class="rp-tags"><em>Lv.${lv}</em><em>HP ${mm.hp}</em><em>攻撃 ${mm.atk}</em><em>得意 ${x.subj == null ? 'なし' : x.subj === 'all' ? 'ぜんぶ' : SUBJNAME(x.subj)}</em></div>
+            <p class="rp-zcskill"><b>スキル「${esc(x.skill.name)}」</b>${esc(SKILL_DESC[x.skill.kind](x.skill))}（正解${x.skill.cost}回でたまる）</p>${x.prof ? `<p>${esc(x.prof)}</p>` : ''}` : '<p>まだ仲間にいない。</p>'}
+            <p class="rp-zcwhere">📍 手に入れ方：${esc(howToGet(x.id))}</p>`;
+      } else {
+        const where = x.kind === 'mid' ? `中間ボス「${MID[zsubj].title}」` : x.kind === 'boss' ? `${lecName(x.lec)} のボス` : x.kind === 'srare' ? `${lecName(x.lec)} STAGE ${x.stage} にたまに出る` : x.kind === 'lec' ? `${lecName(x.lec)} ${x.stage ? 'STAGE ' + x.stage : 'のステージ'}` : x.kind === 'rare' ? 'どのステージにもたまに出る' : 'どのステージにも出る';
+        const tag = x.kind === 'boss' ? '<em class="boss">BOSS</em>' : x.kind === 'mid' ? '<em class="boss">中間ボス</em>' : x.kind === 'rare' || x.kind === 'srare' ? '<em class="rare">レア</em>' : '<em>雑魚</em>';
+        body = `<div class="rp-zcbig${own ? '' : ' sil'}"><span class="rp-zi">${x.icon}</span></div><b class="rp-zcname">${own ? esc(x.name) : '？？？'}</b>${tag}
+          <p>${own ? esc(x.desc || '') : 'まだ出会っていない。'}</p><p class="rp-zcwhere">📍 ${esc(where)}${own ? `　⚔️ たおした数 ${r.zukan[x.key]}` : ''}</p>`;
+      }
+      document.querySelector('.rp-zsheet')?.remove();
+      const sh = document.createElement('div'); sh.className = 'rp-zsheet';
+      sh.innerHTML = `<div class="rp-zcard${ally ? ' r' + x.rar : ''}"><button class="rp-x" data-zx aria-label="閉じる">✕</button>${body}
+        <div class="rp-zcnav"><button data-zn="-1" ${i ? '' : 'disabled'}>‹ 前</button><span>${i + 1} / ${order.length}</span><button data-zn="1" ${i < order.length - 1 ? '' : 'disabled'}>次 ›</button></div></div>`;
+      (document.getElementById('hk-ov') || document.body).appendChild(sh);
+      sh.onclick = (e) => {
+        e.stopPropagation();
+        if (e.target === sh || e.target.closest('[data-zx]')) { sh.remove(); return; }
+        const nb = e.target.closest('[data-zn]'); if (nb && !nb.disabled) { bgm.sfx('tap'); openCard(order[i + +nb.dataset.zn].key); }
+      };
+    }
     m.onclick = (e) => {
-      const zs = e.target.closest('[data-zs]'); if (zs) { e.stopPropagation(); zsubj = zs.dataset.zs; zsel = null; bgm.sfx('tap'); renderZukan(m); return; }
-      if (e.target.closest('[data-zx]')) { e.stopPropagation(); zsel = null; renderZukan(m); return; }
-      const z = e.target.closest('[data-z]'); if (z && !z.disabled) { e.stopPropagation(); zsel = z.dataset.z; bgm.sfx('tap'); renderZukan(m); window.scrollTo(0, 0); }
+      const b = e.target.closest('[data-zm],[data-zs],[data-zf],[data-zrw],[data-z]'); if (!b) return;
+      e.stopPropagation(); bgm.sfx('tap');
+      if (b.dataset.zm) { zmode = b.dataset.zm; zfil = 'all'; return renderZukan(m); }
+      if (b.dataset.zs) { zsubj = b.dataset.zs; return renderZukan(m); }
+      if (b.dataset.zf) { zfil = b.dataset.zf; return renderZukan(m); }
+      if (b.dataset.zrw != null) {
+        const i = +b.dataset.zrw, w = ZREW[zmode][i]; if (r.zrew[rkey(i)] || rate < w.p) return;
+        r.zrew[rkey(i)] = 1; if (w.coins) r.coins += w.coins; if (w.mats) r.mats = (r.mats || 0) + w.mats; if (w.ticket) r.tickets = (r.tickets || 0) + w.ticket;
+        save(); bgm.sfx('rare'); toast(`📖 図鑑の報酬：${w.label} をゲット！`); return renderZukan(m);
+      }
+      openCard(b.dataset.z);
     };
   }
 
@@ -661,6 +727,7 @@ export function makeRPG(ctx) {
           <div class="rp-hskills">${HERO_SKILLS.map((k, i) => { const got = r.hero.lv >= k.lv, on = (r.heroSkill || 0) === i; return `<button class="rp-hsk${on ? ' on' : ''}" data-hsk="${i}" ${got ? '' : 'disabled'}><b>${got ? esc(k.name) : '？？？'}</b><small>${got ? SKILL_DESC[k.kind](k) : `Lv.${k.lv} で覚える`}</small>${on ? '<i>装備中</i>' : ''}</button>`; }).join('')}</div>
           <div class="rp-mat"><span>${MAT.icon} ${MAT.name} <b>×${r.mats || 0}</b><small>ゲキムズで敵を倒すとたまに手に入る</small></span><button class="rp-btn gold" data-mat ${r.mats ? '' : 'disabled'}>使う（上限+${MAT.plus}）</button></div>` : ''}
           ${CHARS[sel]?.prof ? `<p class="rp-prof">${esc(CHARS[sel].prof)}</p>` : ''}
+          ${CHARS[sel]?.limited ? `<div class="rp-mat"><span>${MAT.icon} ${MAT.name} <b>×${r.mats || 0}</b><small>ガチャに出ない仲間は、${MAT.icon}で上限開放</small></span><button class="rp-btn gold" data-mat ${r.mats ? '' : 'disabled'}>使う（上限+${MAT.plus}）</button></div>` : ''}
           <p class="rp-skill"${sel === 'hero' ? ' hidden' : ''}>スキル「${esc(d.skill.name)}」：${SKILL_DESC[d.skill.kind](d.skill)}（正解${d.skill.cost}回でたまる）</p>
           <div class="rp-dbtns">
             ${sel === 'hero' ? '<span class="muted small">リーダーはいつも出撃</span>' : `<button class="rp-btn" data-toggle>${r.party.includes(sel) ? '編成から外す' : '編成に入れる'}</button>`}
@@ -673,7 +740,11 @@ export function makeRPG(ctx) {
       const r = R();
       const sb = e.target.closest('[data-sort]'); if (sb) { sort = sb.dataset.sort; draw(); return; }
       const hk = e.target.closest('[data-hsk]'); if (hk && !hk.disabled) { r.heroSkill = +hk.dataset.hsk; save(); bgm.sfx('skill'); toast(`スキル「${HERO_SKILLS[r.heroSkill].name}」を装備した！`); draw(); return; }
-      if (e.target.closest('[data-mat]') && r.mats > 0) { r.mats--; r.heroLb = (r.heroLb || 0) + 1; save(); bgm.sfx('rare'); toast(`${MAT.icon} 上限開放！ ${heroName()} のレベル上限が ${capOf('hero')} になった`); draw(); return; }
+      if (e.target.closest('[data-mat]') && r.mats > 0) {
+        r.mats--;
+        if (sel === 'hero') r.heroLb = (r.heroLb || 0) + 1; else r.owned[sel].lb = (r.owned[sel].lb || 0) + MAT.plus; // 限定の仲間：💎1個で上限+5
+        save(); bgm.sfx('rare'); toast(`${MAT.icon} 上限開放！ ${sel === 'hero' ? heroName() : CHARS[sel].name} のレベル上限が ${capOf(sel)} になった`); draw(); return;
+      }
       if (e.target.closest('[data-auto]')) { autoParty(); bgm.sfx('skill'); toast(`戦闘力 ${teamPower(r.subj).toLocaleString()} の編成にした！（${SUBJNAME(r.subj)}）`); draw(); return; }
       if (e.target.closest('[data-close-detail]')) { sel = null; draw(); return; }
       const pk = e.target.closest('[data-pick]'); if (pk) { sel = pk.dataset.pick; bgm.sfx('tap'); draw(); return; }
@@ -1259,7 +1330,7 @@ export function makeRPG(ctx) {
         r.party.forEach((pid) => r.owned[pid] && grow(pid, r.owned[pid], CHARS[pid].name));
         addFood(food);
         bump('stage'); if (boss) bump('boss'); if (stars === 3) bump('star3'); if (d) bump('hard');
-        if (isMid && stars === 3 && !r.owned[MID[subj].reward]) { const id = MID[subj].reward; r.owned[id] = { lv: 1, exp: 0 }; if (r.party.length < 3) r.party.push(id); st.joined = id; }
+        if (isMid && stars === 3 && !r.owned[MID[subj].reward]) { const id = MID[subj].reward; r.owned[id] = { lv: Math.max(1, Math.min(RCAP[CHARS[id].rar] || 50, Math.floor(r.hero.lv / 2))), exp: 0 }; /* 主人公のレベルの半分で仲間に */ if (r.party.length < 3) r.party.push(id); st.joined = id; }
       }
       save();
       const nextD = win && d < 2 && first ? DIFF[d + 1] : null;

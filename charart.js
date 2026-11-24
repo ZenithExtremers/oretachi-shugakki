@@ -177,7 +177,7 @@ ${eyes(57, '#0ea5e9')}
 <path d="M36 46 l-26 -6 l24 12 l-22 2 l26 6z" fill="#7dd3fc" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
 <g transform="translate(92 92)"><circle r="10" fill="#0ea5e9" stroke="${OL}" stroke-width="2"/><path d="M-5 -5 l6 5 l-6 5z M1 -5 l6 5 l-6 5z" fill="#fff"/></g>`),
 
-  // ニュクリ：燃える原子核そのもの。顔のついた核のまわりを電子が3つの軌道で回る（体はない）
+  // ニュクリ：燃える原子核そのもの。陽子と中性子のかたまりのまわりを電子が3つの軌道で回る
   nyukuri: wrap4('nyukuri', '#fed7aa', '#9a3412', `
 <g fill="none" stroke="#fde047" stroke-width="2.5" opacity=".9">
 <ellipse cx="60" cy="60" rx="50" ry="17" transform="rotate(30 60 60)"/><ellipse cx="60" cy="60" rx="50" ry="17" transform="rotate(-30 60 60)"/><ellipse cx="60" cy="60" rx="50" ry="17" transform="rotate(90 60 60)"/></g>
@@ -185,12 +185,11 @@ ${eyes(57, '#0ea5e9')}
 <g stroke="#fb923c" stroke-width="3" stroke-linecap="round" opacity=".9"><path d="M60 22 v-6M60 98 v6M24 60 h-6M96 60 h6M34 34 l-5 -5M86 86 l5 5M86 34 l5 -5M34 86 l-5 5"/></g>
 <circle cx="60" cy="60" r="30" fill="#f97316" stroke="${OL}" stroke-width="3"/>
 <g stroke="${OL}" stroke-width="1.6" fill="#fdba74"><circle cx="44" cy="42" r="6"/><circle cx="55" cy="36" r="6" fill="#ef4444"/><circle cx="67" cy="36" r="6"/><circle cx="77" cy="43" r="6" fill="#ef4444"/><circle cx="61" cy="45" r="5" fill="#ef4444"/></g>
-<path d="M46 56 l10 3 M74 56 l-10 3" stroke="${OL}" stroke-width="3" stroke-linecap="round"/>
-<path d="M47 61 q5 -3 9 1 q-5 4 -9 -1z M73 61 q-5 -3 -9 1 q5 4 9 -1z" fill="#fef08a" stroke="${OL}" stroke-width="1.5"/>
-<path d="M52 70 q8 -4 16 0" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<g stroke="${OL}" stroke-width="1.6"><circle cx="50" cy="58" r="7" fill="#ef4444"/><circle cx="63" cy="56" r="7" fill="#fdba74"/><circle cx="74" cy="64" r="6" fill="#ef4444"/><circle cx="46" cy="72" r="6" fill="#fdba74"/><circle cx="58" cy="70" r="7" fill="#ef4444"/><circle cx="70" cy="77" r="6" fill="#fdba74"/></g>
+<circle cx="60" cy="60" r="30" fill="none" stroke="#fde047" stroke-width="2" opacity=".8"/>
 `),
 
-  // ホメオスタシス：恒常性。核と細い毛をもつ丸い細胞が、天秤でいつも同じ状態に保つ（人型ではない）
+  // ホメオスタシス：恒常性。核と細い毛をもつ丸い細胞と、いつも同じ状態に保つ天秤
   homeo: wrap4('homeo', '#d1fae5', '#047857', `
 <circle cx="60" cy="60" r="46" fill="none" stroke="#a7f3d0" stroke-width="2" stroke-dasharray="3 6"/>
 <g stroke="#6ee7b7" stroke-width="2.5" stroke-linecap="round">${Array.from({ length: 20 }, (_, i) => { const a = (i / 20) * Math.PI * 2, x1 = 60 + Math.cos(a) * 34, y1 = 58 + Math.sin(a) * 32, x2 = 60 + Math.cos(a) * 41, y2 = 58 + Math.sin(a) * 39; return `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} L${x2.toFixed(1)} ${y2.toFixed(1)}"/>`; }).join('')}</g>
@@ -198,12 +197,11 @@ ${eyes(57, '#0ea5e9')}
 <ellipse cx="60" cy="58" rx="34" ry="32" fill="#34d399" opacity=".35"/>
 <circle cx="74" cy="44" r="9" fill="#059669" stroke="${OL}" stroke-width="2"/><circle cx="76" cy="42" r="3" fill="#a7f3d0"/>
 <circle cx="40" cy="70" r="3" fill="#10b981"/><circle cx="82" cy="70" r="2.5" fill="#10b981"/><circle cx="46" cy="40" r="2" fill="#10b981"/>
-<path d="M44 58 q6 -4 12 0 M64 58 q6 -4 12 0" stroke="${OL}" stroke-width="3" fill="none" stroke-linecap="round"/>
-<path d="M52 68 q8 5 16 0" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-<circle cx="44" cy="65" r="3.5" fill="#fda4af" opacity=".8"/><circle cx="76" cy="65" r="3.5" fill="#fda4af" opacity=".8"/>
+<g fill="none" stroke="#059669" stroke-width="2" opacity=".7"><path d="M38 60 q8 -6 16 0 t16 0 t14 0"/><path d="M40 72 q6 -4 12 0"/></g>
+<ellipse cx="54" cy="48" rx="4" ry="2.5" fill="#6ee7b7" stroke="#047857" stroke-width="1"/><ellipse cx="68" cy="74" rx="5" ry="3" fill="#6ee7b7" stroke="#047857" stroke-width="1"/>
 <g transform="translate(60 102)" stroke="${OL}" stroke-width="2"><path d="M0 -12 v12 M-22 -10 h44" fill="none"/><path d="M-28 -10 l6 10 l6 -10z M16 -10 l6 10 l6 -10z" fill="url(#gd-homeo)"/><circle cy="-13" r="3" fill="url(#gd-homeo)"/></g>`),
 
-  // イナーシャ：慣性の法則。目のついた鋼の球が、一度転がり出したら止まらない（人型ではない）
+  // イナーシャ：慣性の法則。鋼の球が、一度転がり出したら止まらない（回転の軸と矢印）
   inertia: wrap4('inertia', '#e2e8f0', '#1e293b', `
 <g stroke="#cbd5e1" stroke-width="3.5" stroke-linecap="round" opacity=".85"><path d="M2 46 h22M0 60 h18M4 74 h22M10 88 h14"/></g>
 <path d="M10 104 h100" stroke="#64748b" stroke-width="3"/>
@@ -212,9 +210,9 @@ ${eyes(57, '#0ea5e9')}
 <path d="M28 64 q36 10 72 0" stroke="#475569" stroke-width="2.5" fill="none"/>
 <path d="M44 30 q20 30 0 66 M84 30 q-20 30 0 66" stroke="#475569" stroke-width="2" fill="none" opacity=".6"/>
 <g fill="#64748b" stroke="${OL}" stroke-width="1.2"><circle cx="40" cy="40" r="2.5"/><circle cx="90" cy="44" r="2.5"/><circle cx="92" cy="78" r="2.5"/><circle cx="42" cy="84" r="2.5"/></g>
-<path d="M50 50 l12 3 M88 50 l-12 3" stroke="${OL}" stroke-width="3.5" stroke-linecap="round"/>
-<path d="M52 56 q5 -3 9 1 q-5 4 -9 -1z M86 56 q-5 -3 -9 1 q5 4 9 -1z" fill="#fbbf24" stroke="${OL}" stroke-width="1.5"/>
-<path d="M60 70 q9 4 18 0" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<circle cx="64" cy="60" r="11" fill="#cbd5e1" stroke="${OL}" stroke-width="2.5"/><circle cx="64" cy="60" r="4" fill="#475569"/>
+<path d="M64 49 v-8 M64 71 v8 M53 60 h-8 M75 60 h8" stroke="${OL}" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M90 30 a40 40 0 0 1 10 26" stroke="#fbbf24" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M96 54 l4 4 l3 -5" stroke="#fbbf24" stroke-width="3" fill="none" stroke-linecap="round"/>
 <g transform="translate(100 96)"><path d="M-12 0 h12 v-6 l10 6 l-10 6 v-6" fill="#fbbf24" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/></g>
 <text x="64" y="92" text-anchor="middle" font-size="9" font-weight="900" fill="#1e293b" font-family="serif">F=ma</text>`),
 });

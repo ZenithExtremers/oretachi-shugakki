@@ -1419,3 +1419,73 @@ body.rp-night.rp-day {
 .rp-buffs span.in { background: rgba(100, 116, 139, .3); border-color: rgba(148, 163, 184, .7); }
 .rp-field.nuke { animation: nukeFx .9s ease-out; }
 @keyframes nukeFx { 0% { box-shadow: inset 0 0 0 0 #fde047; filter: brightness(3) saturate(2); } 40% { box-shadow: inset 0 0 60px 20px #f97316; } 100% { box-shadow: none; filter: none; } }
+
+/* ---------- 図鑑（仲間・敵） ---------- */
+.rp-zmode { margin-top: 12px; }
+.rp-zprog { margin-top: 10px; padding: 10px 12px 12px; border-radius: 16px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12); }
+.rp-zprog .rp-zhead { margin-top: 0; }
+.rp-zprog .rp-zbar { position: relative; height: 10px; overflow: visible; }
+.rp-zprog .rp-zbar i { border-radius: 99px; }
+.rp-zbar em { position: absolute; top: -3px; width: 4px; height: 16px; margin-left: -2px; border-radius: 2px; background: #fff; opacity: .7; }
+.rp-zbar em:last-child { margin-left: -4px; }
+.rp-zrews { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.rp-zrw { flex: 1 1 140px; padding: 6px 8px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .2); background: rgba(255, 255, 255, .06); color: #c7cdea; font: inherit; font-size: 12px; font-weight: 700; }
+.rp-zrw.ok { background: linear-gradient(180deg, #fde047, #f59e0b); color: #3b2300; border-color: #f59e0b; cursor: pointer; animation: rp-glow3 .8s infinite alternate; }
+.rp-zrw.done { color: #86efac; border-color: rgba(134, 239, 172, .5); }
+.rp-zfil { display: flex; gap: 6px; margin-top: 12px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.rp-zfil button { flex: none; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .22); background: transparent; color: #c7cdea; font: inherit; font-size: 12.5px; font-weight: 700; }
+.rp-zfil button[aria-pressed="true"] { background: #f5c542; border-color: #f5c542; color: #2a1d00; }
+.rp-zsec { display: flex; align-items: baseline; justify-content: space-between; }
+.rp-zsec small { font-size: 11px; color: #c7cdea; font-weight: 700; }
+.rp-zk { position: relative; cursor: pointer; }
+.rp-zic { display: grid; place-items: center; width: 44px; height: 44px; font-size: 30px; line-height: 1; }
+.rp-zic .rp-face { width: 44px; height: 44px; }
+.rp-zic .rp-emo { font-size: 28px; }
+.rp-zic svg, .rp-zi svg { width: 100%; height: 100%; display: block; }
+.rp-zi { display: grid; place-items: center; width: 100%; height: 100%; }
+.rp-zk.unk { opacity: 1; cursor: pointer; }
+.rp-zk.unk .rp-zic > * { filter: brightness(0); opacity: .45; }
+.rp-zk.unk small { color: #8b93b8; }
+.rp-zk.secret .rp-zic b { filter: none; opacity: 1; font-size: 24px; font-weight: 900; background: linear-gradient(135deg, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.rp-zr { position: absolute; top: 3px; right: 5px; font-style: normal; font-size: 8px; color: #f5c542; letter-spacing: -1px; }
+.rp-zk.r4 .rp-zr { background: linear-gradient(90deg, #f472b6, #facc15, #4ade80, #38bdf8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.rp-zk.r3 { border-color: rgba(245, 197, 66, .55); }
+.rp-zk.r4 { border: 1.5px solid transparent; background: linear-gradient(#211a4a, #211a4a) padding-box, linear-gradient(135deg, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa) border-box; }
+.rp-day .rp-zk.r4 { background: linear-gradient(#fff, #fff) padding-box, linear-gradient(135deg, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa) border-box; }
+/* 詳しいカード */
+.rp-zsheet { position: fixed; inset: 0; z-index: 120; background: rgba(5, 3, 15, .72); display: grid; place-items: center; padding: 16px; animation: gtIn .2s ease-out; }
+.rp-zcard { position: relative; width: min(360px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; box-sizing: border-box; padding: 22px 18px 14px; border-radius: 22px; text-align: center; color: #fff;
+  background: radial-gradient(circle at 50% 18%, #3b2a7a, #1a1446 60%); border: 2px solid #f5c542; box-shadow: 0 10px 40px rgba(0, 0, 0, .5); animation: lgCard .35s cubic-bezier(.2, 1.4, .4, 1); }
+.rp-zcard.r4 { border-color: transparent; background: radial-gradient(circle at 50% 18%, #3b2a7a, #1a1446 60%) padding-box, linear-gradient(135deg, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa) border-box; }
+.rp-zcard .rp-x { position: absolute; top: 10px; right: 10px; }
+.rp-zcbig { width: 150px; height: 150px; margin: 0 auto 6px; display: grid; place-items: center; font-size: 96px; line-height: 1; }
+.rp-zcbig .rp-face { width: 150px; height: 150px; }
+.rp-zcbig .rp-emo { font-size: 96px; }
+.rp-zcbig.sil > * { filter: brightness(0); opacity: .55; }
+.rp-zcbig.secret { font-size: 90px; font-weight: 900; background: linear-gradient(135deg, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.rp-zcname { display: block; font-size: 22px; font-weight: 900; margin: 2px 0; }
+.rp-zcard .rp-rar { font-size: 16px; }
+.rp-zcard > em, .rp-zcard em.boss, .rp-zcard em.rare { display: inline-block; font-style: normal; font-size: 11px; font-weight: 800; padding: 1px 8px; border-radius: 6px; background: #475569; }
+.rp-zcard em.boss { background: #f43f5e; } .rp-zcard em.rare { background: #b7791f; }
+.rp-zcard p { margin: 8px 0; font-size: 13.5px; line-height: 1.6; text-align: left; }
+.rp-zcard .rp-tags { justify-content: center; margin-top: 8px; }
+.rp-zcskill { padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, .08); }
+.rp-zcskill b { display: block; color: #fde68a; }
+.rp-zcwhere { color: #c7cdea; font-size: 12.5px !important; }
+.rp-zcnav { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; font-size: 12px; color: #c7cdea; }
+.rp-zcnav button { padding: 7px 14px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .08); color: #fff; font: inherit; font-weight: 700; }
+.rp-zcnav button:disabled { opacity: .3; }
+.rp-day .rp-zprog { background: rgba(255, 255, 255, .7); border-color: rgba(30, 41, 59, .12); }
+.rp-day .rp-zrw { color: var(--muted); border-color: rgba(30, 41, 59, .15); background: #fff; }
+.rp-day .rp-zrw.done { color: #15803d; }
+.rp-day .rp-zfil button { color: var(--muted); border-color: rgba(30, 41, 59, .2); }
+.rp-day .rp-zfil button[aria-pressed="true"] { color: #2a1d00; }
+.rp-day .rp-zsec small, .rp-day .rp-zk.unk small { color: var(--muted); }
+.rp-day .rp-zcard { background: radial-gradient(circle at 50% 18%, #fff7d6, #fffaf0 60%); color: var(--text); }
+.rp-day .rp-zcard.r4 { background: radial-gradient(circle at 50% 18%, #fff7d6, #fffaf0 60%) padding-box, linear-gradient(135deg, #f472b6, #facc15, #4ade80, #38bdf8, #a78bfa) border-box; }
+.rp-day .rp-zcskill { background: rgba(30, 41, 59, .06); }
+.rp-day .rp-zcskill b { color: #b45309; }
+.rp-day .rp-zcwhere, .rp-day .rp-zcnav { color: var(--muted) !important; }
+.rp-day .rp-zcnav button { color: var(--text); border-color: rgba(30, 41, 59, .2); background: #fff; }
+.rp-seg4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.rp-zmode { grid-template-columns: repeat(2, 1fr); }
