@@ -1,8 +1,8 @@
 // オフライン用。オンラインのときは常に最新を取りに行き（network-first）、つながらないときはキャッシュを使う。
-const CACHE = 'oretachi-v60';
+const CACHE = 'oretachi-v61';
 const SHELL = [
   './', 'index.html', 'style.css', 'app.js', 'sfx.js', 'himakoroshi.js', 'rpg.js', 'enemies.js', 'enemies-stage.js', 'charart.js', 'history.js', 'history-map.js', 'bgm.js', 'manifest.webmanifest',
-  'icons/icon-192.png', 'icons/hero-lv50.svg', 'icons/hero-lv150.svg', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png',
+  'icons/icon-192.png', 'icons/hero-lv50.svg', 'icons/hero-lv100.svg', 'icons/hero-lv150.svg', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png',
   'data/lib.js', 'data/subjects.js', 'data/patchnotes.js', 'data/hima-words.js',
 ];
 

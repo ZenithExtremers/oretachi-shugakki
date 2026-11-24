@@ -35,8 +35,8 @@ const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = rnd(
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 const $ = (s) => document.querySelector(s);
-// 主人公のスキン（冒険の編成で着替える。Lv.50 レッドスーツ・Lv.150 ボーダー）
-const HERO_SKIN_SRC = [['icons/icon-192.png', 1], ['icons/hero-lv50.svg', 50], [null, 100], ['icons/hero-lv150.svg', 150]]; // 冒険の HERO_SKINS と同じ並び
+// 主人公のスキン（冒険の編成で着替える。Lv.50 レッドスーツ・Lv.100 コントローラー・Lv.150 ボーダー）
+const HERO_SKIN_SRC = [['icons/icon-192.png', 1], ['icons/hero-lv50.svg', 50], ['icons/hero-lv100.svg', 100], ['icons/hero-lv150.svg', 150]]; // 冒険の HERO_SKINS と同じ並び
 const heroSrc = () => { const k = HERO_SKIN_SRC[S.rpg?.heroSkin || 0]; return k && k[0] && (S.rpg?.hero?.lv || 0) >= k[1] ? k[0] : HERO_SKIN_SRC[0][0]; };
 let toastT;
 function toast(m) {

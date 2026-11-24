@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 主人公スキン Lv.100「コントローラー」：大きなゲームコントローラーをかぶり、青いマントに金の飾り。手描きのふぞろいな形・なめらかな線。ふち線は黒 -->
+  <defs>
+    <clipPath id="c"><circle cx="256" cy="256" r="220"/></clipPath>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.009" numOctaves="1" seed="5" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="#1e3a8a"/>
+  <circle cx="256" cy="256" r="220" fill="#fff"/>
+  <g clip-path="url(#c)"><g filter="url(#rough)" stroke="#111" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- 体：左は白い袖と紺のベスト、右は水色のマント -->
+    <path d="M120 520 Q118 420 150 380 Q180 350 220 340 L300 340 Q350 356 380 392 Q404 440 404 520 Z" fill="#b3aeb6"/>
+    <path d="M160 520 Q158 430 176 392 Q196 362 230 350 L262 520 Z" fill="#12305a"/>
+    <path d="M228 350 Q290 340 344 362 Q384 384 398 440 L410 520 L268 520 Q252 452 230 386 Z" fill="#5ab3cb"/>
+    <!-- 金の縁どり・金の飾りひも -->
+    <path d="M182 410 L182 440 L204 440 M192 470 L192 520 M206 460 L206 520" fill="none" stroke="#a37a3a" stroke-width="5"/>
+    <path d="M292 384 Q276 376 274 394 Q274 410 292 404 Q304 398 296 386 M294 404 L292 470 Q270 476 258 470 M296 394 Q318 372 342 362" fill="none" stroke="#a37a3a" stroke-width="5"/>
+    <!-- 首 -->
+    <path d="M226 290 L222 346 Q256 366 292 346 L288 290 Z" fill="#a06f5f"/>
+    <!-- 大きなゲームコントローラー（頭にかぶる） -->
+    <path d="M256 124 C290 116 302 84 362 82 C430 82 474 132 474 196 C474 262 432 304 364 304 C318 304 300 270 256 266 C212 270 194 304 148 304 C80 304 38 262 38 196 C38 132 82 82 150 82 C210 84 222 116 256 124 Z" fill="#8c97a6"/>
+    <path d="M70 250 Q100 300 150 300 C194 300 212 268 256 262 C300 268 318 300 364 300 Q420 300 448 254" fill="none" stroke="#6c7686" stroke-width="5"/>
+    <!-- 十字キー -->
+    <path d="M128 132 L160 130 L160 172 L200 172 L200 204 L160 206 L158 248 L126 248 L126 206 L86 206 L88 172 L128 172 Z" fill="#222c3a"/>
+    <!-- 4色のボタン -->
+    <circle cx="374" cy="140" r="21" fill="#b4361a"/>
+    <circle cx="334" cy="180" r="21" fill="#0b5aa0"/>
+    <circle cx="416" cy="188" r="21" fill="#167480"/>
+    <circle cx="372" cy="226" r="21" fill="#c9900f"/>
+    <!-- 顔（コントローラーの真ん中から出ている） -->
+    <path d="M212 190 Q206 278 236 296 Q256 308 278 296 Q306 278 300 190 Q256 172 212 190 Z" fill="#f4eeec"/>
+    <!-- 茶色い髪 -->
+    <path d="M206 214 Q200 166 236 152 Q268 142 292 158 Q312 176 304 214 Q296 196 284 192 Q270 182 256 190 Q238 180 224 194 Q212 198 206 214 Z" fill="#6d4330"/>
+    <!-- 目・鼻・口 -->
+    <path d="M226 222 Q236 216 246 222 Q236 228 226 222 Z M268 222 Q278 216 288 222 Q278 228 268 222 Z" fill="#1d1010" stroke-width="3"/>
+    <path d="M254 230 Q248 250 250 256 Q258 260 266 256" fill="none" stroke="#c39a8e" stroke-width="3"/>
+    <path d="M240 272 Q256 264 272 272 Q256 282 240 272 Z" fill="#f3e9e9" stroke="#5a2a2a" stroke-width="3"/>
+  </g></g>
+</svg>
