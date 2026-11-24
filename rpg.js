@@ -48,8 +48,8 @@ const HERO = { name: '主人公', hp: 100, atk: 20, skill: { kind: 'hint', pow: 
 const HERO_SKILLS = [
   { lv: 1, kind: 'hint', pow: 2, cost: 4, name: 'ひとさし指のひらめき' },
   { lv: 50, kind: 'dmg', pow: 6, cost: 4, name: 'セイキンショット！' },
-  { lv: 100, kind: 'healguard', pow: 1, cost: 5, name: 'ありがとうございました！' },
-  { lv: 150, kind: 'time', pow: 25, cost: 3, name: '今日はこれをやっていきます' },
+  { lv: 100, kind: 'healguard', pow: 1, cost: 5, name: 'Keep Your Head Up' },
+  { lv: 150, kind: 'stardust', pow: 7, cost: 3, name: 'オールスターダスト計画やりましょー！' },
 ];
 // 主人公の上限開放の素材（ゲキムズで敵を倒すとたまに手に入る）
 const MAT = { name: '覚醒の結晶', icon: '💎', drop: 0.05, bossDrop: 0.2, plus: 5 };
@@ -62,6 +62,7 @@ const SKILL_DESC = {
   hint: () => '不正解の選択肢を2つ消す',
   healguard: () => 'パーティのHPを全回復し、次の2回受けるダメージ半分',
   charge: () => 'ほかの仲間全員のスキルのゲージを1たまった状態にする（正解1回ぶん）',
+  stardust: (k) => `場の敵全員に、それぞれ攻撃力×${k.pow} のダメージ（割り振らない）。かわりに仲間のHPが最大値の半分へる（倒れることもある）`,
   nuke: (k) => `場の敵全員に、それぞれ攻撃力×${k.pow} のダメージ（割り振らない）`,
   homeo: (k) => `${k.pow}ターンのあいだ、HPが30%より下がらず、毎ターンHPを5%回復`,
   inertia: (k) => `${k.pow}ターンのあいだ、間違えてもコンボが切れず、受けるダメージ半分`,
@@ -86,7 +87,8 @@ const HLINE = {
   skill: ['ここで…使っていきたいと思います！', 'セイキンショット！'],
   hint: ['ちょっと、ひとついいですか？'],
   shot: ['セイキンショット！'],
-  thanks: ['ありがとうございました！'],
+  thanks: ['Keep Your Head Up！'],
+  stardust: ['オールスターダスト計画、やりましょー！'],
   today: ['今日はこれをやっていきたいと思います！'],
   mat: ['うわっ、結晶が出ました！これはうれしい！'],
   mid: ['ここで中間ボスです！気合い入れていきたいと思います！'],
@@ -237,7 +239,7 @@ export function makeRPG(ctx) {
     return ups;
   }
   // 戦闘力：HP÷2 ＋ 攻撃×5（今の科目が得意なら×1.5、全科目なら×1.2）＋ スキルの強さ
-  const SKW = { dmg: 25, heal: 120, time: 5, guard: 18, hint: 50, healguard: 160, charge: 90, nuke: 32, homeo: 45, inertia: 40 };
+  const SKW = { dmg: 25, heal: 120, time: 5, guard: 18, hint: 50, healguard: 160, charge: 90, nuke: 32, stardust: 30, homeo: 45, inertia: 40 };
   function power(id, subj = R().subj) {
     const m = member(id), k = m.skill;
     const bonus = m.subj === subj ? 1.3 : m.subj === 'all' ? 1.2 : 1;
@@ -1288,6 +1290,11 @@ export function makeRPG(ctx) {
         bgm.sfx('boom'); st.active.filter((i) => foes[i].cur > 0).forEach((i, j) => hitEnemy(atkOf(x) * k.pow, j ? '' : k.name, true, i)); // 場の敵全員に、それぞれ6倍（割り振らない）
         const fl = document.querySelector('.rp-field'); if (fl) { fl.classList.remove('nuke'); void fl.offsetWidth; fl.classList.add('nuke'); }
         if (st.active.some((i) => foes[i].cur <= 0) && !st.busy) { st.busy = true; clearInterval(st.timer); document.querySelectorAll('#rp-q [data-c]').forEach((b) => { b.disabled = true; }); setTimeout(afterTurn, 600); } }
+      else if (k.kind === 'stardust') { // 主人公 Lv.150：全員に×7、そのかわり仲間のHPが最大値の半分へる
+        bgm.sfx('boom'); st.active.filter((i) => foes[i].cur > 0).forEach((i, j) => hitEnemy(atkOf(x) * k.pow, j ? '' : '✨スターダスト', true, i));
+        const fl = document.querySelector('.rp-field'); if (fl) { fl.classList.remove('nuke'); void fl.offsetWidth; fl.classList.add('nuke'); }
+        setTimeout(() => { if (st.over) return; st.hp -= Math.round(st.maxHp / 2); bgm.sfx('ouch'); pop(`反動 -${Math.round(st.maxHp / 2)}`, 'miss'); drawHp();
+          if ((st.hp <= 0 || st.active.some((i) => foes[i].cur <= 0)) && !st.busy) { st.busy = true; clearInterval(st.timer); document.querySelectorAll('#rp-q [data-c]').forEach((b) => { b.disabled = true; }); setTimeout(afterTurn, 600); } }, 450); }
       else if (k.kind === 'homeo') { st.homeo = k.pow; pop('💚 恒常性！', 'heal'); bgm.sfx('heal'); drawBuffs(); }
       else if (k.kind === 'inertia') { st.inertia = k.pow; pop('⚙️ 慣性！', 'info'); bgm.sfx('skill'); drawBuffs(); }
       else if (k.kind === 'healguard') { st.hp = st.maxHp; st.guard += 2; pop('全回復＆ガード！', 'heal'); bgm.sfx('heal'); drawHp(); }
@@ -1297,7 +1304,7 @@ export function makeRPG(ctx) {
         pop('ひらめき！', 'info'); bgm.sfx('skill');
       }
       if (x.rar === 4) cutIn(x); else toast(`${x.name}「${k.name}」`);
-      hsay(x.id === 'hero' ? (k.kind === 'hint' ? 'hint' : k.kind === 'dmg' ? 'shot' : k.kind === 'healguard' ? 'thanks' : 'today') : k.kind === 'heal' ? 'heal' : 'skill');
+      hsay(x.id === 'hero' ? (k.kind === 'hint' ? 'hint' : k.kind === 'dmg' ? 'shot' : k.kind === 'healguard' ? 'thanks' : k.kind === 'stardust' ? 'stardust' : 'today') : k.kind === 'heal' ? 'heal' : 'skill');
       drawTeam();
     }
 
