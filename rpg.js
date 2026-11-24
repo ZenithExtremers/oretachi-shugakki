@@ -44,6 +44,8 @@ export const CHARS = {
   ryu: { name: 'リュウ', icon: '🐉', rar: 3, subj: 'all', hp: 120, atk: 30, skill: { kind: 'dmg', pow: 5, cost: 5, name: 'りゅうのいぶき' } },
 };
 const HERO = { name: '主人公', hp: 100, atk: 20, skill: { kind: 'hint', pow: 2, cost: 4, name: 'ひとさし指のひらめき' } };
+// Lv.50・100・150 になるたびのステータスの倍率。Lv.150 で「同じレベルのリュウ（得意ぜんぶ×1.2込み）」の1.1倍になるように3段階でそろえる
+const HERO_UP = { hp: ((120 * 1.1) / 100) ** (1 / 3), atk: ((30 * 1.2 * 1.1) / 20) ** (1 / 3) }; // HP ×約1.097、攻撃 ×約1.255（1段階あたり）
 // 主人公のスキル：50レベルごとに新しいスキルを覚え、編成画面で1つを選んで装備する
 const HERO_SKILLS = [
   { lv: 1, kind: 'hint', pow: 2, cost: 4, name: 'ひとさし指のひらめき' },
@@ -222,8 +224,8 @@ export function makeRPG(ctx) {
   };
   const member = (id) => {
     const r = R();
-    if (id === 'hero') { const up = 1.5 ** [50, 100, 150].filter((l) => r.hero.lv >= l).length; // Lv.50・100・150 でステータス1.5倍
-      return { id, name: heroName(), lv: r.hero.lv, hp: Math.round(statOf(HERO.hp, r.hero.lv) * up), atk: Math.round(statOf(HERO.atk, r.hero.lv) * up), skill: HERO_SKILLS[r.heroSkill || 0] || HERO.skill, subj: null }; }
+    if (id === 'hero') { const k = [50, 100, 150].filter((l) => r.hero.lv >= l).length; // Lv.50・100・150 で段階的に強くなる
+      return { id, name: heroName(), lv: r.hero.lv, hp: Math.round(statOf(HERO.hp, r.hero.lv) * HERO_UP.hp ** k), atk: Math.round(statOf(HERO.atk, r.hero.lv) * HERO_UP.atk ** k), skill: HERO_SKILLS[r.heroSkill || 0] || HERO.skill, subj: null }; }
     const c = CHARS[id], o = r.owned[id];
     return { id, name: c.name, lv: o.lv, hp: c.fixHp ? c.hp : statOf(c.hp, o.lv), atk: statOf(c.atk, o.lv), skill: c.skill, subj: c.subj, rar: c.rar };
   };
