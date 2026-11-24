@@ -35,6 +35,8 @@ const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = rnd(
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 const $ = (s) => document.querySelector(s);
+// 主人公のスキン（冒険の編成で着替える。Lv.50 でレッドスーツ）
+const heroSrc = () => (S.rpg?.heroSkin === 1 && (S.rpg?.hero?.lv || 0) >= 50 ? 'icons/hero-lv50.svg' : 'icons/icon-192.png');
 let toastT;
 function toast(m) {
   const t = document.getElementById('toast');
@@ -142,7 +144,7 @@ function partnerRec() {
 function partnerArt(happy) {
   const id = partner();
   if (id === 'owl') return owlSVG(stage(), happy);
-  if (id === 'hero') return `<img class="hk-pimg${happy ? ' happy' : ''}" src="icons/icon-192.png" alt="">`;
+  if (id === 'hero') return `<img class="hk-pimg${happy ? ' happy' : ''}" src="${heroSrc()}" alt="">`;
   const c = CHARS[id];
   if (CHAR_ART[id]) return `<span class="hk-pemo hk-partart${happy ? ' happy' : ''}">${CHAR_ART[id]}</span>`;
   return c.icon === 'owl' ? owlSVG(stage(), happy) : `<span class="hk-pemo${happy ? ' happy' : ''}">${c.icon}</span>`;
@@ -184,7 +186,7 @@ function openPartnerPick() {
     <div class="hk-pick">${ids.map((id) => {
       if (!owned(id)) return '<span class="hk-pcell lock"><span class="hk-pface">？</span><small>未発見</small></span>';
       const info = id === 'owl' ? { name: 'フクロウ', lv: S.owl.lv } : rpg.memberInfo(id);
-      const face = id === 'owl' ? `<span class="hk-pface owl">${owlSVG(stage())}</span>` : id === 'hero' ? '<img class="hk-pface" src="icons/icon-192.png" alt="">' : (CHAR_ART[id] ? `<span class="hk-pface hk-partart">${CHAR_ART[id]}</span>` : `<span class="hk-pface">${CHARS[id].icon}</span>`);
+      const face = id === 'owl' ? `<span class="hk-pface owl">${owlSVG(stage())}</span>` : id === 'hero' ? `<img class="hk-pface" src="${heroSrc()}" alt="">` : (CHAR_ART[id] ? `<span class="hk-pface hk-partart">${CHAR_ART[id]}</span>` : `<span class="hk-pface">${CHARS[id].icon}</span>`);
       return `<button class="hk-pcell${partner() === id ? ' on' : ''}" data-partner="${id}">${face}<small>${esc(info.name)}</small><em>Lv.${info.lv}</em></button>`;
     }).join('')}</div>`;
   body().onclick = (e) => {

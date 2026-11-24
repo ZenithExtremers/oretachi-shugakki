@@ -208,9 +208,12 @@ export function makeRPG(ctx) {
   bgm.setEnabled(R().sound === 'bgm');
   let lectures = null; // { ccpp: {1:'第1回 …'}, … }
   const heroName = () => R().heroName;
+  // 主人公のスキン（レベル50ごとに増える。編成の主人公の詳細で着替える）
+  const HERO_SKINS = [{ lv: 1, name: 'いつもの', src: 'icons/icon-192.png' }, { lv: 50, name: 'レッドスーツ', src: 'icons/hero-lv50.svg' }];
+  const heroSrc = () => { const r = R(), k = HERO_SKINS[r.heroSkin || 0]; return k && r.hero.lv >= k.lv ? k.src : HERO_SKINS[0].src; };
 
   const iconHTML = (id, cls = '') => {
-    if (id === 'hero') return `<img class="rp-face ${cls}" src="icons/icon-192.png" alt="">`;
+    if (id === 'hero') return `<img class="rp-face ${cls}" src="${heroSrc()}" alt="">`;
     const c = CHARS[id];
     if (CHAR_ART[id]) return `<span class="rp-face rp-artf ${cls}">${CHAR_ART[id]}</span>`; // オリジナルイラスト（章限定の仲間）
     return c.icon === 'owl' ? `<span class="rp-face rp-owl ${cls}">${owlSVG(2)}</span>` : `<span class="rp-face rp-emo ${cls}">${c.icon}</span>`;
@@ -310,7 +313,7 @@ export function makeRPG(ctx) {
     const r = R(), t = team();
     m.innerHTML = `
       <div class="rp-chead">
-        <img class="rp-heroimg" src="icons/icon-192.png" alt="" data-rp="talk">
+        <img class="rp-heroimg" src="${heroSrc()}" alt="" data-rp="talk">
         <div class="rp-herotxt">${heroTitle() ? `<span class="rp-title">${esc(heroTitle())}</span>` : ''}<button class="rp-name" data-rp="rename"><b>${esc(heroName())}</b><span>✏️</span></button>
           <div class="rp-lv">Lv.${r.hero.lv}<span class="rp-exp"><i style="width:${(r.hero.exp / needExp(r.hero.lv)) * 100}%"></i></span></div></div>
         <div class="rp-hudright"><span class="rp-coin">🪙 ${r.coins}</span><span class="rp-powrow"><button class="rp-btn rp-partyb" data-party>👥 編成</button><span class="rp-pow">戦闘力 <b>${teamPower(r.subj).toLocaleString()}</b></span></span></div>
@@ -372,7 +375,7 @@ export function makeRPG(ctx) {
     m.innerHTML = `
       <div class="rp-hud">
         <div class="rp-hudtop">
-          <img class="rp-heroimg" src="icons/icon-192.png" alt="" data-rp="talk">
+          <img class="rp-heroimg" src="${heroSrc()}" alt="" data-rp="talk">
           <div class="rp-herotxt">
             <button class="rp-name" data-rp="rename"><b>${esc(heroName())}</b><span>✏️</span></button>
             <div class="rp-lv">Lv.${r.hero.lv}<span class="rp-exp"><i style="width:${(r.hero.exp / needExp(r.hero.lv)) * 100}%"></i></span></div>
@@ -403,7 +406,7 @@ export function makeRPG(ctx) {
           return `<button class="rp-spot${boss ? ' boss' : ''}${x.done ? ' done' : ''}${isHere ? ' here' : ''}" style="left:${pos[i].x}%;top:${top}px" data-rp="stage" data-k="${x.k}" data-n="${x.n}" ${x.open ? '' : 'disabled'}>
             <span class="c">${!x.open ? '🔒' : boss ? esc(E.boss[x.k]?.[1] || '👑') : x.n}</span>
             <small>${boss ? 'BOSS' : 'STAGE ' + x.n}${x.done ? ` <i class="rp-stars">${starTxt(sv)}</i>` : ''}</small>
-            ${isHere ? '<img class="rp-me" src="icons/icon-192.png" alt="">' : ''}
+            ${isHere ? `<img class="rp-me" src="${heroSrc()}" alt="">` : ''}
           </button>`;
         }).join('')}
       </div></div>
@@ -678,7 +681,7 @@ export function makeRPG(ctx) {
   function openRename() {
     openOv('主人公の名前'); darkOv();
     body().innerHTML = `<div class="card rp-full" style="max-width:420px">
-      <img class="rp-heroimg big" src="icons/icon-192.png" alt="">
+      <img class="rp-heroimg big" src="${heroSrc()}" alt="">
       <input class="hk-input rp-nameinput" id="rp-nin" maxlength="10" value="${esc(heroName())}" style="min-height:0">
       <p class="muted small">10文字まで</p>
       <button class="btn wide" id="rp-nok">決定</button></div>`;
@@ -725,6 +728,7 @@ export function makeRPG(ctx) {
           <div class="rp-tags"><em class="pw">戦闘力 ${power(sel)}</em><em>HP ${d.hp}</em><em>攻撃 ${d.atk}</em>${o.lb ? `<em>突破+${o.lb}</em>` : ''}<em>得意 ${d.subj == null ? 'なし' : d.subj === 'all' ? 'ぜんぶ' : SUBJ.find((x) => x[0] === d.subj)[1]}</em></div>
           ${sel === 'hero' ? `<p class="rp-prof">${esc(HERO_PROFILE)}</p>
           <div class="rp-hskills">${HERO_SKILLS.map((k, i) => { const got = r.hero.lv >= k.lv, on = (r.heroSkill || 0) === i; return `<button class="rp-hsk${on ? ' on' : ''}" data-hsk="${i}" ${got ? '' : 'disabled'}><b>${got ? esc(k.name) : '？？？'}</b><small>${got ? SKILL_DESC[k.kind](k) : `Lv.${k.lv} で覚える`}</small>${on ? '<i>装備中</i>' : ''}</button>`; }).join('')}</div>
+          <div class="rp-skins"><b>👔 スキン</b><div>${HERO_SKINS.map((k, i) => { const got = r.hero.lv >= k.lv, on = (r.heroSkin || 0) === i; return `<button class="rp-skin${on ? ' on' : ''}" data-skin="${i}" ${got ? '' : 'disabled'}><img src="${k.src}" alt="" class="${got ? '' : 'sil'}"><small>${got ? esc(k.name) : `Lv.${k.lv}で解放`}</small>${on ? '<i>着用中</i>' : ''}</button>`; }).join('')}<button class="rp-skin" disabled><span class="rp-skinq">？</span><small>Lv.${HERO_SKINS[HERO_SKINS.length - 1].lv + 50}で解放（準備中）</small></button></div></div>
           <div class="rp-mat"><span>${MAT.icon} ${MAT.name} <b>×${r.mats || 0}</b><small>ゲキムズで敵を倒すとたまに手に入る</small></span><button class="rp-btn gold" data-mat ${r.mats ? '' : 'disabled'}>使う（上限+${MAT.plus}）</button></div>` : ''}
           ${CHARS[sel]?.prof ? `<p class="rp-prof">${esc(CHARS[sel].prof)}</p>` : ''}
           ${CHARS[sel]?.limited ? `<div class="rp-mat"><span>${MAT.icon} ${MAT.name} <b>×${r.mats || 0}</b><small>ガチャに出ない仲間は、${MAT.icon}で上限開放</small></span><button class="rp-btn gold" data-mat ${r.mats ? '' : 'disabled'}>使う（上限+${MAT.plus}）</button></div>` : ''}
@@ -740,6 +744,8 @@ export function makeRPG(ctx) {
       const r = R();
       const sb = e.target.closest('[data-sort]'); if (sb) { sort = sb.dataset.sort; draw(); return; }
       const hk = e.target.closest('[data-hsk]'); if (hk && !hk.disabled) { r.heroSkill = +hk.dataset.hsk; save(); bgm.sfx('skill'); toast(`スキル「${HERO_SKILLS[r.heroSkill].name}」を装備した！`); draw(); return; }
+      const skb = e.target.closest('[data-skin]');
+      if (skb && !skb.disabled) { r.heroSkin = +skb.dataset.skin; save(); bgm.sfx('skill'); toast(`👔 ${HERO_SKINS[r.heroSkin].name} に着替えた！`); draw(); ctx.refreshHero?.(); return; }
       if (e.target.closest('[data-mat]') && r.mats > 0) {
         r.mats--;
         if (sel === 'hero') r.heroLb = (r.heroLb || 0) + 1; else r.owned[sel].lb = (r.owned[sel].lb || 0) + MAT.plus; // 限定の仲間：💎1個で上限+5
@@ -949,7 +955,7 @@ export function makeRPG(ctx) {
             <div class="rp-hpbar party"><i id="rp-php"></i><span id="rp-phptxt"></span></div>
             <div class="rp-timebar"><i id="rp-time"></i></div>
             <div class="rp-buffs" id="rp-buffs">${buffHTML()}</div>
-            <div class="rp-say" id="rp-say"><img src="icons/icon-192.png" alt=""><span></span></div>
+            <div class="rp-say" id="rp-say"><img src="${heroSrc()}" alt=""><span></span></div>
             <div class="rp-event" id="rp-event" hidden></div>
           </div>
           <div id="rp-q"></div>
@@ -1339,7 +1345,7 @@ export function makeRPG(ctx) {
         <div class="rp-endtitle">${win ? 'STAGE CLEAR!' : 'GAME OVER'}</div>
         ${win ? `<div class="rp-endstars">${[1, 2, 3].map((k) => `<span class="${k <= stars ? 'on' : ''}" style="animation-delay:${k * 0.18}s">★</span>`).join('')}</div>
         <p class="rp-starrule">★1 クリア ${'✓'}　★2 HP半分以上 ${st.hp / st.maxHp >= 0.5 ? '✓' : '✗'}　★3 ノーミス ${st.miss === 0 ? '✓' : `✗（ミス${st.miss}）`}</p>` : ''}
-        <p class="rp-hline"><img src="icons/icon-192.png" alt=""><span>${esc(pick(HLINE[!win ? 'lose' : stars === 3 ? 'star3' : 'clear']))}</span></p>
+        <p class="rp-hline"><img src="${heroSrc()}" alt=""><span>${esc(pick(HLINE[!win ? 'lose' : stars === 3 ? 'star3' : 'clear']))}</span></p>
         <p class="rp-endsub">${win ? `${esc(foes[foes.length - 1].name)}をたおした！${newBest && !first ? ' ★の記録更新！' : ''}` : `正解 ${st.correct}問。パーティを育ててまた挑戦しよう`}</p>
         ${win ? `<div class="rp-rewards"><span>🪙 ${coins}${first ? '<em>初クリア×2</em>' : ''}${st.rares ? `<em>レア+${st.rares * 150}</em>` : ''}</span><span>EXP ${exp}</span><span>🌰 ${food}</span>${st.mats ? `<span>${MAT.icon} ×${st.mats}</span>` : ''}</div>` : ''}
         ${st.joined ? `<div class="rp-joined">${iconHTML(st.joined)}<b>★★★${esc(CHARS[st.joined].name)} が仲間になった！</b></div>` : isMid && win && !r.owned[MID[subj].reward] ? '<p class="rp-unlock">★3でクリアすると仲間になる！</p>' : ''}

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 主人公スキン Lv.50「レッドスーツ」：いつものアイコンと同じ絵のタッチ（紺の背景・白い丸・黒いふち線・ベタ塗り） -->
+  <defs><clipPath id="c"><circle cx="256" cy="256" r="220"/></clipPath></defs>
+  <rect width="512" height="512" fill="#1e3a8a"/>
+  <circle cx="256" cy="256" r="220" fill="#fff"/>
+  <g clip-path="url(#c)" stroke="#111" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <!-- 赤いスーツ（肩幅広め） -->
+    <path d="M20 520 Q24 410 120 380 L206 350 L256 480 L306 350 L392 380 Q488 410 492 520 Z" fill="#ec1622"/>
+    <!-- 黒いシャツ -->
+    <path d="M204 352 L256 480 L308 352 L286 334 L226 334 Z" fill="#111"/>
+    <!-- えり（ラペル） -->
+    <path d="M206 350 L172 392 L198 410 L180 436 L246 512 Z" fill="#c40f1a"/>
+    <path d="M306 350 L340 392 L314 410 L332 436 L266 512 Z" fill="#c40f1a"/>
+    <!-- 赤いネクタイ -->
+    <path d="M242 356 L270 356 L263 378 L280 470 L256 506 L232 470 L249 378 Z" fill="#f01c27"/>
+    <!-- 首 -->
+    <path d="M214 280 L214 340 Q256 364 298 340 L298 280 Z" fill="#e6c2ab"/>
+    <!-- 顔（面長） -->
+    <path d="M160 190 Q156 318 256 344 Q356 318 352 190 Z" fill="#edcbb5"/>
+    <ellipse cx="158" cy="250" rx="13" ry="24" fill="#e3bba3"/>
+    <ellipse cx="354" cy="250" rx="13" ry="24" fill="#e3bba3"/>
+    <!-- マッシュの髪：丸い帽子のような形で、サングラスの上まで -->
+    <path d="M140 224 Q120 92 222 62 Q256 54 296 62 Q394 88 372 224 Q366 234 356 236 L156 236 Q146 234 140 224 Z" fill="#5a3f27"/>
+    <path d="M196 98 Q230 84 262 90 M286 92 Q320 100 340 124" fill="none" stroke="#7a5a3c" stroke-width="5"/>
+    <!-- 黒いサングラス（上が広い四角） -->
+    <path d="M164 232 L248 232 L240 282 Q238 292 226 292 L194 292 Q180 292 176 282 Z" fill="#0b0b0b"/>
+    <path d="M264 232 L348 232 L336 282 Q332 292 318 292 L286 292 Q274 292 272 282 Z" fill="#0b0b0b"/>
+    <path d="M246 240 Q256 236 266 240" fill="none"/>
+    <!-- 口 -->
+    <path d="M232 316 Q256 306 280 316 Q256 328 232 316 Z" fill="#d99a9e" stroke-width="4"/>
+    <path d="M236 316 Q256 320 276 316" fill="none" stroke="#6b1b1b" stroke-width="3"/>
+  </g>
+  <!-- サングラスのつや -->
+  <path d="M186 246 L210 246 M282 246 L306 246" stroke="#5b6170" stroke-width="5" stroke-linecap="round"/>
+</svg>
