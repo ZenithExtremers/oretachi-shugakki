@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 主人公スキン Lv.100「ボーダー」：白黒ボーダーのタートルネック・にっこり笑顔・両手を前に。手描きのふぞろいな形・なめらかな線。ふち線は黒 -->
+  <defs>
+    <clipPath id="c"><circle cx="256" cy="256" r="220"/></clipPath>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.009" numOctaves="1" seed="11" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <clipPath id="body"><path d="M60 520 Q58 380 112 350 Q160 326 212 316 L300 316 Q356 326 400 350 Q456 382 452 520 Z"/></clipPath>
+  </defs>
+  <rect width="512" height="512" fill="#1e3a8a"/>
+  <circle cx="256" cy="256" r="220" fill="#fff"/>
+  <g clip-path="url(#c)"><g filter="url(#rough)" stroke="#111" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- ボーダーのタートルネック -->
+    <path d="M60 520 Q58 380 112 350 Q160 326 212 316 L300 316 Q356 326 400 350 Q456 382 452 520 Z" fill="#fff"/>
+    <g clip-path="url(#body)" stroke="none" fill="#1f1f24">
+      <rect x="40" y="338" width="440" height="11"/><rect x="40" y="362" width="440" height="11"/><rect x="40" y="386" width="440" height="11"/>
+      <rect x="40" y="410" width="440" height="11"/><rect x="40" y="434" width="440" height="11"/><rect x="40" y="458" width="440" height="11"/>
+      <rect x="40" y="482" width="440" height="11"/><rect x="40" y="506" width="440" height="11"/>
+    </g>
+    <path d="M60 520 Q58 380 112 350 Q160 326 212 316 L300 316 Q356 326 400 350 Q456 382 452 520 Z" fill="none"/>
+    <!-- タートルの首 -->
+    <path d="M206 276 Q204 316 214 330 Q256 346 300 330 Q310 314 306 276 Z" fill="#fff"/>
+    <path d="M210 290 Q256 302 304 290 M211 306 Q256 318 305 306" fill="none" stroke="#1f1f24" stroke-width="7"/>
+    <!-- 顔 -->
+    <path d="M178 112 Q166 262 214 290 Q256 312 298 290 Q346 262 334 112 Q256 90 178 112 Z" fill="#f6d6d6"/>
+    <!-- 髪：茶色、前髪を横に流す -->
+    <path d="M172 214 Q150 120 196 78 Q240 44 300 62 Q352 80 350 160 Q352 196 342 216 Q334 186 330 150 Q300 132 268 110 Q248 140 196 150 Q182 174 184 206 Z" fill="#5a3b3e"/>
+    <!-- にっこり閉じた目 -->
+    <path d="M206 186 Q218 180 232 186 M280 186 Q294 180 306 186" fill="none" stroke="#2a1416" stroke-width="7"/>
+    <!-- 鼻（うすいピンクの線） -->
+    <path d="M250 182 Q246 214 240 222 Q256 232 272 222 Q266 214 262 182" fill="none" stroke="#e8a9b1" stroke-width="3"/>
+    <!-- 口：大きく開けて笑う -->
+    <path d="M222 246 Q256 236 292 246 Q284 278 256 280 Q228 278 222 246 Z" fill="#ec8fa8"/>
+    <path d="M226 248 Q256 242 288 248 L286 254 Q256 250 228 254 Z" fill="#fff" stroke-width="2"/>
+    <path d="M232 262 Q256 270 282 262" fill="none" stroke="#3a1010" stroke-width="4"/>
+    <!-- 両手を前に差し出す（手のひらが上） -->
+    <g transform="translate(0 -40) translate(256 470) scale(1.3) translate(-256 -470)">
+    <path d="M96 520 Q90 470 110 440 L118 404 Q124 394 132 404 L138 430 L146 396 Q154 384 162 396 L164 430 L176 400 Q186 390 192 402 L190 438 L206 416 Q216 408 222 420 L212 470 Q200 506 176 520 Z" fill="#eaa9b0"/>
+    <path d="M416 520 Q422 470 402 440 L394 404 Q388 394 380 404 L374 430 L366 396 Q358 384 350 396 L348 430 L336 400 Q326 390 320 402 L322 438 L306 416 Q296 408 290 420 L300 470 Q312 506 336 520 Z" fill="#eaa9b0"/>
+    </g>
+  </g></g>
+</svg>

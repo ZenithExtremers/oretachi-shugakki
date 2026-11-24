@@ -213,7 +213,7 @@ export function makeRPG(ctx) {
   let lectures = null; // { ccpp: {1:'第1回 …'}, … }
   const heroName = () => R().heroName;
   // 主人公のスキン（レベル50ごとに増える。編成の主人公の詳細で着替える）
-  const HERO_SKINS = [{ lv: 1, name: 'いつもの', src: 'icons/icon-192.png' }, { lv: 50, name: 'レッドスーツ', src: 'icons/hero-lv50.svg' }];
+  const HERO_SKINS = [{ lv: 1, name: 'いつもの', src: 'icons/icon-192.png' }, { lv: 50, name: 'レッドスーツ', src: 'icons/hero-lv50.svg' }, { lv: 100, name: 'ボーダー', src: 'icons/hero-lv100.svg' }];
   const heroSrc = () => { const r = R(), k = HERO_SKINS[r.heroSkin || 0]; return k && r.hero.lv >= k.lv ? k.src : HERO_SKINS[0].src; };
 
   const iconHTML = (id, cls = '') => {
