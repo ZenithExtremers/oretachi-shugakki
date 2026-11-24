@@ -177,42 +177,44 @@ ${eyes(57, '#0ea5e9')}
 <path d="M36 46 l-26 -6 l24 12 l-22 2 l26 6z" fill="#7dd3fc" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
 <g transform="translate(92 92)"><circle r="10" fill="#0ea5e9" stroke="${OL}" stroke-width="2"/><path d="M-5 -5 l6 5 l-6 5z M1 -5 l6 5 l-6 5z" fill="#fff"/></g>`),
 
-  // ニュクリ：原子核。燃える芯のまわりを電子の輪が回る。体はひびの入った殻（HP1）
-  nyukuri: wrap4('nyukuri', '#fed7aa', '#c2410c', `
-<ellipse cx="60" cy="58" rx="50" ry="16" fill="none" stroke="#fde047" stroke-width="2.5" transform="rotate(30 60 58)"/>
-<ellipse cx="60" cy="58" rx="50" ry="16" fill="none" stroke="#fde047" stroke-width="2.5" transform="rotate(-30 60 58)"/>
-<ellipse cx="60" cy="58" rx="50" ry="16" fill="none" stroke="#fde047" stroke-width="2.5" transform="rotate(90 60 58)"/>
-<circle cx="103" cy="33" r="4" fill="#fff"/><circle cx="17" cy="83" r="4" fill="#fff"/><circle cx="60" cy="9" r="4" fill="#fff"/>
-<path d="M34 112 q4 -28 26 -30 q22 2 26 30z" fill="#7c2d12" stroke="${OL}" stroke-width="3"/>
-<circle cx="60" cy="58" r="27" fill="#f97316" stroke="${OL}" stroke-width="3"/>
-<circle cx="60" cy="58" r="27" fill="none" stroke="#fde047" stroke-width="2" opacity=".7"/>
-<path d="M44 42 l6 8 l-4 6 M78 70 l-6 -4 l2 -8" stroke="#7c2d12" stroke-width="2" fill="none" stroke-linecap="round"/>
-${eyes(58, '#fef08a')}
-<path d="M50 70 q10 -4 20 0" stroke="${OL}" stroke-width="2.5" fill="none"/><path d="M53 70 l2 3 l2 -3 M63 70 l2 3 l2 -3" fill="#fff" stroke="${OL}" stroke-width="1.2"/>
-<path d="M48 34 q12 -12 24 0" stroke="#fde047" stroke-width="3" fill="none"/>`),
+  // ニュクリ：燃える原子核そのもの。顔のついた核のまわりを電子が3つの軌道で回る（体はない）
+  nyukuri: wrap4('nyukuri', '#fed7aa', '#9a3412', `
+<g fill="none" stroke="#fde047" stroke-width="2.5" opacity=".9">
+<ellipse cx="60" cy="60" rx="50" ry="17" transform="rotate(30 60 60)"/><ellipse cx="60" cy="60" rx="50" ry="17" transform="rotate(-30 60 60)"/><ellipse cx="60" cy="60" rx="50" ry="17" transform="rotate(90 60 60)"/></g>
+<g fill="#fff" stroke="#38bdf8" stroke-width="2"><circle cx="103" cy="35" r="5"/><circle cx="17" cy="85" r="5"/><circle cx="60" cy="10" r="5"/></g>
+<g stroke="#fb923c" stroke-width="3" stroke-linecap="round" opacity=".9"><path d="M60 22 v-6M60 98 v6M24 60 h-6M96 60 h6M34 34 l-5 -5M86 86 l5 5M86 34 l5 -5M34 86 l-5 5"/></g>
+<circle cx="60" cy="60" r="30" fill="#f97316" stroke="${OL}" stroke-width="3"/>
+<g stroke="${OL}" stroke-width="1.6" fill="#fdba74"><circle cx="44" cy="42" r="6"/><circle cx="55" cy="36" r="6" fill="#ef4444"/><circle cx="67" cy="36" r="6"/><circle cx="77" cy="43" r="6" fill="#ef4444"/><circle cx="61" cy="45" r="5" fill="#ef4444"/></g>
+<path d="M46 56 l10 3 M74 56 l-10 3" stroke="${OL}" stroke-width="3" stroke-linecap="round"/>
+<path d="M47 61 q5 -3 9 1 q-5 4 -9 -1z M73 61 q-5 -3 -9 1 q5 4 9 -1z" fill="#fef08a" stroke="${OL}" stroke-width="1.5"/>
+<path d="M52 70 q8 -4 16 0" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+`),
 
-  // ホメオスタシス：恒常性。体の中をいつも同じに保つ番人。ハートの胸当てと天秤、穏やかな目
-  homeo: wrap4('homeo', '#bbf7d0', '#047857', `
-<circle cx="60" cy="58" r="44" fill="none" stroke="#a7f3d0" stroke-width="2" stroke-dasharray="4 6"/>
-<path d="M28 112 q4 -32 32 -34 q28 2 32 34z" fill="#065f46" stroke="${OL}" stroke-width="3"/>
-<path d="M60 102 q-12 -8 -12 -15 q0 -6 6 -6 q4 0 6 4 q2 -4 6 -4 q6 0 6 6 q0 7 -12 15z" fill="#f43f5e" stroke="${OL}" stroke-width="2"/>
-<circle cx="60" cy="56" r="25" fill="#fde7d4" stroke="${OL}" stroke-width="3"/>
+  // ホメオスタシス：恒常性。核と細い毛をもつ丸い細胞が、天秤でいつも同じ状態に保つ（人型ではない）
+  homeo: wrap4('homeo', '#d1fae5', '#047857', `
+<circle cx="60" cy="60" r="46" fill="none" stroke="#a7f3d0" stroke-width="2" stroke-dasharray="3 6"/>
+<g stroke="#6ee7b7" stroke-width="2.5" stroke-linecap="round">${Array.from({ length: 20 }, (_, i) => { const a = (i / 20) * Math.PI * 2, x1 = 60 + Math.cos(a) * 34, y1 = 58 + Math.sin(a) * 32, x2 = 60 + Math.cos(a) * 41, y2 = 58 + Math.sin(a) * 39; return `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} L${x2.toFixed(1)} ${y2.toFixed(1)}"/>`; }).join('')}</g>
+<ellipse cx="60" cy="58" rx="34" ry="32" fill="#a7f3d0" stroke="${OL}" stroke-width="3"/>
+<ellipse cx="60" cy="58" rx="34" ry="32" fill="#34d399" opacity=".35"/>
+<circle cx="74" cy="44" r="9" fill="#059669" stroke="${OL}" stroke-width="2"/><circle cx="76" cy="42" r="3" fill="#a7f3d0"/>
+<circle cx="40" cy="70" r="3" fill="#10b981"/><circle cx="82" cy="70" r="2.5" fill="#10b981"/><circle cx="46" cy="40" r="2" fill="#10b981"/>
 <path d="M44 58 q6 -4 12 0 M64 58 q6 -4 12 0" stroke="${OL}" stroke-width="3" fill="none" stroke-linecap="round"/>
 <path d="M52 68 q8 5 16 0" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-<path d="M34 50 q0 -26 26 -26 q26 0 26 26 q-8 -10 -26 -10 q-18 0 -26 10z" fill="#10b981" stroke="${OL}" stroke-width="2.5"/>
-<ellipse cx="60" cy="20" rx="18" ry="5" fill="none" stroke="url(#gd-homeo)" stroke-width="3"/>
-<g transform="translate(96 84)" stroke="${OL}" stroke-width="2"><path d="M0 -14 v22 M-12 -10 h24" fill="none"/><path d="M-16 -10 l4 10 l4 -10z M8 -10 l4 10 l4 -10z" fill="url(#gd-homeo)"/><path d="M-6 8 h12" /></g>`),
+<circle cx="44" cy="65" r="3.5" fill="#fda4af" opacity=".8"/><circle cx="76" cy="65" r="3.5" fill="#fda4af" opacity=".8"/>
+<g transform="translate(60 102)" stroke="${OL}" stroke-width="2"><path d="M0 -12 v12 M-22 -10 h44" fill="none"/><path d="M-28 -10 l6 10 l6 -10z M16 -10 l6 10 l6 -10z" fill="url(#gd-homeo)"/><circle cy="-13" r="3" fill="url(#gd-homeo)"/></g>`),
 
-  // イナーシャ：慣性の法則。一度動いたら止まらない、鋼の丸いよろい。進む方向に矢印
-  inertia: wrap4('inertia', '#e2e8f0', '#334155', `
-<g stroke="#cbd5e1" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M4 50 h18M2 64 h16M6 78 h18"/></g>
-<path d="M28 112 q4 -30 32 -32 q28 2 32 32z" fill="#475569" stroke="${OL}" stroke-width="3"/>
-<circle cx="60" cy="58" r="30" fill="#94a3b8" stroke="${OL}" stroke-width="3"/>
-<path d="M32 50 q28 -16 56 0" stroke="#e2e8f0" stroke-width="3" fill="none"/>
-<path d="M36 52 h48 v14 h-48z" fill="#0f172a" stroke="${OL}" stroke-width="2.5"/>
-<path d="M42 59 l12 -2 M78 59 l-12 -2" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="60" cy="30" r="4" fill="url(#gd-inertia)" stroke="${OL}" stroke-width="1.5"/>
-<circle cx="38" cy="78" r="3" fill="#e2e8f0" stroke="${OL}" stroke-width="1.2"/><circle cx="82" cy="78" r="3" fill="#e2e8f0" stroke="${OL}" stroke-width="1.2"/>
-<g transform="translate(94 92)"><path d="M-12 0 h16 v-7 l12 7 l-12 7 v-7" fill="#fbbf24" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/></g>
-<text x="60" y="104" text-anchor="middle" font-size="11" font-weight="900" fill="#e2e8f0" font-family="serif">F=ma</text>`),
+  // イナーシャ：慣性の法則。目のついた鋼の球が、一度転がり出したら止まらない（人型ではない）
+  inertia: wrap4('inertia', '#e2e8f0', '#1e293b', `
+<g stroke="#cbd5e1" stroke-width="3.5" stroke-linecap="round" opacity=".85"><path d="M2 46 h22M0 60 h18M4 74 h22M10 88 h14"/></g>
+<path d="M10 104 h100" stroke="#64748b" stroke-width="3"/>
+<circle cx="64" cy="60" r="38" fill="#94a3b8" stroke="${OL}" stroke-width="3"/>
+<path d="M34 46 a38 38 0 0 1 54 -16" stroke="#f1f5f9" stroke-width="5" fill="none" stroke-linecap="round" opacity=".9"/>
+<path d="M28 64 q36 10 72 0" stroke="#475569" stroke-width="2.5" fill="none"/>
+<path d="M44 30 q20 30 0 66 M84 30 q-20 30 0 66" stroke="#475569" stroke-width="2" fill="none" opacity=".6"/>
+<g fill="#64748b" stroke="${OL}" stroke-width="1.2"><circle cx="40" cy="40" r="2.5"/><circle cx="90" cy="44" r="2.5"/><circle cx="92" cy="78" r="2.5"/><circle cx="42" cy="84" r="2.5"/></g>
+<path d="M50 50 l12 3 M88 50 l-12 3" stroke="${OL}" stroke-width="3.5" stroke-linecap="round"/>
+<path d="M52 56 q5 -3 9 1 q-5 4 -9 -1z M86 56 q-5 -3 -9 1 q5 4 9 -1z" fill="#fbbf24" stroke="${OL}" stroke-width="1.5"/>
+<path d="M60 70 q9 4 18 0" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<g transform="translate(100 96)"><path d="M-12 0 h12 v-6 l10 6 l-10 6 v-6" fill="#fbbf24" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/></g>
+<text x="64" y="92" text-anchor="middle" font-size="9" font-weight="900" fill="#1e293b" font-family="serif">F=ma</text>`),
 });

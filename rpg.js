@@ -62,7 +62,7 @@ const SKILL_DESC = {
   hint: () => '不正解の選択肢を2つ消す',
   healguard: () => 'パーティのHPを全回復し、次の2回受けるダメージ半分',
   charge: () => 'ほかの仲間全員のスキルのゲージを1たまった状態にする（正解1回ぶん）',
-  nuke: (k) => `ねらった敵1体に攻撃力×${k.pow}（敵が何体いても割り振らない）`,
+  nuke: (k) => `場の敵全員に、それぞれ攻撃力×${k.pow} のダメージ（割り振らない）`,
   homeo: (k) => `${k.pow}ターンのあいだ、HPが30%より下がらず、毎ターンHPを5%回復`,
   inertia: (k) => `${k.pow}ターンのあいだ、間違えてもコンボが切れず、受けるダメージ半分`,
 };
@@ -297,7 +297,7 @@ export function makeRPG(ctx) {
     if (rw.food) { addFood(rw.food); got.push(`🌰${rw.food}`); }
     if (rw.ticket) { r.tickets = (r.tickets || 0) + rw.ticket; got.push('🎟️ガチャチケット'); }
     if (rw.mat) { r.mats = (r.mats || 0) + rw.mat; got.push(`${MAT.icon}${MAT.name}`); }
-    if (rw.char) { const id = Object.keys(CHARS).find((x) => CHARS[x].limited === cid); if (id && !r.owned[id]) { r.owned[id] = { lv: 1, exp: 0 }; if (r.party.length < 3) r.party.push(id); } got.push(`★★★${CHARS[id].name}`); }
+    if (rw.char) { const id = Object.keys(CHARS).find((x) => CHARS[x].limited === cid); if (id && !r.owned[id]) { r.owned[id] = { lv: Math.max(1, Math.min(RCAP[CHARS[id].rar] || 50, Math.floor(r.hero.lv / 2))), exp: 0 }; if (r.party.length < 3) r.party.push(id); } got.push(`★★★${CHARS[id].name}（Lv.${r.owned[id].lv}）`); } // 主人公のレベルの半分で仲間になる
     if (rw.title) { r.titles = [...new Set([...(r.titles || []), CH_TITLE[cid]])]; if (CHAPTERS.every((c) => r.titles.includes(CH_TITLE[c.id]))) r.titles.push(ALL_TITLE); got.push(`称号「${CH_TITLE[cid]}」`); }
     save(); ctx.renderTop?.(); bgm.sfx(rw.char ? 'rare' : 'win');
     toast(`★の報酬：${got.join('・')} をゲット！`);
@@ -755,7 +755,7 @@ export function makeRPG(ctx) {
   }
   function openGacha(B) {
     let showRates = false;
-    const feat = poolOf(4);
+    const feat = poolOf(3).slice(0, 3);
     const draw = (res) => {
       const r = R(), left = PITY - (r.pity || 0);
       B.innerHTML = `
@@ -765,7 +765,7 @@ export function makeRPG(ctx) {
         ${r.tickets ? `<button class="rp-btn gold big wide rp-ticket" data-g="t">🎟️ チケットで1回<small>のこり ${r.tickets}枚</small></button>` : ''}
         <div class="row rp-gbtns"><button class="rp-btn gold big" data-g="1" ${r.coins < 100 ? 'disabled' : ''}>1回<small>🪙100</small></button><button class="rp-btn gold big rp-g10" data-g="10" ${r.coins < 900 ? 'disabled' : ''}>10連<small>🪙900・★★以上確定</small></button></div>
         <p class="rp-have">持っている 🪙 <b>${r.coins}</b>　<button class="rp-link" data-rates>${showRates ? '閉じる' : '提供割合・キャラ一覧'}</button></p>
-        ${showRates ? `<div class="rp-rates2">${[4, 3, 2, 1].map((k) => `<div class="rr${k}"><b>${RAR[k]}　${['', '68%', '26%', '4%', '2%'][k]}</b><span>${poolOf(k).map((id) => esc(CHARS[id].name)).join('・')}</span></div>`).join('')}<p class="muted small">かぶったら限界突破（レベル上限+1）。章限定の仲間はガチャには出ない。</p></div>` : ''}
+        ${showRates ? `<div class="rp-rates2">${[4, 3, 2, 1].map((k) => `<div class="rr${k}"><b>${RAR[k]}　${['', '68%', '26%', '4%', '2%'][k]}</b><span>${k === 4 ? '？？？（出るまでひみつ）' : poolOf(k).map((id) => esc(CHARS[id].name)).join('・')}</span></div>`).join('')}<p class="muted small">かぶったら限界突破（レベル上限+1）。章限定の仲間はガチャには出ない。</p></div>` : ''}
         ${res ? `<div class="rp-gres">${res.map(([id, isNew], i) => `<span class="rp-gitem r${CHARS[id].rar}" style="animation-delay:${i * 0.05}s">${iconHTML(id)}<span class="rp-rar">${RAR[CHARS[id].rar]}</span><small>${esc(CHARS[id].name)}</small><em>${isNew ? 'NEW!' : '上限+1'}</em></span>`).join('')}</div>` : ''}`;
     };
     draw();
@@ -800,7 +800,9 @@ export function makeRPG(ctx) {
     const ci = isRev ? 0 : isMid ? lecs.indexOf(MID[subj].after) : lecs.indexOf(String(lec));
     const boss = n === 3 || isMid;
     const E = ENEMIES[subj], D = DIFF[d];
-    const lvScale = 1 + ci * 0.4 + (n - 1) * 0.15;
+    // 敵の強さ：章（C/C++ → DB → 設計 → TOEIC）が進むごとに3回ぶん強く（2章の最初＝1章の中盤くらい）＋その章の中の回
+    const lvIdx = ci + (isRev ? 0 : Math.max(0, CHAPTERS.findIndex((c) => c.id === subj)) * 3);
+    const lvScale = 1 + lvIdx * 0.4 + (n - 1) * 0.15;
     // 雑魚：そのステージ専用の2体を中心に、その回の雑魚・どこにでも出る雑魚から選ぶ。たまにレア（ステージ専用のレアが多め）
     const SG = STAGE[subj]?.[lec] || [];
     // 1ウェーブに出る敵の数：ノーマル1体、ハード2体、ゲキムズ3体。雑魚ステージは3ウェーブ（ボス戦はボス＋手下の1ウェーブ）
@@ -1206,7 +1208,7 @@ export function makeRPG(ctx) {
       else if (k.kind === 'guard') { st.guard += k.pow; pop('ガード！', 'info'); bgm.sfx('skill'); drawHp(); }
       else if (k.kind === 'charge') { t.forEach((m) => { if (m.id !== x.id) st.gauge[m.id] = (st.gauge[m.id] || 0) + k.pow; }); pop('⚡ ゲージ+1', 'info'); bgm.sfx('skill'); }
       else if (k.kind === 'nuke') {
-        bgm.sfx('boom'); hitEnemy(atkOf(x) * k.pow, k.name, true, st.fi); // 割り振らず、ねらった1体に全部
+        bgm.sfx('boom'); st.active.filter((i) => foes[i].cur > 0).forEach((i, j) => hitEnemy(atkOf(x) * k.pow, j ? '' : k.name, true, i)); // 場の敵全員に、それぞれ6倍（割り振らない）
         const fl = document.querySelector('.rp-field'); if (fl) { fl.classList.remove('nuke'); void fl.offsetWidth; fl.classList.add('nuke'); }
         if (st.active.some((i) => foes[i].cur <= 0) && !st.busy) { st.busy = true; clearInterval(st.timer); document.querySelectorAll('#rp-q [data-c]').forEach((b) => { b.disabled = true; }); setTimeout(afterTurn, 600); } }
       else if (k.kind === 'homeo') { st.homeo = k.pow; pop('💚 恒常性！', 'heal'); bgm.sfx('heal'); drawBuffs(); }
@@ -1248,8 +1250,8 @@ export function makeRPG(ctx) {
       if (win) {
         stars = 1 + (st.hp / st.maxHp >= 0.5 ? 1 : 0) + (st.miss === 0 ? 1 : 0);
         newBest = stars > (r.stars[dk] || 0);
-        coins = Math.round((boss ? 120 : 40) * (1 + ci * 0.15) * D.rew) * (first ? 2 : 1) + st.rares * 150;
-        exp = Math.round((boss ? 80 : 30) * D.rew);
+        coins = Math.round((boss ? 120 : 40) * (1 + lvIdx * 0.15) * D.rew) * (first ? 2 : 1) + st.rares * 150;
+        exp = Math.round((boss ? 80 : 30) * D.rew * (1 + lvIdx * 0.1)); // 強い章ほど経験値も多め
         food = first ? 2 : 1;
         r.coins += coins; r.clear[id] = 1; if (newBest) r.stars[dk] = stars;
         const grow = (id, o, name) => { if (addExp(id, o, exp)) ups.push(`${name} Lv.${o.lv}`); };
