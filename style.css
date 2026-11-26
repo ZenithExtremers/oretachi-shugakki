@@ -1487,7 +1487,7 @@ body.rp-night.rp-day {
 .rp-day .rp-zcskill b { color: #b45309; }
 .rp-day .rp-zcwhere, .rp-day .rp-zcnav { color: var(--muted) !important; }
 .rp-day .rp-zcnav button { color: var(--text); border-color: rgba(30, 41, 59, .2); background: #fff; }
-.rp-seg4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.rp-seg4 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .rp-zmode { grid-template-columns: repeat(2, 1fr); }
 
 /* ---------- 主人公のスキン ---------- */
@@ -1507,3 +1507,10 @@ body.rp-night.rp-day {
 .rp-skin { padding: 8px 2px 6px; }
 .rp-skin img, .rp-skinq { width: 48px; height: 48px; }
 .rp-skin small { font-size: 10px; }
+
+/* ---------- 免許：合格・不合格 ---------- */
+.passmark { display: inline-flex; flex-direction: column; align-items: center; margin-top: 8px; padding: 6px 22px; border-radius: 12px; font-size: 22px; font-weight: 900; }
+.passmark small { font-size: 11px; font-weight: 700; opacity: .8; }
+.passmark.ok { background: rgba(22, 163, 74, .12); color: var(--ok); border: 2px solid var(--ok); }
+.passmark.ng { background: rgba(220, 38, 38, .08); color: var(--ng); border: 2px solid var(--ng); }
+.diagram.road svg { max-width: 360px; }

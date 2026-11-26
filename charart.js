@@ -67,6 +67,18 @@ ${eyes(58)}
 <path d="M30 50 h60 v6 h-60z" fill="#1e293b" stroke="${OL}" stroke-width="2.5"/>
 <g transform="translate(60 36)" stroke="#1e3a8a" stroke-width="2.2" fill="none" stroke-linecap="round"><path d="M0 -8 v15"/><path d="M-6 3 q6 8 12 0"/><path d="M-4 -4 h8"/></g>
 <g transform="translate(96 92)"><circle r="12" fill="url(#gd-senchou)" stroke="${OL}" stroke-width="2"/><circle r="8" fill="#fff7ed" stroke="${OL}" stroke-width="1.4"/><path d="M0 -7 l2.5 7 -2.5 7 -2.5 -7z" fill="#dc2626" stroke="${OL}" stroke-width="1"/><text y="-9.5" text-anchor="middle" font-size="6" font-weight="900" fill="${OL}">A</text></g>`),
+
+  // ドライブ教官（免許）：緑の帽子と制服、チェックボード、ハンドルのバッジ
+  kyokan: wrap('kyokan', '#bbf7d0', '#15803d', `
+<path d="M28 112 q2 -32 32 -34 q30 2 32 34z" fill="#166534" stroke="${OL}" stroke-width="3"/>
+<path d="M50 80 l10 14 l10 -14" fill="#f8fafc" stroke="${OL}" stroke-width="2"/><path d="M56 88 h8 l-2 18 h-4z" fill="#dc2626" stroke="${OL}" stroke-width="1.5"/>
+<circle cx="60" cy="58" r="25" fill="#f5d0b0" stroke="${OL}" stroke-width="3"/>
+${eyes(58)}
+<path d="M51 71 q9 5 18 0" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<path d="M32 44 q28 -22 56 0 v4 h-56z" fill="#15803d" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M30 48 q30 8 64 0 l2 6 q-34 8 -68 0z" fill="#14532d" stroke="${OL}" stroke-width="2.5"/>
+<circle cx="60" cy="36" r="5" fill="url(#gd-kyokan)" stroke="${OL}" stroke-width="1.5"/>
+<g transform="translate(92 92) rotate(12)"><rect x="-12" y="-15" width="24" height="30" rx="3" fill="#fef3c7" stroke="${OL}" stroke-width="2"/><rect x="-6" y="-18" width="12" height="6" rx="2" fill="url(#gd-kyokan)" stroke="${OL}" stroke-width="1.5"/><path d="M-7 -5 l3 3 l5 -6 M-7 5 l3 3 l5 -6" stroke="#16a34a" stroke-width="2" fill="none"/></g>
+<g transform="translate(26 94)"><circle r="10" fill="none" stroke="url(#gd-kyokan)" stroke-width="4"/><path d="M-10 0 h20 M0 0 v10" stroke="url(#gd-kyokan)" stroke-width="3"/></g>`),
 };
 
 // ===== 中間ボスのキャラ（すべてオリジナル） =====

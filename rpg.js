@@ -31,6 +31,7 @@ export const CHARS = {
   ninja: { name: 'ポインタ忍者', icon: '🥷', rar: 3, subj: 'ccpp', hp: 115, atk: 32, limited: 'ccpp', skill: { kind: 'dmg', pow: 5, cost: 4, name: 'アドレス手裏剣' } },
   kenja: { name: 'テーブル賢者', icon: '🧙', rar: 3, subj: 'db', hp: 140, atk: 24, limited: 'db', skill: { kind: 'heal', pow: 0.7, cost: 4, name: '正規化の祈り' } },
   kenchiku: { name: 'UML建築士', icon: '👷', rar: 3, subj: 'sd', hp: 125, atk: 27, limited: 'sd', skill: { kind: 'time', pow: 18, cost: 3, name: '設計図ひろげ' } },
+  kyokan: { name: 'ドライブ教官', icon: '🧑‍🏫', rar: 3, subj: 'menkyo', hp: 125, atk: 27, limited: 'menkyo', skill: { kind: 'guard', pow: 3, cost: 3, name: '補助ブレーキ' } },
   senchou: { name: 'ことばの船長', icon: '🧑‍✈️', rar: 3, subj: 'toeic', hp: 120, atk: 28, limited: 'toeic', skill: { kind: 'hint', pow: 2, cost: 3, name: '辞書の羅針盤' } },
   // 中間ボスを★3でクリアすると仲間になる（ガチャには出ない）
   liner: { name: 'グランドビルドライナー', icon: '🚂', rar: 3, subj: 'ccpp', hp: 150, atk: 34, limited: 'mid', skill: { kind: 'dmg', pow: 6, cost: 5, name: '合体ビルドバスター' } },
@@ -150,13 +151,14 @@ function allEnemies(subj) {
 /* ---------- 計算 ---------- */
 const needExp = (lv) => lv * 50;
 const statOf = (base, lv) => Math.round(base * (1 + (lv - 1) * 0.12));
-const SUBJ = [['ccpp', 'C/C++'], ['db', 'DB'], ['sd', '設計'], ['toeic', 'TOEIC']];
+const SUBJ = [['ccpp', 'C/C++'], ['db', 'DB'], ['sd', '設計'], ['toeic', 'TOEIC'], ['menkyo', '免許']];
 // 冒険の章（科目ごと）
 const CHAPTERS = [
   { id: 'ccpp', name: 'C/C++プログラミング', sub: 'コンパイルの森', color: '#2563eb' },
   { id: 'db', name: 'データベース', sub: 'テーブルの谷', color: '#0f766e' },
   { id: 'sd', name: 'ソフトウェア設計', sub: '設計図の塔', color: '#7c3aed' },
   { id: 'toeic', name: 'TOEIC', sub: 'ことばの港町', color: '#ea580c' },
+  { id: 'menkyo', name: '普通免許（学科）', sub: 'ドライブの街道', color: '#16a34a' },
 ];
 // 章の★集めの報酬（★はノーマル・ハード・ゲキムズの合計。p は全部の★に対する割合）
 const STAR_REW = [
@@ -168,7 +170,7 @@ const STAR_REW = [
   { p: 0.8, mat: 1, ticket: 1, label: '💎結晶＋🎟️' },
   { p: 1, title: true, mat: 2, label: '称号＋💎結晶×2' },
 ];
-const CH_TITLE = { ccpp: 'C/C++マスター', db: 'データベースマスター', sd: '設計マスター', toeic: 'TOEICマスター' };
+const CH_TITLE = { ccpp: 'C/C++マスター', db: 'データベースマスター', sd: '設計マスター', toeic: 'TOEICマスター', menkyo: '免許マスター' };
 const ALL_TITLE = '秋学期の覇者';
 // 中間ボスステージ：範囲の最後の回のボスのあとに出る連戦。★3でクリアすると最後の敵が仲間になる（すべてオリジナル）
 const MID = {

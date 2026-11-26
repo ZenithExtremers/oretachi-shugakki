@@ -193,6 +193,7 @@ function viewSubject(s) {
       <div class="menu">
         ${s.lessons.length ? `<button class="menu-btn" data-act="nav" data-to="s/${s.id}/lessons"><span class="ic">基</span><div><b>基礎コース</b><small>説明を読んで確認問題 ・ クリア ${s.lessons.filter((l) => store.lessons?.[l.id]).length}/${s.lessons.length}</small></div></button>` : ''}
         <button class="menu-btn" data-act="nav" data-to="s/${s.id}/field"><span class="ic">分</span><div><b>分野別</b><small>回・問題の型を選んで、1問ずつ解説つき</small></div></button>
+        ${(s.mocks || []).map((mk, i) => `<button class="menu-btn" data-act="mock" data-i="${i}"><span class="ic">模</span><div><b>${esc(mk.name)}</b><small>${mk.note ? esc(mk.note) : '本番と同じ配分'} ・ ${mk.minutes}分</small></div></button>`).join('')}
         ${s.mock ? `<button class="menu-btn" data-act="mock"><span class="ic">模</span><div><b>${esc(s.mock.name)}</b><small>${s.mock.note ? esc(s.mock.note) : '本番と同じ配分'} ・ 最後にまとめて採点${s.mock.minutes ? ` ・ ${s.mock.minutes}分` : ''}</small></div></button>` : ''}
         <button class="menu-btn" ${(s.pastExams || []).length ? `data-act="nav" data-to="s/${s.id}/past"` : 'disabled'}><span class="ic">本</span><div><b>本番の問題</b><small>${esc((s.pastExams || []).map((p) => p.name).join('・') || 'まだありません')}</small></div></button>
         <button class="menu-btn" data-act="review" ${rev ? '' : 'disabled'}><span class="ic">復</span><div><b>復習</b><small>${rev ? '間違えた問題と、3日前に正解した問題。正解すると消えます' : 'まだありません'}</small></div>${rev ? `<span class="badge">${rev}</span>` : ''}</button>
@@ -290,7 +291,7 @@ function makeSession(s, { kind, mode, title, groups, minutes = 0 }) {
   const shufflePast = store.settings.shufflePast, shuffleOrig = store.settings.shuffleOriginal;
   for (const { g, qs } of groups) {
     pages.push({ gid: g.id, qids: qs.map((q) => q.id) });
-    const doShuffle = isPast(g) ? shufflePast : shuffleOrig;
+    const doShuffle = !s.fixedChoices && (isPast(g) ? shufflePast : shuffleOrig); // 免許の○×は並びを固定
     const perm = (n) => { const a = [...Array(n).keys()]; return doShuffle ? shuffle(a) : a; }; // 選択肢の数に合わせる（TOEIC は4択）
     if (g.sharedChoices) order[g.id] = perm(g.sharedChoices.length);
     for (const q of qs) if (!g.sharedChoices) order[q.id] = perm(q.choices.length);
@@ -304,9 +305,10 @@ function makeSession(s, { kind, mode, title, groups, minutes = 0 }) {
   go(`s/${s.id}/quiz`);
 }
 
-function startMock(s) {
+function startMock(s, mi = null) {
+  const mk = mi == null ? s.mock : s.mocks[mi];
   const picked = [];
-  for (const { lecture, n } of s.mock.blueprint) {
+  for (const { lecture, n } of mk.blueprint) {
     const orig = shuffle(s.groups.filter((g) => g.lecture === lecture && !isPast(g)));
     const past = shuffle(s.groups.filter((g) => g.lecture === lecture && isPast(g)));
     let rest = n;
@@ -317,7 +319,8 @@ function startMock(s) {
       rest -= qs.length;
     }
   }
-  makeSession(s, { kind: 'mock', mode: 'exam', title: s.mock.name, groups: picked, minutes: s.mock.minutes });
+  makeSession(s, { kind: 'mock', mode: 'exam', title: mk.name, groups: picked, minutes: mk.minutes });
+  session.pass = mk.pass || 0; saveSession(); // 合格ライン（免許：仮免45/50・本免90/100）
 }
 
 function startPast(s, src, mode) {
@@ -546,6 +549,16 @@ function finish(s) {
       const b = (res[k][v] ||= { c: 0, n: 0 }); b.n++; if (ok) b.c++;
     }
   }
+  // イラスト問題（危険予測）のように、大問の小問が全部正解で g.points 点（1つでも間違えたら0点）
+  if (session.qids.some((id) => s.qById[id].group.points)) {
+    let sc = 0, tot = 0;
+    for (const p of session.pages) {
+      const g = s.groupById[p.gid];
+      if (g.points) { tot += g.points; if (p.qids.every((id) => session.answers[id] === s.qById[id].answer)) sc += g.points; }
+      else for (const id of p.qids) { tot++; if (session.answers[id] === s.qById[id].answer) sc++; }
+    }
+    res.score = sc; res.total = tot; res.points = true;
+  }
   session.finished = true;
   session.result = res;
   session.seconds = Math.floor((Date.now() - session.startedAt) / 1000);
@@ -578,7 +591,8 @@ function viewResult(s) {
   $app.innerHTML = `
     ${top('結果', { back: 's/' + s.id })}
     <main class="wrap">
-      <div class="score"><div class="big">${r.score}<small> / ${r.total}</small></div><p>${esc(session.title)} ・ 正答率 ${pct}%${session.mode === 'exam' ? ` ・ ${m}分` : ''}</p></div>
+      <div class="score"><div class="big">${r.score}<small> / ${r.total}${r.points ? ' 点' : ''}</small></div><p>${esc(session.title)} ・ 正答率 ${pct}%${session.mode === 'exam' ? ` ・ ${m}分` : ''}</p>
+        ${session.pass ? `<div class="passmark ${r.score >= session.pass ? 'ok' : 'ng'}">${r.score >= session.pass ? '🎉 合格' : '不合格'}<small>合格ライン ${session.pass}${r.points ? '点' : '問'}</small></div>` : ''}</div>
       <div class="row mt">
         <button class="btn" data-act="retrywrong" ${wrong.length ? '' : 'disabled'}>間違えた ${wrong.length} 問を解き直す</button>
       </div>
@@ -636,7 +650,7 @@ function lessonQ(l, q, i) {
 }
 function viewLesson(s, l) {
   if (!lessonOpen(s, l)) return go(`s/${s.id}/lessons`);
-  if (!lessonState || lessonState.id !== l.id) lessonState = { id: l.id, answers: {}, order: l.questions.map((q) => shuffle(q.choices.map((_, i) => i))) };
+  if (!lessonState || lessonState.id !== l.id) lessonState = { id: l.id, answers: {}, order: l.questions.map((q) => (s.fixedChoices ? q.choices.map((_, i) => i) : shuffle(q.choices.map((_, i) => i)))) };
   const next = s.lessons[l.index + 1];
   $app.innerHTML = `
     ${top(l.title, { back: `s/${s.id}/lessons`, sub: `${l.index + 1}/${s.lessons.length}` })}
@@ -724,7 +738,7 @@ const HIMA_API = {
   renderQ(s, q) {
     cur = s;
     const g = q.group, ch = choicesOf(q);
-    const perm = shuffle(ch.map((_, i) => i));
+    const perm = s.fixedChoices ? ch.map((_, i) => i) : shuffle(ch.map((_, i) => i));
     return {
       body: `<div class="rp-gtitle muted small">${esc(g.title)}</div>${renderGroupBody(g)}`,
       q: inline(q.q),
@@ -808,7 +822,7 @@ document.addEventListener('click', async (e) => {
       try { await navigator.clipboard.writeText(url); toast('リンクをコピーしました'); } catch { prompt('このリンクを共有してください', url); }
       return;
     }
-    case 'mock': return confirmReplace() && startMock(s);
+    case 'mock': return confirmReplace() && startMock(s, el.dataset.i == null ? null : +el.dataset.i);
     case 'past': return confirmReplace() && startPast(s, el.dataset.src, el.dataset.mode);
     case 'review': return confirmReplace() && startReview(s, reviewIds(s));
     case 'retrywrong': return startReview(s, session.wrong, '解き直し');

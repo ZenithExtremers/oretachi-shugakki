@@ -35,4 +35,13 @@ export default [
     color: '#ea580c',
     module: './toeic/index.js',
   },
+  {
+    id: 'menkyo',
+    name: '普通免許（学科）',
+    short: '免許',
+    mark: '免許',
+    sub: '仮免・本免の学科 ○× ・ 標識と危険予測',
+    color: '#16a34a',
+    module: './menkyo/index.js',
+  },
 ];
