@@ -68,6 +68,18 @@ ${eyes(58)}
 <g transform="translate(60 36)" stroke="#1e3a8a" stroke-width="2.2" fill="none" stroke-linecap="round"><path d="M0 -8 v15"/><path d="M-6 3 q6 8 12 0"/><path d="M-4 -4 h8"/></g>
 <g transform="translate(96 92)"><circle r="12" fill="url(#gd-senchou)" stroke="${OL}" stroke-width="2"/><circle r="8" fill="#fff7ed" stroke="${OL}" stroke-width="1.4"/><path d="M0 -7 l2.5 7 -2.5 7 -2.5 -7z" fill="#dc2626" stroke="${OL}" stroke-width="1"/><text y="-9.5" text-anchor="middle" font-size="6" font-weight="900" fill="${OL}">A</text></g>`),
 
+  // ききみみウサギ（TOEIC リスニング）：長い耳に大きなヘッドホン、音符
+  kikimimi: wrap('kikimimi', '#bae6fd', '#0369a1', `
+<path d="M38 112 q2 -30 22 -32 q20 2 22 32z" fill="#f1f5f9" stroke="${OL}" stroke-width="3"/>
+<path d="M46 50 q-10 -40 2 -44 q10 0 6 42z" fill="#f8fafc" stroke="${OL}" stroke-width="3"/><path d="M48 44 q-4 -26 2 -32" stroke="#fda4af" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M74 50 q10 -40 -2 -44 q-10 0 -6 42z" fill="#f8fafc" stroke="${OL}" stroke-width="3"/><path d="M72 44 q4 -26 -2 -32" stroke="#fda4af" stroke-width="5" fill="none" stroke-linecap="round"/>
+<circle cx="60" cy="64" r="24" fill="#f8fafc" stroke="${OL}" stroke-width="3"/>
+${eyes(64, '#0f172a')}
+<path d="M56 74 q4 4 8 0" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="60" cy="71" r="2.5" fill="#f472b6"/>
+<path d="M34 62 q0 -32 26 -32 q26 0 26 32" fill="none" stroke="#0f172a" stroke-width="5"/>
+<rect x="26" y="56" width="14" height="22" rx="6" fill="#0ea5e9" stroke="${OL}" stroke-width="2.5"/><rect x="80" y="56" width="14" height="22" rx="6" fill="#0ea5e9" stroke="${OL}" stroke-width="2.5"/>
+<g fill="url(#gd-kikimimi)" stroke="${OL}" stroke-width="1.5"><path d="M96 30 v14 a4 4 0 1 1 -3 -4 v-14 l10 -3 v4z"/><path d="M16 88 v10 a4 4 0 1 1 -3 -4 v-10 l8 -2 v3z"/></g>`),
+
   // ドライブ教官（免許）：緑の帽子と制服、チェックボード、ハンドルのバッジ
   kyokan: wrap('kyokan', '#bbf7d0', '#15803d', `
 <path d="M28 112 q2 -32 32 -34 q30 2 32 34z" fill="#166534" stroke="${OL}" stroke-width="3"/>

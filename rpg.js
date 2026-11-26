@@ -32,6 +32,7 @@ export const CHARS = {
   kenja: { name: 'テーブル賢者', icon: '🧙', rar: 3, subj: 'db', hp: 140, atk: 24, limited: 'db', skill: { kind: 'heal', pow: 0.7, cost: 4, name: '正規化の祈り' } },
   kenchiku: { name: 'UML建築士', icon: '👷', rar: 3, subj: 'sd', hp: 125, atk: 27, limited: 'sd', skill: { kind: 'time', pow: 18, cost: 3, name: '設計図ひろげ' } },
   kyokan: { name: 'ドライブ教官', icon: '🧑‍🏫', rar: 3, subj: 'menkyo', hp: 125, atk: 27, limited: 'menkyo', skill: { kind: 'guard', pow: 3, cost: 3, name: '補助ブレーキ' } },
+  kikimimi: { name: 'ききみみウサギ', icon: '🐰', rar: 3, subj: 'toeicL', hp: 115, atk: 27, limited: 'toeicL', skill: { kind: 'time', pow: 18, cost: 3, name: 'もう一回きく' } },
   senchou: { name: 'ことばの船長', icon: '🧑‍✈️', rar: 3, subj: 'toeic', hp: 120, atk: 28, limited: 'toeic', skill: { kind: 'hint', pow: 2, cost: 3, name: '辞書の羅針盤' } },
   // 中間ボスを★3でクリアすると仲間になる（ガチャには出ない）
   liner: { name: 'グランドビルドライナー', icon: '🚂', rar: 3, subj: 'ccpp', hp: 150, atk: 34, limited: 'mid', skill: { kind: 'dmg', pow: 6, cost: 5, name: '合体ビルドバスター' } },
@@ -150,14 +151,19 @@ function allEnemies(subj) {
 
 /* ---------- 計算 ---------- */
 const needExp = (lv) => lv * 50;
+// 1エリア＝雑魚ステージ＋ボス。TOEIC（リスニング・リーディング）だけ雑魚ステージ4つ、ほかは2つ
+const nsOf = (subj) => (/^toeic/.test(subj) ? 4 : 2);
+const bossOf = (subj) => nsOf(subj) + 1;
+const nodesOf = (subj) => Array.from({ length: bossOf(subj) }, (_, i) => i + 1);
 const statOf = (base, lv) => Math.round(base * (1 + (lv - 1) * 0.12));
-const SUBJ = [['ccpp', 'C/C++'], ['db', 'DB'], ['sd', '設計'], ['toeic', 'TOEIC'], ['menkyo', '免許']];
+const SUBJ = [['ccpp', 'C/C++'], ['db', 'DB'], ['sd', '設計'], ['toeicL', 'TOEIC L'], ['toeic', 'TOEIC R'], ['menkyo', '免許']];
 // 冒険の章（科目ごと）
 const CHAPTERS = [
   { id: 'ccpp', name: 'C/C++プログラミング', sub: 'コンパイルの森', color: '#2563eb' },
   { id: 'db', name: 'データベース', sub: 'テーブルの谷', color: '#0f766e' },
   { id: 'sd', name: 'ソフトウェア設計', sub: '設計図の塔', color: '#7c3aed' },
-  { id: 'toeic', name: 'TOEIC', sub: 'ことばの港町', color: '#ea580c' },
+  { id: 'toeicL', name: 'TOEIC リスニング', sub: 'ききとりの灯台', color: '#0284c7' },
+  { id: 'toeic', name: 'TOEIC リーディング', sub: 'ことばの港町', color: '#ea580c' },
   { id: 'menkyo', name: '普通免許（学科）', sub: 'ドライブの街道', color: '#16a34a' },
 ];
 // 章の★集めの報酬（★はノーマル・ハード・ゲキムズの合計。p は全部の★に対する割合）
@@ -170,7 +176,7 @@ const STAR_REW = [
   { p: 0.8, mat: 1, ticket: 1, label: '💎結晶＋🎟️' },
   { p: 1, title: true, mat: 2, label: '称号＋💎結晶×2' },
 ];
-const CH_TITLE = { ccpp: 'C/C++マスター', db: 'データベースマスター', sd: '設計マスター', toeic: 'TOEICマスター', menkyo: '免許マスター' };
+const CH_TITLE = { ccpp: 'C/C++マスター', db: 'データベースマスター', sd: '設計マスター', toeicL: 'TOEICリスニングマスター', toeic: 'TOEICリーディングマスター', menkyo: '免許マスター' };
 const ALL_TITLE = '秋学期の覇者';
 // 中間ボスステージ：範囲の最後の回のボスのあとに出る連戦。★3でクリアすると最後の敵が仲間になる（すべてオリジナル）
 const MID = {
@@ -205,6 +211,11 @@ export function makeRPG(ctx) {
     if (!r.sound) r.sound = 'silent'; // 'silent' | 'bgm'（講義中に使うので最初はサイレント）
     if (!r.stars) { r.stars = {}; for (const id of Object.keys(r.clear)) r.stars[`${id}#0`] = 1; } // 前のデータのクリアは★1から
     if (!r.zukan) r.zukan = {};
+    if (r.titles?.includes('TOEICマスター')) r.titles = r.titles.map((t) => (t === 'TOEICマスター' ? 'TOEICリーディングマスター' : t)); // TOEIC をリスニングとリーディングに分けた
+    if (!r.st5) { // 前のデータ：TOEIC のボスは3番目だった → 5番目に移す
+      const mv = (o) => { for (const key of Object.keys(o)) { const m = key.match(/^(toeic)-(\d+)-3(#\d)?$/); if (m) { o[`${m[1]}-${m[2]}-${bossOf(m[1])}${m[3] || ''}`] = o[key]; delete o[key]; } } };
+      mv(r.clear); mv(r.stars); r.st5 = 1;
+    }
     if (!r.wmiss) r.wmiss = {}; // 冒険の単語4択で間違えた単語（復讐の対象）
     if (!r.rev) r.rev = { n: 0, log: [] }; // 晴らした恨み
     if (r.heroLb === undefined) { r.heroLb = Math.max(0, Math.ceil((r.hero.lv - 50) / MAT.plus)); r.mats = r.mats || 0; r.heroSkill = 0; }
@@ -292,8 +303,8 @@ export function makeRPG(ctx) {
   function chStars(cid) {
     const r = R(), lecs = Object.keys(lectures[cid] || {});
     let got = 0;
-    for (const k of lecs) for (const n of [1, 2, 3]) for (const d of [0, 1, 2]) got += r.stars[`${cid}-${k}-${n}#${d}`] || 0;
-    return [got, lecs.length * 3 * 3 * 3];
+    for (const k of lecs) for (const n of nodesOf(cid)) for (const d of [0, 1, 2]) got += r.stars[`${cid}-${k}-${n}#${d}`] || 0;
+    return [got, lecs.length * nodesOf(cid).length * 3 * 3];
   }
   const need = (rw, tot) => Math.ceil(tot * rw.p);
   const claimable = (cid) => { const [g, t] = chStars(cid), c = R().chRew?.[cid] || {}; return STAR_REW.some((rw, i) => !c[i] && g >= need(rw, t)); };
@@ -327,9 +338,9 @@ export function makeRPG(ctx) {
       </div>
       <h3 class="rp-zsec">章を選ぶ</h3>
       <div class="rp-chapters">${CHAPTERS.map((c, i) => {
-        const lecs = Object.keys(lectures[c.id] || {}), total = lecs.length * 3;
-        const done = lecs.reduce((a, k) => a + [1, 2, 3].filter((n) => r.clear[`${c.id}-${k}-${n}`]).length, 0);
-        const stars = lecs.reduce((a, k) => a + [1, 2, 3].reduce((b, n) => b + Math.max(...starsOf(`${c.id}-${k}-${n}`)), 0), 0);
+        const lecs = Object.keys(lectures[c.id] || {}), total = lecs.length * nodesOf(c.id).length;
+        const done = lecs.reduce((a, k) => a + nodesOf(c.id).filter((n) => r.clear[`${c.id}-${k}-${n}`]).length, 0);
+        const stars = lecs.reduce((a, k) => a + nodesOf(c.id).reduce((b, n) => b + Math.max(...starsOf(`${c.id}-${k}-${n}`)), 0), 0);
         const boss = ENEMIES[c.id].boss[lecs[lecs.length - 1]] || ['', '👑'];
         const [sg, stt] = chStars(c.id);
         return `<button class="rp-chap${r.subj === c.id ? ' last' : ''}${frameOf(c.id)}" data-chap="${c.id}" style="--c:${c.color}">${claimable(c.id) ? '<em class="rp-dot"></em>' : ''}
@@ -354,13 +365,13 @@ export function makeRPG(ctx) {
     const r = R();
     const t = team();
     const chapters = Object.entries(lectures[r.subj] || {});
-    // 下から上へ：各章 章の看板 → ステージ1 → ステージ2 → ボス
+    // 下から上へ：各章 章の看板 → ステージ（TOEIC は4つ、ほかは2つ） → ボス
     const rows = [];
     chapters.forEach(([k, v], ci) => {
       const mt = v.match(/^(第\S+?回)\s*(.*)$/) || [null, v, ''];
       rows.push({ kind: 'sign', no: mt[1], title: mt[2], ci });
-      [1, 2, 3].forEach((n) => { const id = `${r.subj}-${k}-${n}`; rows.push({ kind: 'node', k, n, ci, open: isOpen(r.subj, k, n, ci) && (mapDiff === 0 || (r.stars[`${id}#${mapDiff - 1}`] || 0) > 0), done: (r.stars[`${id}#${mapDiff}`] || 0) > 0 }); });
-      if (MID[r.subj]?.after === String(k)) { const id = `${r.subj}-mid-0`; rows.push({ kind: 'mid', k: 'mid', n: 0, ci, open: !!r.clear[`${r.subj}-${k}-3`] && (mapDiff === 0 || (r.stars[`${id}#${mapDiff - 1}`] || 0) > 0), done: (r.stars[`${id}#${mapDiff}`] || 0) > 0 }); }
+      nodesOf(r.subj).forEach((n) => { const id = `${r.subj}-${k}-${n}`; rows.push({ kind: 'node', k, n, ci, open: isOpen(r.subj, k, n, ci) && (mapDiff === 0 || (r.stars[`${id}#${mapDiff - 1}`] || 0) > 0), done: (r.stars[`${id}#${mapDiff}`] || 0) > 0 }); });
+      if (MID[r.subj]?.after === String(k)) { const id = `${r.subj}-mid-0`; rows.push({ kind: 'mid', k: 'mid', n: 0, ci, open: !!r.clear[`${r.subj}-${k}-${bossOf(r.subj)}`] && (mapDiff === 0 || (r.stars[`${id}#${mapDiff - 1}`] || 0) > 0), done: (r.stars[`${id}#${mapDiff}`] || 0) > 0 }); }
     });
     const nodes = rows.filter((x) => x.kind === 'node');
     const here = nodes.find((x) => x.open && !x.done) || nodes[nodes.length - 1];
@@ -369,7 +380,7 @@ export function makeRPG(ctx) {
     for (let i = 0; i < rows.length; i++) {
       const x = rows[i];
       const h = RH[x.kind];
-      pos[i] = { y: y + h / 2, x: x.kind !== 'node' ? 50 : x.n === 3 ? 50 : x.n === 1 ? 28 : 72 };
+      pos[i] = { y: y + h / 2, x: x.kind !== 'node' ? 50 : x.n === bossOf(r.subj) ? 50 : x.n % 2 ? 28 : 72 };
       y += h;
     }
     const H = y + 30;
@@ -408,7 +419,7 @@ export function makeRPG(ctx) {
           if (x.kind === 'mid') { const M = MID[r.subj], sv = starsOf(`${r.subj}-mid-0`)[mapDiff]; return `<button class="rp-midspot${x.done ? ' done' : ''}" style="top:${top}px" data-rp="mid" ${x.open ? '' : 'disabled'}>
             <span class="c">${x.open ? MID_ART[M.foes[M.foes.length - 1].art] : '🔒'}</span><b>中間ボス</b><small>${esc(M.title)}${x.done ? ` <i class="rp-stars">${starTxt(sv)}</i>` : ''}</small></button>`; }
           const isHere = x === here;
-          const boss = x.n === 3;
+          const boss = x.n === bossOf(r.subj);
           const sv = starsOf(`${r.subj}-${x.k}-${x.n}`)[mapDiff];
           return `<button class="rp-spot${boss ? ' boss' : ''}${x.done ? ' done' : ''}${isHere ? ' here' : ''}" style="left:${pos[i].x}%;top:${top}px" data-rp="stage" data-k="${x.k}" data-n="${x.n}" ${x.open ? '' : 'disabled'}>
             <span class="c">${!x.open ? '🔒' : boss ? esc(E.boss[x.k]?.[1] || '👑') : x.n}</span>
@@ -452,9 +463,9 @@ export function makeRPG(ctx) {
 
   // ステージをタップ：出てくる敵・難易度・★を見て出撃
   function openStage(m, subj, k, n) {
-    const r = R(), id = `${subj}-${k}-${n}`, st = starsOf(id), boss = n === 3, E = ENEMIES[subj], d = mapDiff;
+    const r = R(), id = `${subj}-${k}-${n}`, st = starsOf(id), boss = n === bossOf(subj), E = ENEMIES[subj], d = mapDiff;
     const no = (lectures[subj][k].match(/^(第\S+?回)/) || [lectures[subj][k]])[0];
-    const tri = STAGE[subj]?.[k]?.[n - 1];
+    const tri = STAGE[subj]?.[k]?.[(n - 1) % 2]; // ステージ専用の敵：1・3 と 2・4 で同じ組
     const foes = boss ? [E.boss[k]] : [...(tri ? tri.slice(0, 2) : []), ...(E.lec[k] || []), ...E.common];
     const seen = (nm) => (r.zukan[`${subj}|${nm}`] || 0) > 0;
     const sh = document.createElement('div'); sh.className = 'rp-sheet';
@@ -506,12 +517,12 @@ export function makeRPG(ctx) {
     return items;
   }
   function revFoe(it) {
-    const subjOfDeck = (d) => (d.startsWith('toeic') ? 'toeic' : d);
+    const subjOfDeck = (d) => (/^toeic\d$/.test(d) ? 'toeic' : d); // toeic1〜3 はリーディングの単語帳
     const sj = it.kind === 'q' ? it.sid : subjOfDeck(it.deck);
     const E = ENEMIES[sj];
     let bossName = '忘れた単語', icon = '👻';
     if (E) {
-      const lec = it.kind === 'q' ? String(it.lec) : it.deck.startsWith('toeic') ? it.deck.slice(5) : Object.keys(E.boss)[0];
+      const lec = it.kind === 'q' ? String(it.lec) : /^toeic\d$/.test(it.deck) ? it.deck.slice(5) : it.word?.[2] != null && E.boss[it.word[2]] ? String(it.word[2]) : Object.keys(E.boss)[0];
       const b = E.boss[lec] || Object.values(E.boss)[0];
       bossName = b[0]; icon = b[1];
     }
@@ -608,7 +619,7 @@ export function makeRPG(ctx) {
             <p class="rp-zcskill"><b>スキル「${esc(x.skill.name)}」</b>${esc(SKILL_DESC[x.skill.kind](x.skill))}（正解${x.skill.cost}回でたまる）</p>${x.prof ? `<p>${esc(x.prof)}</p>` : ''}` : '<p>まだ仲間にいない。</p>'}
             <p class="rp-zcwhere">📍 手に入れ方：${esc(howToGet(x.id))}</p>`;
       } else {
-        const where = x.kind === 'mid' ? `中間ボス「${MID[zsubj].title}」` : x.kind === 'boss' ? `${lecName(x.lec)} のボス` : x.kind === 'srare' ? `${lecName(x.lec)} STAGE ${x.stage} にたまに出る` : x.kind === 'lec' ? `${lecName(x.lec)} ${x.stage ? 'STAGE ' + x.stage : 'のステージ'}` : x.kind === 'rare' ? 'どのステージにもたまに出る' : 'どのステージにも出る';
+        const where = x.kind === 'mid' ? `中間ボス「${MID[zsubj].title}」` : x.kind === 'boss' ? `${lecName(x.lec)} のボス` : x.kind === 'srare' ? `${lecName(x.lec)} STAGE ${nsOf(zsubj) > 2 ? `${x.stage}・${x.stage + 2}` : x.stage} にたまに出る` : x.kind === 'lec' ? `${lecName(x.lec)} ${x.stage ? `STAGE ${nsOf(zsubj) > 2 ? `${x.stage}・${x.stage + 2}` : x.stage}` : 'のステージ'}` : x.kind === 'rare' ? 'どのステージにもたまに出る' : 'どのステージにも出る';
         const tag = x.kind === 'boss' ? '<em class="boss">BOSS</em>' : x.kind === 'mid' ? '<em class="boss">中間ボス</em>' : x.kind === 'rare' || x.kind === 'srare' ? '<em class="rare">レア</em>' : '<em>雑魚</em>';
         body = `<div class="rp-zcbig${own ? '' : ' sil'}"><span class="rp-zi">${x.icon}</span></div><b class="rp-zcname">${own ? esc(x.name) : '？？？'}</b>${tag}
           <p>${own ? esc(x.desc || '') : 'まだ出会っていない。'}</p><p class="rp-zcwhere">📍 ${esc(where)}${own ? `　⚔️ たおした数 ${r.zukan[x.key]}` : ''}</p>`;
@@ -676,12 +687,13 @@ export function makeRPG(ctx) {
   // 解放条件：その科目の最初のステージは最初から。ほかは1つ前のステージをクリア
   function isOpen(subj, k, n, ci) {
     const r = R(), keys = Object.keys(lectures[subj]);
+    if (r.clear[`${subj}-${k}-${n}`]) return true; // 一度クリアしたステージは閉じない
     if (n > 1) return !!r.clear[`${subj}-${k}-${n - 1}`];
     if (ci === 0) return true;
     if (r.clear[`${subj}-${k}-1`]) return true; // もう遊んだことのあるステージは閉じない
     // 中間ボスの次の回は、中間ボスを倒してから
     if (MID[subj]?.after === String(keys[ci - 1])) return !!r.clear[`${subj}-mid-0`];
-    return !!r.clear[`${subj}-${keys[ci - 1]}-3`];
+    return !!r.clear[`${subj}-${keys[ci - 1]}-${bossOf(subj)}`];
   }
 
   /* ---------- 名前を変える ---------- */
@@ -882,17 +894,17 @@ export function makeRPG(ctx) {
     const isMid = lec === 'mid', isRev = !!rev;
     const lecs = Object.keys(lectures[subj] || {});
     const ci = isRev ? 0 : isMid ? lecs.indexOf(MID[subj].after) : lecs.indexOf(String(lec));
-    const boss = n === 3 || isMid;
+    const boss = n === bossOf(subj) || isMid;
     const E = ENEMIES[subj], D = DIFF[d];
     // 敵の強さ：章（C/C++ → DB → 設計 → TOEIC）が進むごとに3回ぶん強く（2章の最初＝1章の中盤くらい）＋その章の中の回
     const lvIdx = ci + (isRev ? 0 : Math.max(0, CHAPTERS.findIndex((c) => c.id === subj)) * 3);
-    const lvScale = 1 + lvIdx * 0.4 + (n - 1) * 0.15;
+    const lvScale = 1 + lvIdx * 0.4 + (n - 1) * (0.3 / nsOf(subj)); // ボスはどの章も +0.3、雑魚ステージは少しずつ強く
     // 雑魚：そのステージ専用の2体を中心に、その回の雑魚・どこにでも出る雑魚から選ぶ。たまにレア（ステージ専用のレアが多め）
     const SG = STAGE[subj]?.[lec] || [];
     // 1ウェーブに出る敵の数：ノーマル1体、ハード2体、ゲキムズ3体。雑魚ステージは3ウェーブ（ボス戦はボス＋手下の1ウェーブ）
     const slots = isMid || isRev ? 1 : [1, 2, 3][d];
     const zakos = (cnt) => {
-      const tri = SG[boss ? rnd(SG.length || 1) : n - 1];
+      const tri = SG[boss ? rnd(SG.length || 1) : (n - 1) % 2];
       const own = tri ? tri.slice(0, 2) : [];
       const pool = shuffle([...own, ...own, ...shuffle([...(E.lec[lec] || []), ...E.common])]);
       const z = []; for (let i = 0; i < cnt; i++) z.push(pool[i % pool.length]);
@@ -914,14 +926,14 @@ export function makeRPG(ctx) {
     // ウェーブ：雑魚ステージは3ウェーブ、ボス戦は1ウェーブ、中間ボスは1体ずつ
     const waves = isMid || isRev ? foes.map((_, i) => [i]) : boss ? [foes.map((_, i) => i)] : [0, 1, 2].map((w) => Array.from({ length: slots }, (_, k) => w * slots + k));
     const st = { foes, waves, wave: 0, active: [...waves[0]], fi: 0, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: isRev ? 60 : Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0 };
-    const deckObj = DECKS.find((d) => d.id === subj) || DECKS.find((d) => d.id === subj + lec) || DECKS[0]; // TOEIC はレベルごとの単語帳
+    const deckObj = DECKS.find((d) => d.id === subj) || DECKS.find((d) => d.id === subj + lec) || (subj === 'toeic' && DECKS.find((d) => d.id === 'toeic3')) || DECKS[0]; // TOEIC リーディングはレベルごとの単語帳（Part 6・7 は Lv.3）
     const deck = deckObj.words, deckId = deckObj.id;
     // 雑魚戦の単語はその回のものだけ（単語に回の番号が付いている科目）。選択肢のハズレは科目全体から
     const lecDeck = deck.filter((w) => String(w[2]) === String(lec));
     const qDeck = lecDeck.length >= 3 ? lecDeck : deck;
     const usedW = new Set(), usedQ = new Set(); // 1回のバトルで同じ問題は全部出るまで出さない
-    // STAGE 2（ボスの前）は、その回の本番形式（ボスと同じ範囲）を必ず1〜2問まぜる：2ウェーブ目・3ウェーブ目の最初の問題
-    const realAt = !isRev && !isMid && !boss && n === 2 ? new Set(rnd(2) ? [1, 2] : [1 + rnd(2)]) : new Set();
+    // ボスの前のステージ（TOEIC は STAGE 4、ほかは STAGE 2）は、その回の本番形式（ボスと同じ範囲）を必ず1〜2問まぜる：2ウェーブ目・3ウェーブ目の最初の問題
+    const realAt = !isRev && !isMid && !boss && n === nsOf(subj) ? new Set(rnd(2) ? [1, 2] : [1 + rnd(2)]) : new Set();
     const no = isRev ? (rev.rush ? '怨念ボスラッシュ' : '復讐') : isMid ? '中間ボス' : (lectures[subj][lec].match(/^(第\S+?回)/) || [lectures[subj][lec]])[0];
     openOv(isRev ? `${no}（${foes.length}体）` : `${no} ${isMid ? `${foes.length}連戦` : boss ? 'BOSS' : 'STAGE ' + n}${d ? ' ' + D.tag + D.name : ''}`); darkOv();
     setCleanup(() => { clearInterval(st.timer); bgm.play('map'); });
@@ -1081,9 +1093,9 @@ export function makeRPG(ctx) {
       if (bqP) {
         const bq = await bqP;
         if (st.over || !document.getElementById('rp-q')) return;
-        st.q = { answer: bq.answer, exp: bq.exp, n: bq.choices.length, boss: true, qid: bq.qid, choices: bq.choices, sid: F.sid || subj, lec: F.qid ? F.lec : F.lec || lec, real: !F.boss };
+        st.q = { answer: bq.answer, exp: bq.exp, n: bq.choices.length, boss: true, qid: bq.qid, choices: bq.reveal || bq.choices, reveal: bq.reveal, sid: F.sid || subj, lec: F.qid ? F.lec : F.lec || lec, real: !F.boss };
         qEl.innerHTML = `<div class="rp-bq">${st.q.real ? '<div class="rp-realtag">📝 本番形式（ボスと同じ範囲）</div>' : ''}${bq.body}<div class="q-text">${bq.q}</div>${bq.qcode}</div>
-          <div class="choices">${bq.choices.map((c, i) => `<button class="choice" data-c="${i}"><span class="num">(${i + 1})</span><span class="txt">${c}</span></button>`).join('')}</div>`;
+          <div class="choices">${bq.choices.map((c, i) => `<button class="choice" data-c="${i}"><span class="num">(${bq.letters ? 'ABCDE'[i] : i + 1})</span><span class="txt">${c}</span></button>`).join('')}</div>`;
       } else {
         const wd = F.word ? (DECKS.find((x) => x.id === F.deck) || { words: [F.word] }).words : deck;
         let c = F.word;
@@ -1116,7 +1128,7 @@ export function makeRPG(ctx) {
     async function revDetail(i, ok) {
       const F = foes[st.fi], q = st.q;
       const strip = (h) => String(h).replace(/<(?!\/?(code|b|pre)\b)[^>]*>/g, ' ');
-      const sid = q.boss ? q.sid : F.deck?.startsWith('toeic') ? 'toeic' : F.deck;
+      const sid = q.boss ? q.sid : /^toeic\d$/.test(F.deck || '') ? 'toeic' : F.deck;
       const lec = q.boss ? q.lec : q.word?.[2] ?? DECKS.find((x) => x.id === F.deck)?.words.find((w) => w[0] === q.word?.[0])?.[2]; // 前に保存された単語は回の番号がないので単語帳から引く
       const les = lec != null ? await api.lessonDigest?.(sid, lec).catch(() => '') : '';
       const mine = i < 0 ? '（時間切れ）' : strip(q.choices[i]);
@@ -1143,7 +1155,7 @@ export function makeRPG(ctx) {
       }
       const ev = st.event; st.event = null;
       const btns = document.querySelectorAll('#rp-q [data-c]');
-      btns.forEach((b) => { b.disabled = true; if (+b.dataset.c === st.q.answer) b.classList.add('ok'); });
+      btns.forEach((b) => { b.disabled = true; if (+b.dataset.c === st.q.answer) b.classList.add('ok'); if (st.q.reveal) b.querySelector('.txt').innerHTML = st.q.reveal[+b.dataset.c]; }); // Part 1・2 は答えたあとに選択肢を見せる
       if (btn && !ok) btn.classList.add('ng');
       const evEl = document.getElementById('rp-event'); if (evEl) evEl.hidden = true;
       let line = '';

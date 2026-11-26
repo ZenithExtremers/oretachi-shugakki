@@ -1487,7 +1487,7 @@ body.rp-night.rp-day {
 .rp-day .rp-zcskill b { color: #b45309; }
 .rp-day .rp-zcwhere, .rp-day .rp-zcnav { color: var(--muted) !important; }
 .rp-day .rp-zcnav button { color: var(--text); border-color: rgba(30, 41, 59, .2); background: #fff; }
-.rp-seg4 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.rp-seg4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .rp-zmode { grid-template-columns: repeat(2, 1fr); }
 
 /* ---------- 主人公のスキン ---------- */
@@ -1514,3 +1514,13 @@ body.rp-night.rp-day {
 .passmark.ok { background: rgba(22, 163, 74, .12); color: var(--ok); border: 2px solid var(--ok); }
 .passmark.ng { background: rgba(220, 38, 38, .08); color: var(--ng); border: 2px solid var(--ng); }
 .diagram.road svg { max-width: 360px; }
+
+/* ---------- TOEIC リスニング ---------- */
+.listen { margin: 10px 0; }
+.listen .row { gap: 8px; }
+.listen-play { flex: 1; font-weight: 800; }
+.script { margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: var(--brand-soft); font-size: 14px; line-height: 1.6; }
+.script p { margin: 4px 0; }
+.script b { display: inline-block; min-width: 3.5em; margin-right: 6px; font-size: 12px; color: var(--brand); }
+.rp-bq .listen-play { width: 100%; }
+.passage.pre { white-space: pre-line; }

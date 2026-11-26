@@ -61,7 +61,7 @@ for (const meta of subjects) {
       const w = `${where}/${q.id}`;
       if (ids.has(q.id)) err(w, 'question id が重複'); ids.add(q.id);
       const ch = q.choices || g.sharedChoices;
-      if (!ch || ch.length !== (subj.choices || 5)) err(w, `選択肢が${subj.choices || 5}つでない`);
+      if (!ch || (subj.choicesIn ? !subj.choicesIn.includes(ch.length) : ch.length !== (subj.choices || 5))) err(w, `選択肢が${subj.choicesIn ? subj.choicesIn.join('か') : subj.choices || 5}つでない`);
       else if (new Set(ch.map((c) => (q.tableChoices || g.tableChoices ? norm(c) : c))).size !== ch.length) err(w, '選択肢に同じものがある');
       const qsql = q.sql || ((q.lang || g.lang) === 'sql' && (q.tableChoices || g.tableChoices) ? q.code : null);
       if (qsql && g.tables) {

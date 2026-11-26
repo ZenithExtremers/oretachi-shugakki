@@ -89,6 +89,26 @@ const grammar = [
       { q: 'They are considering ____ the plan.', choices: ['changing', 'to change', 'change', 'changed'], answer: 0, exp: 'consider ＋ -ing。' },
     ],
   },
+  {
+    id: 'toeic-P6', lecture: 6, title: 'Part 6 長文穴埋めのコツ',
+    blocks: [
+      'メールやお知らせの中に空欄が4つ。そのうち1つは **文を入れる問題**。',
+      { list: ['空欄の前後の文だけでなく、**文章全体の流れ**（時制・話題）を見る', 'However / Therefore / For example など、つなぎの言葉は前後の関係（逆接・結果・例）で選ぶ', '文を入れる問題は、**次の文とつながるか** を確かめる'] },
+    ],
+    questions: [
+      { q: '「業者が毎晩掃除します。［ ］、日中もきれいに使ってください。」に入るのは？', choices: ['However', 'For example', 'Therefore', 'Instead of'], answer: 0, exp: '前と反対の内容を続ける → However（しかし）。' },
+    ],
+  },
+  {
+    id: 'toeic-P7', lecture: 7, title: 'Part 7 読解のコツ',
+    blocks: [
+      'お知らせ・メール・広告・チャット・記事などを読んで設問に答える。',
+      { list: ['**先に設問を読んで**、探す情報を決めてから本文を読む', 'NOT 問題（本文に書かれていないもの）は、選択肢を1つずつ本文と照らす', 'チャットの「意図」問題は、**直前の相手の発言** を見る', '言いかえに注意（hire ＝ employ、free ＝ at no cost など）'] },
+    ],
+    questions: [
+      { q: '「What is NOT mentioned ～?」の答え方は？', choices: ['本文に書かれていないものを選ぶ', '本文に書かれているものを選ぶ'], answer: 0, exp: 'NOT 問題は、本文にないものが正解。' },
+    ],
+  },
 ];
 
 export default [...grammar, ...wordLessons()].sort((a, b) => a.lecture - b.lecture);

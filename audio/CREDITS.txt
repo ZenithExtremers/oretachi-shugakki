@@ -1,0 +1,15 @@
+TOEIC リスニングの日本語の案内音声（audio/toeicL-p*.mp3）
+
+音声合成：Open JTalk（Nagoya Institute of Technology） http://open-jtalk.sourceforge.net/
+
+声：
+- HTS Voice "Mei"（mei_normal）
+  Copyright (c) 2009-2018 Nagoya Institute of Technology, Department of Computer Science
+  MMDAgent Project Team http://www.mmdagent.jp/
+  Creative Commons Attribution 3.0（CC BY 3.0）
+- HTS Voice "NIT ATR503 M001"（nitech_jp_atr503_m001）
+  Copyright (c) 2003-2012 Nagoya Institute of Technology, Department of Computer Science
+  Copyright (c) 2003-2008 Tokyo Institute of Technology
+  Creative Commons Attribution 3.0（CC BY 3.0）
+
+英語の音声は、端末（ブラウザ）の読み上げ機能で再生しています（音声ファイルはありません）。

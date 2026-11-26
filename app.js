@@ -42,6 +42,7 @@ const saveSession = () => writeJSON(SKEY, session);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const NUMS = ['(1)', '(2)', '(3)', '(4)', '(5)'];
+const numOf = (i) => (cur && cur.letters ? `(${'ABCDE'[i]})` : NUMS[i]); // TOEIC は (A)〜(D)
 const ICON = {
   back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
   next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
@@ -395,17 +396,66 @@ function refLabel(g) { return g.code ? '&lt;/&gt; コード' : g.tables?.length 
 function renderDiagram(svg) { return `<div class="diagram">${svg}</div>`; }
 function renderGroupBody(g) {
   return `${g.intro ? `<p class="intro">${inline(g.intro)}</p>` : ''}
-      ${g.passage ? renderPassage(g.passage) : ''}
+      ${g.passage ? renderPassage(g.passage, g.pre) : ''}
       ${g.diagram ? renderDiagram(g.diagram) : ''}
       ${(g.tables || []).map(renderTable).join('')}
-      ${g.code ? renderCode(g.code, g.id, g.lang || cur.lang) : ''}`;
+      ${g.code ? renderCode(g.code, g.id, g.lang || cur.lang) : ''}
+      ${g.listen ? listenHTML(g) : ''}`;
 }
+/* ---------- TOEIC リスニング：英語は端末の読み上げ、日本語の案内は Open JTalk の音声ファイル ---------- */
+const SPK = { W: '女性', M: '男性', W2: '女性2', M2: '男性2', N: 'ナレーター' };
+function listenHTML(g) {
+  return `<div class="listen"><div class="row"><button class="btn listen-play" data-act="say" data-g="${g.id}">▶ 音声を再生</button><button class="btn sub" data-act="script">📄 スクリプト</button></div>
+    <div class="script" hidden>${g.listen.lines.map(([sp, t]) => `<p>${SPK[sp] ? `<b>${SPK[sp]}</b>` : ''}${esc(t)}</p>`).join('')}${g.listen.ja ? `<p class="muted small">${esc(g.listen.ja)}</p>` : ''}</div></div>`;
+}
+const SAY = { tok: 0, guided: new Set(), btn: null };
+const FEMALE = /female|samantha|zira|jenny|aria|karen|moira|tessa|victoria|susan|allison|ava|serena|kate|joanna|salli|kimberly|emma|libby|sonia|natasha|google us english/i;
+const MALE = /\bmale|daniel|alex|david|guy|fred|tom\b|aaron|arthur|rishi|oliver|ryan|brian|matthew|justin|thomas|google uk english male/i;
+function pickVoice(sp) {
+  const vs = (window.speechSynthesis?.getVoices() || []).filter((v) => /^en[-_]/i.test(v.lang));
+  const us = vs.filter((v) => /US/i.test(v.lang));
+  const pool = (re) => [...us.filter((v) => re.test(v.name)), ...vs.filter((v) => re.test(v.name))];
+  const list = sp[0] === 'M' ? pool(MALE).filter((v) => !/female/i.test(v.name)) : pool(FEMALE);
+  return (sp.endsWith('2') ? list[1] || list[0] : list[0]) || us[0] || vs[0] || null;
+}
+function speakLine(t, sp) {
+  return new Promise((res) => {
+    const u = new SpeechSynthesisUtterance(t); u.lang = 'en-US'; u.rate = 0.95;
+    const v = pickVoice(sp); if (v) u.voice = v;
+    if (!v || !(sp[0] === 'M' ? MALE : FEMALE).test(v.name)) u.pitch = sp[0] === 'M' ? 0.8 : 1.2; // 男女の声がないときは高さで分ける
+    u.onend = u.onerror = () => res();
+    speechSynthesis.speak(u);
+  });
+}
+function stopSay() { SAY.tok++; try { speechSynthesis.cancel(); } catch {} if (SAY.audio) { SAY.audio.pause(); SAY.audio = null; } if (SAY.btn) SAY.btn.textContent = '▶ 音声を再生'; SAY.btn = null; }
+async function sayGroup(g, btn) {
+  if (SAY.btn === btn) return stopSay(); // 再生中にもう一度押すと止める
+  stopSay();
+  if (!window.speechSynthesis) { alert('この端末は読み上げに対応していません。スクリプトを読んでください。'); return; }
+  const tok = SAY.tok; SAY.btn = btn; btn.textContent = '■ 止める';
+  try { speechSynthesis.speak(new SpeechSynthesisUtterance('')); } catch {} // iPhone は最初の読み上げをタップの中で始める必要がある
+  const part = g.listen.part;
+  if (part && !SAY.guided.has(part)) { // 日本語の案内（パートごとに最初の1回）
+    SAY.guided.add(part);
+    await new Promise((res) => { const a = new Audio(`audio/toeicL-p${part}.mp3`); SAY.audio = a; a.onended = a.onerror = res; a.play().catch(res); });
+    if (tok !== SAY.tok) return;
+    await new Promise((r) => setTimeout(r, 400));
+  }
+  for (const [sp, t] of g.listen.lines) {
+    if (tok !== SAY.tok) return;
+    await speakLine(t, sp);
+    await new Promise((r) => setTimeout(r, /^\([A-D]\)/.test(t) ? 700 : 350));
+  }
+  if (tok === SAY.tok) { btn.textContent = '▶ もう一度'; SAY.btn = null; }
+}
+window.addEventListener('hashchange', () => stopSay()); // 画面を移ったら読み上げを止める
+function groupById(gid) { for (const s of Object.values(loaded)) if (s.groupById[gid]) return s.groupById[gid]; return null; }
 // 説明文中の **太字** と `コード`
 function inline(t) {
   return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, (m, c) => `<code>${yen(c)}</code>`);
 }
-function renderPassage(text) {
-  return `<div class="passage">${esc(text).replace(/［[^］]+］/g, (m) => `<span class="blank">${m}</span>`)}</div>`;
+function renderPassage(text, pre = false) {
+  return `<div class="passage${pre ? ' pre' : ''}">${esc(text).replace(/［[^］]+］/g, (m) => `<span class="blank">${m}</span>`)}</div>`;
 }
 function choiceHTML(q, mono, txt) {
   if (q.tableChoices || q.group?.tableChoices) return miniTable(txt);
@@ -424,13 +474,13 @@ function renderQuestion(q) {
     let cls = 'choice';
     if (reveal) { if (oi === q.answer) cls += ' ok'; else if (oi === ans) cls += ' ng'; }
     else if (oi === ans) cls += ' sel';
-    return `<button class="${cls}" data-act="ans" data-q="${q.id}" data-o="${oi}" ${reveal ? 'disabled' : ''}><span class="num">${NUMS[di]}</span><span class="txt">${choiceHTML(q, monoOf(q), ch[oi])}</span></button>`;
+    return `<button class="${cls}" data-act="ans" data-q="${q.id}" data-o="${oi}" ${reveal ? 'disabled' : ''}><span class="num">${numOf(di)}</span><span class="txt">${g.hideChoices && !reveal ? '<span class="muted small">（音声で流れる）</span>' : choiceHTML(q, monoOf(q), ch[oi])}</span></button>`;
   }).join('');
   let exp = '';
   if (reveal) {
     const ok = ans === q.answer;
     const sent = isDue(store.stats[q.id]);
-    exp = `<div class="exp ${ok ? 'ok' : 'ng'}"><span class="verdict">${ok ? '正解' : '不正解'}</span>正解は ${NUMS[perm.indexOf(q.answer)]}。${inline(q.exp)}
+    exp = `<div class="exp ${ok ? 'ok' : 'ng'}"><span class="verdict">${ok ? '正解' : '不正解'}</span>正解は ${numOf(perm.indexOf(q.answer))}。${inline(q.exp)}
       <button class="rev-send${sent ? ' sent' : ''}" data-act="revsend" data-q="${q.id}" ${sent ? 'disabled' : ''}>${sent ? '👻 復讐リストに入っています' : '👻 復讐に送る'}</button></div>`;
   }
   const qcode = q.code ? renderCode(q.code, 'q-' + q.id, q.lang || g.lang || cur.lang, q.code.includes('\n')) : '';
@@ -584,7 +634,7 @@ function viewResult(s) {
     const ok = a === q.answer;
     const perm = session.order[q.group.sharedChoices ? q.group.id : q.id];
     const ch = choicesOf(q);
-    return `<details class="res-item-wrap"><summary class="res-item"><span class="mark ${ok ? 'ok' : 'ng'}">${ok ? '○' : '×'}</span><span>問${qNumber(id)} ${esc(q.q.length > 46 ? q.q.slice(0, 46) + '…' : q.q)}<small>あなた：${a === undefined ? '未回答' : NUMS[perm.indexOf(a)] + ' ' + esc(ch[a].replace(/\n/g, ' / '))} ／ 正解：${NUMS[perm.indexOf(q.answer)]} ${esc(ch[q.answer].replace(/\n/g, ' / '))}</small></span></summary>
+    return `<details class="res-item-wrap"><summary class="res-item"><span class="mark ${ok ? 'ok' : 'ng'}">${ok ? '○' : '×'}</span><span>問${qNumber(id)} ${esc(q.q.length > 46 ? q.q.slice(0, 46) + '…' : q.q)}<small>あなた：${a === undefined ? '未回答' : numOf(perm.indexOf(a)) + ' ' + esc(ch[a].replace(/\n/g, ' / '))} ／ 正解：${numOf(perm.indexOf(q.answer))} ${esc(ch[q.answer].replace(/\n/g, ' / '))}</small></span></summary>
       <div class="exp ${ok ? 'ok' : 'ng'}">${inline(q.exp)}</div></details>`;
   }).join('');
   const m = Math.floor((session.seconds || 0) / 60);
@@ -643,7 +693,7 @@ function lessonQ(l, q, i) {
   const btns = perm.map((oi, di) => {
     let cls = 'choice';
     if (done) { if (oi === q.answer) cls += ' ok'; else if (oi === ans) cls += ' ng'; }
-    return `<button class="${cls}" data-act="lans" data-i="${i}" data-o="${oi}" ${done ? 'disabled' : ''}><span class="num">${NUMS[di]}</span><span class="txt">${choiceHTML(q, q.mono, q.choices[oi])}</span></button>`;
+    return `<button class="${cls}" data-act="lans" data-i="${i}" data-o="${oi}" ${done ? 'disabled' : ''}><span class="num">${numOf(di)}</span><span class="txt">${choiceHTML(q, q.mono, q.choices[oi])}</span></button>`;
   }).join('');
   const exp = done ? `<div class="exp ${ans === q.answer ? 'ok' : 'ng'}"><span class="verdict">${ans === q.answer ? '正解' : '不正解'}</span>${inline(q.exp)}</div>` : '';
   return `<div class="q" id="lq-${i}"><div class="q-text"><span class="qn">Q${i + 1}</span>${inline(q.q)}</div>${q.code ? renderCode(q.code, 'lq' + i, q.lang || cur.lang) : ''}${q.table ? renderTable(q.table) : ''}<div class="choices">${btns}</div>${exp}</div>`;
@@ -743,9 +793,11 @@ const HIMA_API = {
       body: `<div class="rp-gtitle muted small">${esc(g.title)}</div>${renderGroupBody(g)}`,
       q: inline(q.q),
       qcode: q.code ? renderCode(q.code, 'rq' + Math.random().toString(36).slice(2, 7), q.lang || g.lang || s.lang, q.code.includes('\n')) : '',
-      choices: perm.map((i) => choiceHTML(q, monoOf(q), ch[i])),
+      choices: perm.map((i) => (g.hideChoices ? '<span class="muted small">（音声で流れる）</span>' : choiceHTML(q, monoOf(q), ch[i]))),
+      reveal: g.hideChoices ? perm.map((i) => esc(ch[i])) : null, // 答えたあとに見せる選択肢（Part 1・2）
+      letters: !!s.letters,
       answer: perm.indexOf(q.answer),
-      exp: `正解は (${perm.indexOf(q.answer) + 1})。${inline(q.exp)}`,
+      exp: `正解は ${numOf(perm.indexOf(q.answer))}。${inline(q.exp)}${g.listen ? `<div class="script">${g.listen.lines.map(([sp, t]) => `<p>${SPK[sp] ? `<b>${SPK[sp]}</b>` : ''}${esc(t)}</p>`).join('')}</div>` : ''}`,
       qid: q.id,
     };
   },
@@ -801,6 +853,11 @@ function viewSettings() {
         <p class="small muted" style="margin-top:0">成績と間違えた問題の記録は、この端末のブラウザの中だけに保存されます。</p>
         <button class="btn sub wide" data-act="reset">記録をすべて消す</button>
       </div>
+      <h3 class="sec">クレジット</h3>
+      <div class="card small">
+        <p style="margin-top:0">TOEIC リスニングの日本語の案内音声：Open JTalk（名古屋工業大学）／ HTS Voice "Mei"（MMDAgent Project Team・名古屋工業大学, CC BY 3.0）／ HTS Voice "NIT ATR503 M001"（名古屋工業大学・東京工業大学, CC BY 3.0）</p>
+        <p class="muted" style="margin-bottom:0">英語の音声は端末の読み上げ機能を使っています。TOEIC は ETS の登録商標です。このアプリの問題はすべてオリジナルで、ETS とは関係ありません。</p>
+      </div>
       <p class="muted small mt center">俺たちの秋学期 v${VERSION} ・ 解答は公式のものではありません</p>
     </main>`;
 }
@@ -812,6 +869,8 @@ document.addEventListener('click', async (e) => {
   const act = el.dataset.act;
   const sid = (location.hash.match(/#\/s\/([^/]+)/) || [])[1];
   const s = sid ? await getSubject(sid) : null;
+  if (act === 'say') { const g = groupById(el.dataset.g); if (g) sayGroup(g, el); return; }
+  if (act === 'script') { const sc = el.closest('.listen')?.querySelector('.script'); if (sc) sc.hidden = !sc.hidden; return; }
   switch (act) {
     case 'nav': return go(el.dataset.to);
     case 'back': return go(el.dataset.to);
