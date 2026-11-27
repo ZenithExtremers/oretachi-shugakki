@@ -464,3 +464,281 @@ ${smug(78, 9)}`),
 <g font-family="monospace" font-size="5" font-weight="900" fill="#78350f"></g>
 <circle cx="60" cy="30" r="14" fill="url(#eg-goldcstr)" stroke="${OL}" stroke-width="2.5"/>${smug(28, 5)}`),
 });
+
+// 小さな表（テーブル）と DB の筒
+const tbl = (x, y, w, h, c = '#e0f2fe', rows = 3, cols = 3) => `<g stroke="${OL}" stroke-width="2"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${c}"/><rect x="${x}" y="${y}" width="${w}" height="${h / (rows + 1)}" rx="3" fill="#38bdf8"/>${Array.from({ length: rows }, (_, i) => `<path d="M${x} ${y + (h / (rows + 1)) * (i + 1)} h${w}"/>`).join('')}${Array.from({ length: cols - 1 }, (_, i) => `<path d="M${x + (w / cols) * (i + 1)} ${y} v${h}"/>`).join('')}</g>`;
+const cyl = (x, y, w, h, c = '#38bdf8') => `<g stroke="${OL}" stroke-width="2.5"><path d="M${x} ${y} v${h} a${w / 2} ${w / 6} 0 0 0 ${w} 0 v-${h}" fill="${c}"/><ellipse cx="${x + w / 2}" cy="${y}" rx="${w / 2}" ry="${w / 6}" fill="#bae6fd"/><path d="M${x} ${y + h / 2} a${w / 2} ${w / 6} 0 0 0 ${w} 0" fill="none"/></g>`;
+const keyShape = (x, y, c = '#fbbf24', r = 0) => `<g transform="translate(${x} ${y}) rotate(${r})" stroke="${OL}" stroke-width="2.5"><circle r="11" fill="${c}"/><circle r="4" fill="#fff"/><path d="M11 -3 h26 v6 h-4 v6 h-5 v-6 h-4 v6 h-5 v-6 h-8z" fill="${c}" stroke-linejoin="round"/></g>`;
+
+Object.assign(ENEMY_ART, {
+  // ----- DB：どの回にも出る雑魚 -----
+  'db|NULL霊': sprite('dbnull', `
+<path d="M30 98 q-6 -58 30 -64 q36 6 30 64 l-8 -8 l-8 10 l-7 -10 l-7 10 l-7 -10 l-8 10 l-7 -10z" fill="#e2e8f0" fill-opacity=".75" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+${evil(56, 10, '#94a3b8')}<ellipse cx="60" cy="74" rx="6" ry="8" fill="#334155" stroke="${OL}" stroke-width="2"/>
+<path d="M28 70 q-12 0 -14 10 M92 70 q12 0 14 10" stroke="${OL}" stroke-width="2.5" fill="none"/>`),
+  'db|重複レコード': sprite('dup', `
+${[0, 1].map((i) => `<g transform="translate(${i * 30} ${i * -4})"><ellipse cx="44" cy="70" rx="22" ry="26" fill="#a78bfa" stroke="${OL}" stroke-width="3"/>${''}<path d="M34 64 l5 1.5 M50 64 l-5 1.5" stroke="${OL}" stroke-width="2.4" stroke-linecap="round"/><circle cx="37" cy="68" r="2" fill="${OL}"/><circle cx="51" cy="68" r="2" fill="${OL}"/><path d="M38 80 q6 4 12 0" stroke="${OL}" stroke-width="2" fill="none"/><rect x="30" y="88" width="28" height="9" rx="2" fill="#ede9fe" stroke="${OL}" stroke-width="1.8"/></g>`).join('')}`),
+  'db|ゴミデータ': sprite('garbage', `
+<path d="M30 48 h60 l-6 60 h-48z" fill="#78716c" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><rect x="24" y="40" width="72" height="10" rx="3" fill="#a8a29e" stroke="${OL}" stroke-width="3" transform="rotate(-8 60 45)"/>
+<g stroke="${OL}" stroke-width="1.5"><rect x="38" y="26" width="12" height="10" fill="#fca5a5" transform="rotate(-20 44 31)"/><rect x="64" y="22" width="12" height="10" fill="#fde047" transform="rotate(15 70 27)"/></g>
+${evil(74, 12, '#bef264')}${grin(88, 9)}`),
+  'db|文字化け': sprite('mojibake', `
+${blob('#f472b6', 66, 30, 30)}
+<g font-size="12" font-weight="900" fill="#831843" opacity=".75"><text x="38" y="58">縺</text><text x="66" y="54">繧</text><text x="54" y="96">�</text></g>
+<g fill="none" stroke="${OL}" stroke-width="2.2"><path d="M42 72 l8 -4 l-8 -4 M78 72 l-8 -4 l8 -4"/></g><path d="M50 84 q5 -4 10 0 t10 0" stroke="${OL}" stroke-width="2.2" fill="none"/>`),
+  'db|全件DELETE魔': sprite('delall', `
+<path d="M74 28 q8 -12 18 -10" stroke="#78350f" stroke-width="3" fill="none"/><path d="M90 16 l4 -6 M94 20 l6 -2 M88 12 l-2 -6" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="60" cy="68" r="36" fill="#1f2937" stroke="${OL}" stroke-width="3"/><rect x="64" y="26" width="14" height="10" rx="2" fill="#475569" stroke="${OL}" stroke-width="2"/>
+${hl(38, 52, 12)}${evil(64, 12, '#ef4444')}${grin(80, 12)}`),
+  'db|迷子の主キー': sprite('lostpk', `
+<g transform="translate(-30 -20) scale(1.6)">${keyShape(44, 60, '#fbbf24', -10)}</g>
+<circle cx="40" cy="76" r="13" fill="#fbbf24"/><path d="M30 68 l7 3 M50 68 l-7 3" stroke="${OL}" stroke-width="2.5" stroke-linecap="round"/><circle cx="34" cy="74" r="2.4" fill="${OL}"/><circle cx="46" cy="74" r="2.4" fill="${OL}"/>
+<path d="M35 84 q5 -4 10 0" stroke="${OL}" stroke-width="2.2" fill="none"/><text x="92" y="42" font-size="18" font-weight="900" fill="#fde047">?</text>`),
+  // ----- DB：回ごとの雑魚 -----
+  'db|INSERT忘れ': sprite('noinsert', `
+<path d="M50 108 v-46" stroke="#78350f" stroke-width="6"/><path d="M26 40 h48 q12 0 12 12 v18 h-60z" fill="#3b82f6" stroke="${OL}" stroke-width="3"/><path d="M26 40 q-12 0 -12 12 v18 h12" fill="#1d4ed8" stroke="${OL}" stroke-width="3"/>
+<path d="M86 48 v-16 h10 v6 h-6" fill="#ef4444" stroke="${OL}" stroke-width="2"/>${evil(56, 10, '#fff').replace(/60 -/g, '56 -').replace(/60 \+/g, '56 +')}`),
+  'db|命令まちがい': sprite('wrongcmd', `
+<g stroke="${OL}" stroke-width="2.5">${[['#38bdf8', -18], ['#4ade80', -6], ['#fbbf24', 6], ['#f87171', 18]].map(([c, r], i) => `<rect x="44" y="34" width="32" height="46" rx="4" fill="${c}" transform="rotate(${r} 60 100)"/>`).join('')}</g>
+${evil(56, 8, '#fff')}<path d="M52 68 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'db|LIKE迷い': sprite('like', `
+<circle cx="52" cy="54" r="28" fill="#e0f2fe" fill-opacity=".8" stroke="${OL}" stroke-width="5"/><path d="M72 74 l24 24" stroke="${OL}" stroke-width="12" stroke-linecap="round"/><path d="M72 74 l24 24" stroke="#a16207" stroke-width="7" stroke-linecap="round"/>
+${evil(54, 9, '#0ea5e9').replace(/60 -/g, '52 -').replace(/60 \+/g, '52 +')}<text x="44" y="72" font-size="11" font-weight="900" fill="#0369a1">%</text>`),
+  'db|BETWEENはみ出し': sprite('between', `
+<path d="M14 62 h92" stroke="#94a3b8" stroke-width="4"/><path d="M30 50 v24 M90 50 v24" stroke="${OL}" stroke-width="4"/>
+<ellipse cx="96" cy="62" rx="16" ry="20" fill="#fb923c" stroke="${OL}" stroke-width="3"/>${evil(58, 5, '#fff').replace(/60 -/g, '96 -').replace(/60 \+/g, '96 +')}
+<path d="M88 72 q8 3 14 -1" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'db|ORDER逆さま': sprite('orderrev', `
+<g stroke="${OL}" stroke-width="2.5"><rect x="26" y="34" width="20" height="70" fill="#f472b6"/><rect x="50" y="54" width="20" height="50" fill="#fb923c"/><rect x="74" y="74" width="20" height="30" fill="#facc15"/></g>
+<path d="M98 40 v40 l-8 -8 M98 80 l8 -8" stroke="#fde047" stroke-width="3" fill="none" stroke-linecap="round"/>
+${evil(48, 0, '#fff').replace(/cx="60"/g, 'cx="36"')}<path d="M30 46 l4 1 M40 46 l-4 1" stroke="${OL}" stroke-width="0"/>
+<g transform="translate(36 52)"><circle cx="-4" r="2" fill="${OL}"/><circle cx="4" r="2" fill="${OL}"/><path d="M-4 8 q4 -3 8 0" stroke="${OL}" stroke-width="2" fill="none"/></g>`),
+  'db|LIMITかくれんぼ': sprite('limit', `
+<rect x="20" y="30" width="80" height="78" rx="6" fill="#64748b" stroke="${OL}" stroke-width="3"/><rect x="20" y="30" width="80" height="26" rx="6" fill="#cbd5e1" stroke="${OL}" stroke-width="3"/>
+<circle cx="60" cy="72" r="18" fill="#a78bfa" stroke="${OL}" stroke-width="3"/><path d="M42 66 q18 -8 36 0 l-4 10 q-14 -6 -28 0z" fill="#facc15" stroke="${OL}" stroke-width="2"/>
+<path d="M52 84 q8 4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'db|CASEまよい': sprite('casesql', `
+<path d="M60 104 v-30 l-24 -24 M60 74 l24 -24 M60 74 v-34" stroke="#78350f" stroke-width="7" stroke-linecap="round" fill="none"/>
+<circle cx="60" cy="86" r="16" fill="#22d3ee" stroke="${OL}" stroke-width="3"/>${evil(84, 5, '#fff')}
+<g fill="#fde047" stroke="${OL}" stroke-width="2"><circle cx="36" cy="46" r="6"/><circle cx="60" cy="36" r="6"/><circle cx="84" cy="46" r="6"/></g>`),
+  'db|NULL伝染': sprite('nullinf', `
+<path d="M48 24 h24 v10 l14 46 q4 20 -16 24 h-20 q-20 -4 -16 -24 l14 -46z" fill="#e0f2fe" fill-opacity=".8" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M36 72 q24 -8 48 0 l2 10 q2 16 -16 20 h-20 q-18 -4 -16 -20z" fill="#a3e635"/>
+<g fill="#ecfccb"><circle cx="50" cy="84" r="3"/><circle cx="66" cy="90" r="2.5"/></g>${evil(70, 9, '#fff')}`),
+  'db|HAVINGまちがい': sprite('havingx', `
+<rect x="26" y="30" width="68" height="76" rx="8" fill="#0f766e" stroke="${OL}" stroke-width="3"/><rect x="34" y="38" width="52" height="16" rx="2" fill="#99f6e4" stroke="${OL}" stroke-width="2"/>
+<g fill="#5eead4" stroke="${OL}" stroke-width="1.5">${[0, 1, 2].map((r) => [0, 1, 2].map((c) => `<rect x="${36 + c * 17}" y="${62 + r * 13}" width="13" height="9" rx="2"/>`).join('')).join('')}</g>
+${evil(46, 10, '#0f766e')}`),
+  'db|GROUPはぐれ': sprite('groupstray', `
+<g fill="#f8fafc" stroke="${OL}" stroke-width="2">${[[22, 60], [34, 52], [28, 72], [42, 66]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="9"/>`).join('')}</g>
+<g fill="#fff" stroke="${OL}" stroke-width="2.5">${[[80, 64], [92, 58], [96, 72], [84, 76], [74, 72]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="10"/>`).join('')}</g>
+<ellipse cx="86" cy="68" rx="10" ry="12" fill="#334155" stroke="${OL}" stroke-width="2"/><circle cx="82" cy="66" r="2" fill="#fde047"/><circle cx="90" cy="66" r="2" fill="#fde047"/>
+<path d="M78 86 v10 M92 86 v10" stroke="${OL}" stroke-width="4" stroke-linecap="round"/>`),
+  'db|副問合せ複数': sprite('multisub', `
+${[[34, 70, '#f472b6'], [60, 62, '#a78bfa'], [86, 70, '#38bdf8']].map(([x, y, c]) => `<g><ellipse cx="${x}" cy="${y}" rx="15" ry="20" fill="${c}" stroke="${OL}" stroke-width="2.5"/><path d="M${x - 7} ${y - 6} l5 1.5 M${x + 7} ${y - 6} l-5 1.5" stroke="${OL}" stroke-width="2"/><circle cx="${x - 5}" cy="${y - 2}" r="1.6" fill="${OL}"/><circle cx="${x + 5}" cy="${y - 2}" r="1.6" fill="${OL}"/></g>`).join('')}
+<path d="M14 40 q46 -24 92 0" stroke="#fde047" stroke-width="3" fill="none" stroke-dasharray="4 4"/>`),
+  'db|NOT IN罠': sprite('notin', `
+<path d="M16 96 h88" stroke="#78350f" stroke-width="6" stroke-linecap="round"/>
+<path d="M24 96 a36 36 0 0 1 72 0" fill="none" stroke="#94a3b8" stroke-width="5"/><g stroke="#cbd5e1" stroke-width="3">${Array.from({ length: 7 }, (_, i) => { const a = Math.PI + (i + 1) * Math.PI / 8; return `<path d="M${(60 + Math.cos(a) * 36).toFixed(1)} ${(96 + Math.sin(a) * 36).toFixed(1)} l${(Math.cos(a) * -8).toFixed(1)} ${(Math.sin(a) * -8).toFixed(1)}"/>`; }).join('')}</g>
+<rect x="48" y="80" width="24" height="12" rx="2" fill="#ef4444" stroke="${OL}" stroke-width="2"/>${evil(72, 10, '#fde047')}`),
+  'db|結合条件忘れ': sprite('joinx', `
+${tbl(10, 46, 36, 40, '#e0f2fe')}${tbl(74, 46, 36, 40, '#fce7f3')}
+<g stroke="#ef4444" stroke-width="2.5" fill="none"><path d="M46 56 l28 22 M46 66 l28 -8 M46 76 l28 4"/></g>
+${evil(36, 22, '#fde047')}`),
+  'db|あいまい列': sprite('ambigcol', `
+<path d="M14 70 q10 -28 30 -22 q8 -18 26 -12 q18 -10 30 8 q16 4 12 22 q-2 18 -22 16 h-56 q-24 -2 -20 -12z" fill="#cbd5e1" fill-opacity=".9" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<g stroke="#94a3b8" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M24 90 h40 M50 98 h50"/></g>${evil(68, 12, '#e2e8f0')}`),
+  // ----- DB：回のボス -----
+  'db|WHERE忘れ大王': sprite('wherek', `
+<path d="M16 110 q4 -36 44 -42 q40 6 44 42z" fill="#1e3a8a" stroke="${OL}" stroke-width="3"/>
+<g fill="#60a5fa" stroke="${OL}" stroke-width="1.5" opacity=".9">${[0, 1, 2].map((r) => `<rect x="${32 + r * 4}" y="${84 + r * 8}" width="${56 - r * 8}" height="6" rx="1"/>`).join('')}</g>
+<path d="M22 40 l-6 -18 l14 10 M98 40 l6 -18 l-14 10" fill="#1e40af" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="60" cy="52" r="24" fill="#3b82f6" stroke="${OL}" stroke-width="3"/>
+<path d="M36 32 l6 -16 l10 10 l8 -14 l8 14 l10 -10 l6 16z" fill="url(#eg-wherek)" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+${evil(50, 10, '#fde047')}${grin(62, 12)}`, { aura: '#3b82f6' }),
+  'db|検索の迷宮主': sprite('mazelord', `
+<rect x="16" y="22" width="88" height="88" rx="6" fill="#134e4a" stroke="${OL}" stroke-width="3"/>
+<g stroke="#5eead4" stroke-width="4" fill="none" stroke-linecap="round"><path d="M26 32 h30 v14 h20 M86 32 v28 h-14 M26 46 v24 h16 v14 M50 60 h14 v24 M76 74 h18 v24 h-30 M26 96 h22"/></g>
+<circle cx="60" cy="62" r="18" fill="#0d9488" stroke="${OL}" stroke-width="3"/>${evil(60, 7, '#fde047')}${grin(70, 7)}
+<path d="M44 40 l-6 -14 l12 8z M76 40 l6 -14 l-12 8z" fill="url(#eg-mazelord)" stroke="${OL}" stroke-width="2"/>`, { aura: '#14b8a6' }),
+  'db|並び替えカオス': sprite('chaos', `
+<path d="M20 30 q40 -14 80 0 q-6 14 -24 18 q14 6 10 20 q-12 10 -28 8 q6 10 0 18 q-10 4 -16 0 q2 10 -6 14 q-8 -8 -4 -18 q-12 -4 -10 -16 q-10 -8 -6 -22 q-10 -6 4 -22z" fill="#c084fc" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<g stroke="${OL}" stroke-width="1.5">${[[30, 20, '#fde047'], [90, 26, '#38bdf8'], [16, 60, '#4ade80'], [100, 70, '#fb7185'], [84, 100, '#fde047']].map(([x, y, c], i) => `<rect x="${x}" y="${y}" width="12" height="8" fill="${c}" transform="rotate(${i * 30} ${x + 6} ${y + 4})"/>`).join('')}</g>
+${evil(40, 11, '#fde047')}${grin(54, 12)}`, { aura: '#a855f7' }),
+  'db|関数キメラ': sprite('chimera', `
+<path d="M16 110 q-2 -30 20 -40 h48 q22 10 20 40z" fill="#16a34a" stroke="${OL}" stroke-width="3"/>
+${[[30, 50, '#f97316'], [60, 38, '#22c55e'], [90, 50, '#3b82f6']].map(([x, y, c]) => `<g><path d="M${x - 8} ${y - 10} l-4 -10 l9 5z M${x + 8} ${y - 10} l4 -10 l-9 5z" fill="${c}" stroke="${OL}" stroke-width="2"/><circle cx="${x}" cy="${y}" r="15" fill="${c}" stroke="${OL}" stroke-width="3"/><path d="M${x - 9} ${y - 4} l6 2 M${x + 9} ${y - 4} l-6 2" stroke="${OL}" stroke-width="2.2"/><circle cx="${x - 5}" cy="${y}" r="2" fill="#fde047"/><circle cx="${x + 5}" cy="${y}" r="2" fill="#fde047"/><path d="M${x - 6} ${y + 7} l3 3 l3 -3 l3 3 l3 -3" stroke="#fff" stroke-width="1.6" fill="none"/></g>`).join('')}`, { aura: '#22c55e' }),
+  'db|集計ゴーレム': sprite('sumgolem', `
+<path d="M22 66 l-12 6 l-2 18 l12 4 l8 -14z M98 66 l12 6 l2 18 l-12 4 l-8 -14z" fill="#64748b" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M28 108 l-2 -48 l8 -14 h52 l8 14 l-2 48z" fill="#94a3b8" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<g font-size="16" font-weight="900" fill="#fde047" stroke="${OL}" stroke-width=".8"><text x="50" y="92">Σ</text></g>
+<path d="M40 44 l4 -22 h32 l4 22z" fill="#cbd5e1" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M46 32 h12 v5 h-12z M62 32 h12 v5 h-12z" fill="#f97316" stroke="${OL}" stroke-width="1.5"/>`, { aura: '#94a3b8' }),
+  'db|副問合せの影': sprite('subshadow', `
+<path d="M24 108 q-6 -60 36 -70 q42 10 36 70 q-10 -10 -18 0 q-8 -10 -18 0 q-10 -10 -18 0 q-8 -10 -18 0z" fill="#1e1b4b" stroke="${OL}" stroke-width="3"/>
+<g fill="none" stroke="#6366f1" stroke-width="3"><path d="M44 56 q-8 14 0 28 M76 56 q8 14 0 28"/><path d="M50 62 q-4 8 0 16 M70 62 q4 8 0 16"/></g>
+${evil(46, 10, '#a5b4fc')}`, { aura: '#6366f1' }),
+  'db|NULL消しの番人': sprite('nullguard', `
+<ellipse cx="60" cy="100" rx="40" ry="10" fill="#020617" stroke="${OL}" stroke-width="3"/>
+<path d="M30 96 v-40 q0 -26 30 -26 q30 0 30 26 v40" fill="#334155" stroke="${OL}" stroke-width="3"/>
+<path d="M30 60 h60" stroke="#475569" stroke-width="5"/><path d="M22 40 v60 M98 40 v60" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/><path d="M18 40 l4 -10 l4 10 M94 40 l4 -10 l4 10" fill="#cbd5e1" stroke="${OL}" stroke-width="1.5"/>
+${evil(46, 11, '#f87171')}${grin(58, 10)}`, { aura: '#ef4444' }),
+  'db|ゴールデンインデックス': gold('goldidx', `
+<path d="M28 30 h56 q8 0 8 8 v64 h-56 q-8 0 -8 -8z" fill="url(#eg-goldidx)" stroke="${OL}" stroke-width="3"/><path d="M36 102 v-72" stroke="#92400e" stroke-width="2"/>
+<g stroke="${OL}" stroke-width="1.5"><rect x="92" y="36" width="10" height="12" fill="#ef4444"/><rect x="92" y="52" width="10" height="12" fill="#38bdf8"/><rect x="92" y="68" width="10" height="12" fill="#4ade80"/></g>
+${smug(62, 10).replace(/60 -/g, '64 -').replace(/60 \+/g, '64 +')}`),
+});
+
+Object.assign(ENEMY_ART, {
+  // ----- DB：ステージ専用（第2回） -----
+  'db|テーブル迷子': sprite('tablelost', `${tbl(24, 38, 72, 56, '#e0f2fe', 3, 3)}
+<path d="M30 94 l-4 14 M90 94 l4 14" stroke="${OL}" stroke-width="4" stroke-linecap="round"/>${evil(64, 14, '#fde047')}<path d="M52 80 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'db|DBMS居眠り': sprite('dbmssleep', `${cyl(30, 42, 60, 54, '#60a5fa')}
+<path d="M44 70 q6 4 12 0 M64 70 q6 4 12 0" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="60" cy="84" rx="5" ry="3" fill="#1e3a8a"/>
+<g font-weight="900" fill="#e0f2fe"><text x="88" y="34" font-size="14">z</text><text x="100" y="22" font-size="10">z</text></g>`),
+  'db|金のテーブル': gold('goldtbl', `<g transform="translate(0 0)">${tbl(26, 40, 68, 56, '#fde68a', 3, 3).replace(/#38bdf8/g, '#f59e0b')}</g>${smug(78, 12)}`),
+  'db|UPDATE暴走': sprite('updrun', `
+<g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M4 60 h18 M2 74 h14 M6 88 h16"/></g>
+<path d="M22 86 q4 -20 22 -22 l12 -14 h24 l14 16 q14 2 16 20z" fill="#ef4444" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M58 52 h18 l10 12 h-28z" fill="#bae6fd" stroke="${OL}" stroke-width="2"/>
+<circle cx="38" cy="88" r="10" fill="#1f2937" stroke="${OL}" stroke-width="2.5"/><circle cx="90" cy="88" r="10" fill="#1f2937" stroke="${OL}" stroke-width="2.5"/>${evil(72, 10, '#fde047').replace(/60 -/g, '46 -').replace(/60 \+/g, '46 +')}`),
+  'db|VALUES迷子': sprite('valueslost', `
+<path d="M24 50 l36 -14 l36 14 v44 l-36 14 l-36 -14z" fill="#d6a76c" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M24 50 l36 14 l36 -14 M60 64 v44" stroke="${OL}" stroke-width="2.5" fill="none"/>
+<g stroke="${OL}" stroke-width="1.5"><rect x="36" y="22" width="10" height="10" fill="#38bdf8" transform="rotate(20 41 27)"/><rect x="62" y="16" width="10" height="10" fill="#f472b6" transform="rotate(-15 67 21)"/><rect x="80" y="26" width="10" height="10" fill="#4ade80"/></g>
+${evil(82, 0, '#fff').replace(/cx="60"/g, 'cx="42"')}<path d="M34 80 l5 1 M48 80 l-5 1" stroke="${OL}" stroke-width="0"/>`),
+  'db|金の4大命令': gold('gold4', `
+<g stroke="${OL}" stroke-width="2.5">${[-24, -8, 8, 24].map((r, i) => `<rect x="46" y="36" width="28" height="44" rx="4" fill="url(#eg-gold4)" transform="rotate(${r} 60 100)"/>`).join('')}</g>
+${smug(56, 7)}`),
+  // ----- 第3回 -----
+  'db|アスタリスク乱用': sprite('starabuse', `
+<path d="M60 18 l12 26 l28 4 l-20 20 l6 28 l-26 -14 l-26 14 l6 -28 l-20 -20 l28 -4z" fill="#facc15" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+${evil(58, 9, '#fff')}${grin(70, 8)}<g fill="#fde047"><circle cx="14" cy="96" r="4"/><circle cx="104" cy="96" r="3"/><circle cx="28" cy="108" r="2.5"/></g>`),
+  'db|IN迷子': sprite('inlost', `
+<path d="M24 58 h72 l-8 46 h-56z" fill="#d97706" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M28 70 h64 M30 82 h60 M32 94 h56" stroke="#92400e" stroke-width="2"/><path d="M36 58 q24 -40 48 0" stroke="${OL}" stroke-width="4" fill="none"/>
+<circle cx="60" cy="52" r="12" fill="#a3e635" stroke="${OL}" stroke-width="2.5"/><circle cx="56" cy="51" r="1.8" fill="${OL}"/><circle cx="64" cy="51" r="1.8" fill="${OL}"/><path d="M56 57 q4 2 8 0" stroke="${OL}" stroke-width="1.6" fill="none"/>
+<g stroke="${OL}" stroke-width="1.5"><circle cx="16" cy="40" r="7" fill="#f87171"/><circle cx="104" cy="44" r="7" fill="#60a5fa"/></g>`),
+  'db|金のWHERE': gold('goldwhere', `
+<circle cx="54" cy="54" r="26" fill="#fef9c3" fill-opacity=".8" stroke="url(#eg-goldwhere)" stroke-width="7"/><path d="M74 74 l22 22" stroke="url(#eg-goldwhere)" stroke-width="11" stroke-linecap="round"/><path d="M74 74 l22 22" stroke="${OL}" stroke-width="1.5" fill="none"/>
+${smug(52, 8).replace(/60 -/g, '54 -').replace(/60 \+/g, '54 +')}`),
+  'db|AND/OR混線': sprite('andor', `
+<g fill="none" stroke-linecap="round" stroke-width="5"><path d="M14 40 q30 30 46 20 t46 -20" stroke="#ef4444"/><path d="M14 60 q30 -30 46 0 t46 0" stroke="#3b82f6"/><path d="M14 84 q40 -10 46 -24 t46 24" stroke="#22c55e"/></g>
+<rect x="44" y="52" width="32" height="30" rx="6" fill="#334155" stroke="${OL}" stroke-width="3"/>${evil(66, 7, '#fde047')}
+<g stroke="${OL}" stroke-width="2"><rect x="8" y="34" width="8" height="12" fill="#fbbf24"/><rect x="104" y="78" width="8" height="12" fill="#fbbf24"/></g>`),
+  'db|IS NULL忘れ': sprite('isnull', `
+${blob('#e2e8f0', 66, 30, 30)}<path d="M56 46 q0 -10 8 -10 q8 0 8 8 q0 6 -8 8 v6" stroke="#64748b" stroke-width="5" fill="none" stroke-linecap="round" opacity=".6"/>
+${evil(68, 10, '#94a3b8')}<path d="M52 82 h16" stroke="${OL}" stroke-width="2.2"/>`),
+  'db|金の検索': gold('goldsearch', `
+<circle cx="60" cy="64" r="34" fill="url(#eg-goldsearch)" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="64" r="24" fill="#fffbeb" stroke="${OL}" stroke-width="2"/>
+<path d="M60 44 l6 20 l-6 20 l-6 -20z" fill="#ef4444" stroke="${OL}" stroke-width="1.5"/><path d="M60 64 l6 20 l-6 0z" fill="#3b82f6"/>
+${smug(56, 13)}`),
+  // ----- 第4回 -----
+  'db|DISTINCT忘れ': sprite('nodistinct', `
+${[0, 1, 2].map((i) => `<g transform="translate(${i * 24 - 24} ${i % 2 ? 6 : 0})"><path d="M44 96 q-4 -40 16 -42 q20 2 16 42z" fill="#fb7185" stroke="${OL}" stroke-width="2.5"/><path d="M52 70 l4 1 M68 70 l-4 1" stroke="${OL}" stroke-width="2"/><circle cx="54" cy="74" r="1.6" fill="${OL}"/><circle cx="66" cy="74" r="1.6" fill="${OL}"/><path d="M56 82 q4 2 8 0" stroke="${OL}" stroke-width="1.6" fill="none"/></g>`).join('')}`),
+  'db|DESC逆走': sprite('desc', `
+<path d="M60 108 l-28 -40 h18 v-44 h20 v44 h18z" fill="#f97316" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>${evil(46, 7, '#fff')}${grin(58, 6)}
+<g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M36 30 v-14 M84 30 v-14 M96 46 v-14"/></g>`),
+  'db|金の並び順': gold('goldorder', `
+<g stroke="${OL}" stroke-width="2.5"><rect x="26" y="78" width="18" height="26" fill="url(#eg-goldorder)"/><rect x="48" y="62" width="18" height="42" fill="url(#eg-goldorder)"/><rect x="70" y="44" width="18" height="60" fill="url(#eg-goldorder)"/></g>
+${smug(64, 12).replace(/60 -/g, '57 -').replace(/60 \+/g, '57 +')}`),
+  'db|OFFSETずれ': sprite('offset', `
+<g stroke="${OL}" stroke-width="2"><rect x="18" y="36" width="56" height="12" rx="2" fill="#cbd5e1" opacity=".6"/><rect x="18" y="52" width="56" height="12" rx="2" fill="#cbd5e1" opacity=".6"/><rect x="32" y="68" width="56" height="12" rx="2" fill="#38bdf8"/><rect x="32" y="84" width="56" height="12" rx="2" fill="#38bdf8"/></g>
+<path d="M90 42 q16 8 0 30" stroke="#fde047" stroke-width="3" fill="none"/><path d="M86 70 l4 4 l4 -6" stroke="#fde047" stroke-width="3" fill="none"/>${evil(80, 12, '#fff')}`),
+  'db|UNIONかぶり': sprite('union', `
+<circle cx="46" cy="62" r="28" fill="#f472b6" fill-opacity=".85" stroke="${OL}" stroke-width="3"/><circle cx="74" cy="62" r="28" fill="#60a5fa" fill-opacity=".85" stroke="${OL}" stroke-width="3"/>
+<path d="M60 38 a28 28 0 0 1 0 48 a28 28 0 0 1 0 -48z" fill="#a78bfa" stroke="${OL}" stroke-width="2"/>${evil(60, 18, '#fff')}${grin(74, 8)}`),
+  'db|金の集合': gold('goldset', `
+<g stroke="${OL}" stroke-width="3"><circle cx="46" cy="58" r="22" fill="url(#eg-goldset)" fill-opacity=".9"/><circle cx="74" cy="58" r="22" fill="url(#eg-goldset)" fill-opacity=".9"/><circle cx="60" cy="80" r="22" fill="url(#eg-goldset)" fill-opacity=".9"/></g>
+${smug(64, 8)}`),
+});
+
+Object.assign(ENEMY_ART, {
+  // ----- DB：ステージ専用（第5回） -----
+  'db|文字列連結ミス': sprite('concat', `
+<g stroke="${OL}" stroke-width="3"><rect x="14" y="52" width="38" height="26" rx="6" fill="#f472b6"/><rect x="68" y="52" width="38" height="26" rx="6" fill="#60a5fa"/></g>
+<path d="M52 60 q8 -10 16 0 M52 70 q8 10 16 0" stroke="#94a3b8" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M58 56 l4 -8" stroke="#fde047" stroke-width="3"/>
+${evil(64, 26, '#fff')}`),
+  'db|ROUNDずれ': sprite('round', `
+<circle cx="60" cy="64" r="34" fill="#a3e635" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="64" r="26" fill="none" stroke="#4d7c0f" stroke-width="2" stroke-dasharray="4 4"/>
+${evil(58, 11, '#fff')}<path d="M50 76 q10 -5 20 0" stroke="${OL}" stroke-width="2.2" fill="none"/>`),
+  'db|金の関数': gold('golddbfn', `
+<path d="M32 104 l40 -64" stroke="#78350f" stroke-width="6" stroke-linecap="round"/><path d="M72 40 l4 -12 l4 12 l12 4 l-12 4 l-4 12 l-4 -12 l-12 -4z" fill="url(#eg-golddbfn)" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="44" cy="80" r="14" fill="url(#eg-golddbfn)" stroke="${OL}" stroke-width="2.5"/>${smug(78, 5).replace(/60 -/g, '44 -').replace(/60 \+/g, '44 +')}`),
+  'db|日付迷子': sprite('datelost', `
+<rect x="24" y="30" width="72" height="72" rx="8" fill="#fff" stroke="${OL}" stroke-width="3"/><rect x="24" y="30" width="72" height="18" rx="8" fill="#ef4444" stroke="${OL}" stroke-width="3"/><path d="M40 24 v14 M80 24 v14" stroke="${OL}" stroke-width="4" stroke-linecap="round"/>
+<g fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1">${[0, 1, 2].map((r) => [0, 1, 2, 3].map((c) => `<rect x="${32 + c * 15}" y="${56 + r * 14}" width="11" height="10" rx="2"/>`).join('')).join('')}</g>
+${evil(72, 12, '#fde047')}`),
+  'db|型変換ミス': sprite('castmiss', `
+<path d="M60 30 a32 32 0 1 1 -30 22" fill="none" stroke="${OL}" stroke-width="12" stroke-linecap="round"/><path d="M60 30 a32 32 0 1 1 -30 22" fill="none" stroke="#38bdf8" stroke-width="7" stroke-linecap="round"/><path d="M22 44 l8 10 l8 -10" fill="#38bdf8" stroke="${OL}" stroke-width="2"/>
+<circle cx="60" cy="62" r="16" fill="#e0f2fe" stroke="${OL}" stroke-width="2.5"/>${evil(62, 6, '#0ea5e9')}`),
+  'db|金のCASE': gold('goldcase', `
+<rect x="30" y="38" width="60" height="62" rx="8" fill="url(#eg-goldcase)" stroke="${OL}" stroke-width="3"/>
+<g stroke="${OL}" stroke-width="2">${[0, 1, 2].map((i) => `<path d="M${42 + i * 18} 50 v40" stroke="#92400e"/><rect x="${36 + i * 18}" y="${[56, 74, 64][i]}" width="12" height="8" rx="2" fill="#fff7ed"/>`).join('')}</g>${smug(30, 9)}`),
+  // ----- 第6回 -----
+  'db|COUNTかぞえ違い': sprite('countx', `
+<g fill="#f8fafc" stroke="${OL}" stroke-width="2.5">${[[30, 86], [50, 92], [70, 88], [90, 84]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="10"/>`).join('')}</g><circle cx="90" cy="84" r="10" fill="#cbd5e1" stroke="${OL}" stroke-width="2.5" stroke-dasharray="3 2"/>
+<circle cx="60" cy="48" r="22" fill="#14b8a6" stroke="${OL}" stroke-width="3"/>${evil(46, 8, '#fff')}<path d="M52 58 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>
+<path d="M78 56 l10 18" stroke="${OL}" stroke-width="3" stroke-linecap="round"/>`),
+  'db|AVGまよい': sprite('avg', `
+<path d="M16 100 h88" stroke="${OL}" stroke-width="3"/><g stroke="${OL}" stroke-width="2.5"><rect x="22" y="60" width="14" height="40" fill="#60a5fa"/><rect x="42" y="44" width="14" height="56" fill="#60a5fa"/><rect x="62" y="74" width="14" height="26" fill="#60a5fa"/><rect x="82" y="52" width="14" height="48" fill="#cbd5e1" stroke-dasharray="3 2"/></g>
+<path d="M16 66 h88" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="6 4"/>${evil(30, 12, '#fde047')}`),
+  'db|金の集計': gold('goldsum', `
+<path d="M34 54 q-8 -6 -4 -16 h60 q4 10 -4 16 q16 10 16 30 q0 24 -30 24 q-30 0 -30 -24 q0 -20 16 -30z" fill="url(#eg-goldsum)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M40 38 q20 -14 40 0" stroke="#92400e" stroke-width="3" fill="none"/>${smug(76, 11)}`),
+  'db|GROUP BY迷子': sprite('groupby', `
+<g stroke="${OL}" stroke-width="2.5"><rect x="16" y="56" width="26" height="40" rx="3" fill="#f472b6"/><rect x="47" y="56" width="26" height="40" rx="3" fill="#60a5fa"/><rect x="78" y="56" width="26" height="40" rx="3" fill="#4ade80"/></g>
+<g stroke="${OL}" stroke-width="1.5" fill="#fff">${[[22, 64], [30, 76], [52, 66], [62, 80], [86, 70]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3"/>`).join('')}</g>
+<circle cx="60" cy="34" r="16" fill="#fde047" stroke="${OL}" stroke-width="3"/><circle cx="55" cy="33" r="1.8" fill="${OL}"/><circle cx="65" cy="33" r="1.8" fill="${OL}"/><path d="M55 40 q5 -3 10 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'db|HAVING取り違え': sprite('havingmix', `
+<path d="M60 108 v-50" stroke="#78350f" stroke-width="6"/><rect x="22" y="22" width="76" height="40" rx="4" fill="#fde68a" stroke="${OL}" stroke-width="3" transform="rotate(-6 60 42)"/>
+${evil(42, 12, '#fff')}<path d="M50 54 q10 -5 20 0" stroke="${OL}" stroke-width="2.2" fill="none"/>`),
+  'db|金のグループ': gold('goldgroup', `
+<g stroke="${OL}" stroke-width="2.5">${[[38, 70], [60, 62], [82, 70]].map(([x, y]) => `<path d="M${x - 14} ${y + 34} q0 -30 14 -34 q14 4 14 34z" fill="url(#eg-goldgroup)"/><circle cx="${x}" cy="${y - 4}" r="11" fill="url(#eg-goldgroup)"/>`).join('')}</g>
+${[38, 60, 82].map((x, i) => smug([66, 58, 66][i], 4).replace(/60 -/g, `${x} -`).replace(/60 \+/g, `${x} +`)).join('')}`),
+  // ----- 第7回 -----
+  'db|カッコ迷子': sprite('paren', `
+<path d="M40 22 q-24 40 0 80" stroke="${OL}" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M40 22 q-24 40 0 80" stroke="#a78bfa" stroke-width="9" fill="none" stroke-linecap="round"/>
+<path d="M80 22 q24 40 0 80" stroke="#94a3b8" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="6 6"/>
+${evil(60, 10, '#fde047')}<path d="M52 72 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'db|ANY/ALL混同': sprite('anyall', `
+<circle cx="40" cy="66" r="22" fill="#38bdf8" stroke="${OL}" stroke-width="3"/><circle cx="80" cy="66" r="22" fill="#f472b6" stroke="${OL}" stroke-width="3"/>
+${evil(64, 0, '#fff').replace(/cx="60"/g, 'cx="40"')}<g transform="translate(40 0)"><circle cx="35" cy="62" r="2" fill="${OL}"/><circle cx="45" cy="62" r="2" fill="${OL}"/></g>
+<g transform="translate(40 62)"><circle cx="-6" r="2" fill="${OL}"/><circle cx="6" r="2" fill="${OL}"/><path d="M-5 9 q5 -3 10 0" stroke="${OL}" stroke-width="1.8" fill="none"/></g>
+<g transform="translate(80 62)"><path d="M-8 -4 l5 2 M8 -4 l-5 2" stroke="${OL}" stroke-width="2"/><path d="M-5 9 q5 3 10 0" stroke="${OL}" stroke-width="1.8" fill="none"/></g>
+<path d="M54 40 l12 -12 M66 40 l-12 -12" stroke="#fde047" stroke-width="3" stroke-linecap="round"/>`),
+  'db|金の副問合せ': gold('goldsub', `
+<ellipse cx="60" cy="62" rx="30" ry="40" fill="url(#eg-goldsub)" stroke="${OL}" stroke-width="3"/><ellipse cx="60" cy="62" rx="20" ry="28" fill="#fef9c3" stroke="#b45309" stroke-width="2"/><ellipse cx="60" cy="62" rx="10" ry="14" fill="#fde68a" stroke="#b45309" stroke-width="1.5"/>
+${smug(56, 8)}`),
+  'db|相関迷子': sprite('correl', `
+<path d="M30 78 q30 -50 60 0" stroke="#fb923c" stroke-width="4" fill="none" stroke-dasharray="5 4"/>
+<circle cx="30" cy="80" r="16" fill="#fb923c" stroke="${OL}" stroke-width="3"/><circle cx="90" cy="80" r="16" fill="#facc15" stroke="${OL}" stroke-width="3"/>
+<g transform="translate(30 78)"><circle cx="-5" r="2" fill="${OL}"/><circle cx="5" r="2" fill="${OL}"/></g><g transform="translate(90 78)"><circle cx="-5" r="2" fill="${OL}"/><circle cx="5" r="2" fill="${OL}"/></g>
+<path d="M60 30 v-8" stroke="#fde047" stroke-width="3"/>`),
+  'db|EXISTS迷い': sprite('exists', `
+${blob('#2dd4bf', 66, 30, 30)}<g fill="#fff" stroke="${OL}" stroke-width="2.5"><circle cx="48" cy="60" r="10"/><circle cx="72" cy="60" r="10"/></g><circle cx="50" cy="62" r="4" fill="${OL}"/><circle cx="74" cy="62" r="4" fill="${OL}"/>
+<path d="M52 82 q8 -4 16 0" stroke="${OL}" stroke-width="2.2" fill="none"/>`),
+  'db|金の入れ子': gold('goldnest', `
+<path d="M38 104 q-10 -30 4 -44 q-8 -20 18 -26 q26 6 18 26 q14 14 4 44z" fill="url(#eg-goldnest)" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="48" r="14" fill="#fff7ed" stroke="${OL}" stroke-width="2"/>
+<path d="M40 74 q20 8 40 0" stroke="#92400e" stroke-width="2.5" fill="none"/>${smug(46, 5)}`),
+  // ----- 第8回 -----
+  'db|外部キー迷子': sprite('fklost', `${tbl(64, 50, 44, 44, '#fce7f3', 3, 2)}
+<path d="M44 66 q12 -20 24 -4" stroke="#94a3b8" stroke-width="3" fill="none" stroke-dasharray="4 3"/>
+<g transform="translate(-6 10) scale(1.1)">${keyShape(30, 60, '#fb923c', 20)}</g><circle cx="27" cy="76" r="1.8" fill="${OL}"/><circle cx="33" cy="76" r="1.8" fill="${OL}"/>`),
+  'db|ON忘れ': sprite('noon', `
+<path d="M14 54 h30 v-10 q0 -8 8 -8 q8 0 8 8 v10 h12 v28 h-58z" fill="#f472b6" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M76 58 h30 v28 h-30 v-8 q-8 0 -8 -6 q0 -6 8 -6z" fill="#60a5fa" stroke="${OL}" stroke-width="3" stroke-linejoin="round" transform="rotate(10 90 72)"/>
+${evil(68, 22, '#fff').replace(/60 -/g, '50 -').replace(/60 \+/g, '50 +')}`),
+  'db|金のリレーション': gold('goldrel', `
+<path d="M18 80 q12 -20 30 -16 l14 10 q4 6 -2 8 l-10 -4 M102 80 q-12 -20 -30 -16 l-14 10" fill="url(#eg-goldrel)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M44 70 q16 -10 32 0 q-4 16 -16 18 q-12 -2 -16 -18z" fill="url(#eg-goldrel)" stroke="${OL}" stroke-width="3"/>${smug(46, 10)}`),
+  'db|RIGHT JOIN迷子': sprite('rightjoin', `
+<circle cx="44" cy="64" r="26" fill="#cbd5e1" fill-opacity=".6" stroke="${OL}" stroke-width="2.5" stroke-dasharray="5 3"/><circle cx="76" cy="64" r="26" fill="#22c55e" stroke="${OL}" stroke-width="3"/>
+${evil(62, 8, '#fff').replace(/60 -/g, '80 -').replace(/60 \+/g, '80 +')}<path d="M72 76 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>
+<path d="M98 30 l10 0 l-4 -4 M108 30 l-4 4" stroke="#fde047" stroke-width="3" fill="none"/>`),
+  'db|自己結合迷子': sprite('selfjoin', `
+<rect x="54" y="30" width="12" height="72" rx="3" fill="#e2e8f0" stroke="${OL}" stroke-width="2.5"/>
+<circle cx="34" cy="66" r="20" fill="#a78bfa" stroke="${OL}" stroke-width="3"/><circle cx="86" cy="66" r="20" fill="#a78bfa" fill-opacity=".6" stroke="${OL}" stroke-width="3"/>
+<g transform="translate(34 64)"><path d="M-8 -6 l5 2 M8 -6 l-5 2" stroke="${OL}" stroke-width="2"/><circle cx="-5" cy="-1" r="1.8" fill="${OL}"/><circle cx="5" cy="-1" r="1.8" fill="${OL}"/></g>
+<g transform="translate(86 64)"><path d="M-8 -6 l5 2 M8 -6 l-5 2" stroke="${OL}" stroke-width="2"/><circle cx="-5" cy="-1" r="1.8" fill="${OL}"/><circle cx="5" cy="-1" r="1.8" fill="${OL}"/></g>`),
+  'db|金のJOIN': gold('goldjoin', `
+<g fill="none" stroke-width="9">${[[24, 64], [44, 56], [64, 64], [84, 56], [100, 64]].map(([x, y], i) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="7" stroke="${OL}" transform="rotate(${i % 2 ? 20 : -20} ${x} ${y})"/>`).join('')}</g>
+<g fill="none" stroke-width="5">${[[24, 64], [44, 56], [64, 64], [84, 56], [100, 64]].map(([x, y], i) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="7" stroke="url(#eg-goldjoin)" transform="rotate(${i % 2 ? 20 : -20} ${x} ${y})"/>`).join('')}</g>
+<circle cx="60" cy="92" r="13" fill="url(#eg-goldjoin)" stroke="${OL}" stroke-width="2.5"/>${smug(90, 5)}`),
+});
