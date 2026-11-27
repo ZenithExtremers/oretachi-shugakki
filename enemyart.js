@@ -1330,3 +1330,223 @@ ${evil(68, 12, '#a78bfa')}`),
 <path d="M22 32 h70 v74 h-70z" fill="url(#eg-goldnews)" stroke="${OL}" stroke-width="3"/><path d="M92 46 h8 v54 q0 6 -8 6" fill="#fde68a" stroke="${OL}" stroke-width="3"/>
 <rect x="30" y="40" width="54" height="12" fill="#78350f"/><g stroke="#92400e" stroke-width="2.5"><path d="M30 88 h54 M30 96 h40"/></g>${smug(70, 10).replace(/60 -/g, '57 -').replace(/60 \+/g, '57 +')}`),
 });
+
+// 車（横向き）とタイヤ
+const car = (x, y, c = '#ef4444', w = 70) => `<g transform="translate(${x} ${y})"><path d="M0 0 q2 -14 16 -16 l10 -12 h${w * 0.4} l12 12 q${w * 0.2} 2 ${w * 0.22} 16 v8 h-${w}z" fill="${c}" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M28 -26 h${w * 0.36} l9 10 h-${w * 0.36 + 9}z" fill="#bae6fd" stroke="${OL}" stroke-width="2"/><path d="M${w * 0.42} -21 l4 1.5 M${w * 0.42 + 12} -21 l-4 1.5" stroke="${OL}" stroke-width="1.8" stroke-linecap="round"/><circle cx="${w * 0.42 + 2}" cy="-18" r="1.7" fill="${OL}"/><circle cx="${w * 0.42 + 10}" cy="-18" r="1.7" fill="${OL}"/><circle cx="16" cy="8" r="8" fill="#1f2937" stroke="${OL}" stroke-width="2"/><circle cx="${w - 14}" cy="8" r="8" fill="#1f2937" stroke="${OL}" stroke-width="2"/><circle cx="16" cy="8" r="3" fill="#cbd5e1"/><circle cx="${w - 14}" cy="8" r="3" fill="#cbd5e1"/></g>`;
+const road = `<path d="M0 100 h120 v20 h-120z" fill="#64748b"/><path d="M6 110 h16 M34 110 h16 M62 110 h16 M90 110 h16" stroke="#fff" stroke-width="3"/>`;
+
+Object.assign(ENEMY_ART, {
+  // ----- 免許：どの回にも出る雑魚 -----
+  'menkyo|ながらスマホ': sprite('phone', `
+<rect x="34" y="20" width="52" height="88" rx="10" fill="#1f2937" stroke="${OL}" stroke-width="3"/><rect x="40" y="30" width="40" height="64" rx="3" fill="#38bdf8"/>
+${evil(56, 10, '#fff')}${grin(72, 9)}<g fill="#fde047"><path d="M16 30 l6 6 M14 44 h8 M104 30 l-6 6 M106 44 h-8" stroke="#fde047" stroke-width="3" stroke-linecap="round"/></g>`),
+  'menkyo|うっかり信号無視': sprite('runred', `
+<rect x="20" y="36" width="80" height="34" rx="12" fill="#1f2937" stroke="${OL}" stroke-width="3"/><g stroke="${OL}" stroke-width="2"><circle cx="38" cy="53" r="10" fill="#475569"/><circle cx="60" cy="53" r="10" fill="#fde047"/><circle cx="82" cy="53" r="10" fill="#475569"/></g>
+<path d="M60 70 v40" stroke="#64748b" stroke-width="6"/><path d="M56 50 l3 1 M64 50 l-3 1" stroke="${OL}" stroke-width="1.8"/><circle cx="56" cy="55" r="1.6" fill="${OL}"/><circle cx="64" cy="55" r="1.6" fill="${OL}"/>`),
+  'menkyo|合図わすれ': sprite('nosignal', `
+<rect x="26" y="46" width="68" height="40" rx="14" fill="#fbbf24" stroke="${OL}" stroke-width="3"/><path d="M40 66 h40 l-10 -8 M80 66 l-10 8" stroke="#78350f" stroke-width="4" fill="none" stroke-linecap="round" opacity=".35"/>
+${evil(62, 14, '#fff')}<path d="M20 36 l10 8 M100 36 l-10 8" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>`),
+  'menkyo|車間つめすぎ': sprite('tailgate', `${road}${car(6, 84, '#60a5fa', 56)}${car(56, 84, '#ef4444', 58)}<path d="M60 64 l6 6 M66 60 l4 8" stroke="#fde047" stroke-width="3" stroke-linecap="round"/>
+<g transform="translate(92 66)"><path d="M-6 -4 l5 2 M6 -4 l-5 2" stroke="${OL}" stroke-width="2"/></g>`),
+  'menkyo|シートベルトはずし': sprite('seatbelt', `
+<path d="M26 110 v-50 q0 -24 34 -24 q34 0 34 24 v50z" fill="#475569" stroke="${OL}" stroke-width="3"/><path d="M38 40 l44 70" stroke="#94a3b8" stroke-width="9" stroke-dasharray="14 8"/>
+<rect x="70" y="80" width="18" height="12" rx="2" fill="#cbd5e1" stroke="${OL}" stroke-width="2"/>${evil(64, 12, '#fde047')}`),
+  'menkyo|あおり運転': sprite('roadrage', `${road}${car(10, 84, '#1f2937', 96)}
+<path d="M58 54 l8 -4 M74 54 l-8 -4" stroke="#ef4444" stroke-width="3"/><g stroke="#fde047" stroke-width="3" stroke-linecap="round"><path d="M14 66 l-8 -6 M12 76 h-10"/></g>
+<g fill="#ef4444" stroke="${OL}" stroke-width="1.5"><path d="M92 40 l6 -8 l2 10 l8 -4 l-4 10z"/></g>`),
+  // ----- 回ごとの雑魚 -----
+  'menkyo|標識見落とし': sprite('signmiss', `
+<path d="M60 64 v46" stroke="#94a3b8" stroke-width="6"/><circle cx="60" cy="46" r="30" fill="#fff" stroke="#dc2626" stroke-width="8"/><circle cx="60" cy="46" r="30" fill="none" stroke="${OL}" stroke-width="2"/>
+${evil(46, 10, '#fde047')}<path d="M52 58 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'menkyo|手信号まよい': sprite('handsig', `
+<path d="M14 54 h28 M78 54 h28" stroke="${OL}" stroke-width="10" stroke-linecap="round"/><path d="M14 54 h28 M78 54 h28" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+<ellipse cx="60" cy="66" rx="20" ry="26" fill="#1e40af" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="36" r="14" fill="#1e40af" stroke="${OL}" stroke-width="3"/><path d="M44 30 q16 -16 32 0z" fill="#1e3a8a" stroke="${OL}" stroke-width="2"/>
+<circle cx="55" cy="38" r="2" fill="#fde047"/><circle cx="65" cy="38" r="2" fill="#fde047"/>`),
+  'menkyo|はみ出しくん': sprite('overline', `
+<path d="M0 100 h120 v20 h-120z" fill="#64748b"/><path d="M0 108 h120" stroke="#facc15" stroke-width="4"/>
+<ellipse cx="60" cy="74" rx="28" ry="30" fill="#f97316" stroke="${OL}" stroke-width="3"/><path d="M44 104 l-6 8 M76 104 l6 8" stroke="${OL}" stroke-width="5" stroke-linecap="round"/>${evil(70, 10, '#fff')}${grin(84, 9)}`),
+  'menkyo|サイレンあわて': sprite('siren', `
+<path d="M34 68 q0 -40 26 -40 q26 0 26 40z" fill="#ef4444" stroke="${OL}" stroke-width="3"/><rect x="26" y="68" width="68" height="16" rx="3" fill="#94a3b8" stroke="${OL}" stroke-width="3"/>
+<g stroke="#fca5a5" stroke-width="3" stroke-linecap="round"><path d="M20 40 l-8 -6 M100 40 l8 -6 M60 18 v-8"/></g>${evil(52, 10, '#fff')}<path d="M54 62 q6 -6 12 0" stroke="${OL}" stroke-width="2" fill="#7f1d1d"/>`),
+  'menkyo|スピード狂': sprite('speedmania', `
+<g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M2 60 h18 M0 74 h14"/></g>${road}
+<path d="M22 92 q4 -16 20 -18 l10 -10 h22 l18 10 q16 2 16 18z" fill="#dc2626" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><circle cx="40" cy="94" r="9" fill="#1f2937" stroke="${OL}" stroke-width="2"/><circle cx="92" cy="94" r="9" fill="#1f2937" stroke="${OL}" stroke-width="2"/>
+<path d="M60 66 l6 -2 M74 66 l-6 -2" stroke="${OL}" stroke-width="2.4"/><circle cx="62" cy="70" r="1.8" fill="${OL}"/><circle cx="72" cy="70" r="1.8" fill="${OL}"/>`),
+  'menkyo|無理な追い越し': sprite('overtake', `${road}${car(4, 92, '#60a5fa', 54)}${car(58, 72, '#f97316', 58)}
+<path d="M40 60 q20 -20 40 0" stroke="#fde047" stroke-width="3" fill="none" stroke-dasharray="5 4"/>`),
+  'menkyo|飛び出しボール': sprite('ball', `
+<circle cx="60" cy="66" r="34" fill="#fff" stroke="${OL}" stroke-width="3"/><path d="M60 46 l14 10 l-6 16 h-16 l-6 -16z" fill="${OL}"/><g stroke="${OL}" stroke-width="2"><path d="M60 46 v-14 M74 56 l14 -4 M68 72 l8 12 M52 72 l-8 12 M46 56 l-14 -4"/></g>
+<path d="M40 80 l7 2 M80 80 l-7 2" stroke="${OL}" stroke-width="2.4"/><circle cx="44" cy="85" r="2.2" fill="${OL}"/><circle cx="76" cy="85" r="2.2" fill="${OL}"/><g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M10 60 h14 M6 74 h14"/></g>`),
+  'menkyo|迷惑駐車': sprite('badpark', `
+<rect x="20" y="20" width="44" height="44" rx="6" fill="#2563eb" stroke="${OL}" stroke-width="3"/><text x="42" y="54" text-anchor="middle" font-size="30" font-weight="900" fill="#fff">P</text><path d="M24 24 l36 36" stroke="#ef4444" stroke-width="6"/>
+${car(40, 96, '#a855f7', 72)}<path d="M76 74 l5 2 M90 74 l-5 2" stroke="${OL}" stroke-width="2"/>`),
+  'menkyo|ハイビームおばけ': sprite('highbeam', `
+<path d="M60 54 l60 -30 v60z" fill="#fef9c3" opacity=".6"/><path d="M28 96 q-6 -56 30 -62 q36 6 30 62 l-8 -8 l-7 10 l-7 -10 l-8 10 l-7 -10 l-8 10 l-7 -10z" fill="#e2e8f0" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<circle cx="48" cy="56" r="9" fill="#fde047" stroke="${OL}" stroke-width="2"/><circle cx="72" cy="56" r="9" fill="#fde047" stroke="${OL}" stroke-width="2"/><ellipse cx="60" cy="76" rx="5" ry="6" fill="#334155"/>`),
+  'menkyo|逆走ドライバー': sprite('wrongway', `${road}
+<g transform="translate(120 0) scale(-1 1)">${car(20, 90, '#16a34a', 80)}</g><path d="M14 40 h30 l-8 -8 M14 40 l8 8" stroke="#ef4444" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M50 70 l5 -2 M64 70 l-5 -2" stroke="${OL}" stroke-width="2.4"/>`),
+  'menkyo|ハイドロすべり': sprite('hydro', `
+<path d="M0 92 q15 -8 30 0 t30 0 t30 0 t30 0 v28 h-120z" fill="#38bdf8" stroke="${OL}" stroke-width="2.5"/>
+<g transform="rotate(-10 60 70)">${car(24, 78, '#f472b6', 72)}</g><g fill="#bae6fd"><circle cx="16" cy="80" r="4"/><circle cx="104" cy="82" r="3"/></g>`),
+  'menkyo|パンク魔': sprite('puncture', `
+<circle cx="60" cy="64" r="38" fill="#1f2937" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="64" r="18" fill="#94a3b8" stroke="${OL}" stroke-width="2.5"/><g stroke="#475569" stroke-width="3">${Array.from({ length: 12 }, (_, i) => { const a = i / 12 * Math.PI * 2; return `<path d="M${(60 + Math.cos(a) * 26).toFixed(1)} ${(64 + Math.sin(a) * 26).toFixed(1)} L${(60 + Math.cos(a) * 36).toFixed(1)} ${(64 + Math.sin(a) * 36).toFixed(1)}"/>`; }).join('')}</g>
+<path d="M94 50 l14 -8" stroke="#cbd5e1" stroke-width="4"/>${evil(62, 7, '#f87171')}`),
+  'menkyo|かげの飛び出し': sprite('shadowdash', `
+${car(8, 96, '#64748b', 68)}<path d="M78 104 q-4 -36 20 -40 q20 4 18 40z" fill="#1e293b" stroke="${OL}" stroke-width="3"/><circle cx="94" cy="54" r="12" fill="#1e293b" stroke="${OL}" stroke-width="3"/>
+<circle cx="90" cy="54" r="2" fill="#fde047"/><circle cx="98" cy="54" r="2" fill="#fde047"/>`),
+  'menkyo|見えない二輪車': sprite('ghostbike', `
+<g opacity=".7"><circle cx="30" cy="92" r="16" fill="none" stroke="${OL}" stroke-width="5"/><circle cx="90" cy="92" r="16" fill="none" stroke="${OL}" stroke-width="5"/><path d="M30 92 l20 -30 h20 l20 30 M50 62 l-6 -10 h-10 M70 62 l4 -10 h10" stroke="#94a3b8" stroke-width="5" fill="none" stroke-linejoin="round"/></g>
+<circle cx="60" cy="46" r="14" fill="#e2e8f0" fill-opacity=".7" stroke="${OL}" stroke-width="2.5" stroke-dasharray="4 3"/><circle cx="56" cy="45" r="2" fill="${OL}"/><circle cx="64" cy="45" r="2" fill="${OL}"/>`),
+  // ----- 回のボス -----
+  'menkyo|赤信号の番人': sprite('redguard', `
+<path d="M60 84 v28" stroke="#475569" stroke-width="8"/><rect x="30" y="12" width="60" height="76" rx="14" fill="#1f2937" stroke="${OL}" stroke-width="3"/>
+<circle cx="60" cy="32" r="12" fill="#ef4444" stroke="${OL}" stroke-width="2"/><circle cx="60" cy="54" r="10" fill="#57534e" stroke="${OL}" stroke-width="2"/><circle cx="60" cy="74" r="10" fill="#57534e" stroke="${OL}" stroke-width="2"/>
+<path d="M50 28 l6 2 M70 28 l-6 2" stroke="${OL}" stroke-width="2.4"/><path d="M54 38 q6 -3 12 0" stroke="${OL}" stroke-width="2" fill="none"/>
+<path d="M30 30 l-12 -8 M90 30 l12 -8" stroke="#fca5a5" stroke-width="3" stroke-linecap="round"/>`, { aura: '#ef4444' }),
+  'menkyo|車線ふさぎ大王': sprite('laneking', `${road}
+<rect x="8" y="44" width="64" height="50" rx="4" fill="#64748b" stroke="${OL}" stroke-width="3"/><path d="M72 58 h22 l16 18 v18 h-38z" fill="#f59e0b" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M78 62 h14 l10 12 h-24z" fill="#bae6fd" stroke="${OL}" stroke-width="2"/>
+<g fill="#1f2937" stroke="${OL}" stroke-width="2"><circle cx="24" cy="96" r="9"/><circle cx="52" cy="96" r="9"/><circle cx="92" cy="96" r="9"/></g>
+<path d="M18 44 l6 -16 l8 10 l8 -14 l8 14 l8 -10 l6 16z" fill="url(#eg-laneking)" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>${evil(68, 0, '#fde047').replace(/cx="60"/g, 'cx="40"')}`, { aura: '#f59e0b' }),
+  'menkyo|暴走ドリフター': sprite('drifter', `
+<path d="M10 104 q50 -30 100 -10" stroke="#475569" stroke-width="14" fill="none"/><g fill="#cbd5e1" opacity=".7"><circle cx="14" cy="88" r="8"/><circle cx="26" cy="78" r="6"/></g>
+<g transform="rotate(-16 60 70)">${car(22, 80, '#7c3aed', 78)}</g><path d="M58 50 l6 -2 M72 48 l-6 1" stroke="#fde047" stroke-width="3"/>`, { aura: '#a855f7' }),
+  'menkyo|路駐の主': sprite('parkboss', `${road}
+${car(14, 92, '#0f766e', 92)}<path d="M38 58 l8 -4 M84 56 l-8 -3" stroke="${OL}" stroke-width="3"/><circle cx="46" cy="62" r="3" fill="#fde047"/><circle cx="76" cy="60" r="3" fill="#fde047"/>
+<g transform="translate(96 30)"><circle r="14" fill="#2563eb" stroke="#dc2626" stroke-width="4"/><path d="M-10 -10 l20 20" stroke="#dc2626" stroke-width="4"/></g>`, { aura: '#14b8a6' }),
+  'menkyo|霧の高速ゴースト': sprite('fogghost', `
+<path d="M10 80 q10 -20 30 -16 q10 -16 30 -10 q20 -6 30 10 q14 4 10 20z" fill="#e2e8f0" opacity=".6"/>
+<path d="M28 100 q-6 -60 32 -66 q38 6 32 66 l-8 -8 l-8 10 l-8 -10 l-8 10 l-8 -10 l-8 10 l-8 -10z" fill="#f1f5f9" fill-opacity=".9" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<circle cx="46" cy="58" r="8" fill="#fde047" stroke="${OL}" stroke-width="2"/><circle cx="74" cy="58" r="8" fill="#fde047" stroke="${OL}" stroke-width="2"/>${grin(76, 10)}`, { aura: '#e2e8f0' }),
+  'menkyo|事故現場の混乱': sprite('accident', `
+<path d="M14 104 h92 l-10 -14 h-72z" fill="#f97316" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><g fill="#fff"><path d="M30 104 l8 -14 h8 l-8 14z M54 104 l8 -14 h8 l-8 14z M78 104 l8 -14 h8 l-8 14z"/></g>
+<path d="M30 90 l12 -60 h36 l12 60z" fill="#f97316" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M38 70 h44 M42 50 h36" stroke="#fff" stroke-width="7"/>
+${evil(60, 9, '#fde047')}${grin(80, 8)}`, { aura: '#f97316' }),
+  'menkyo|かもしれない魔王': sprite('maybeking', `
+<path d="M16 112 q4 -40 44 -46 q40 6 44 46z" fill="#4c1d95" stroke="${OL}" stroke-width="3"/>
+<path d="M28 34 l-8 -22 l18 12 M92 34 l8 -22 l-18 12" fill="#3b0764" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="60" cy="52" r="26" fill="#7c3aed" stroke="${OL}" stroke-width="3"/><path d="M36 30 l6 -16 l10 10 l8 -14 l8 14 l10 -10 l6 16z" fill="url(#eg-maybeking)" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+${evil(50, 11, '#fde047')}${grin(64, 13)}<g transform="translate(96 82)"><path d="M0 -14 l14 24 h-28z" fill="#fde047" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/><text y="7" text-anchor="middle" font-size="13" font-weight="900" fill="${OL}">!</text></g>`, { aura: '#7c3aed' }),
+  'menkyo|金の若葉マーク': gold('goldwakaba', `
+<path d="M60 28 l-26 14 v44 l26 -14z" fill="url(#eg-goldwakaba)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M60 28 l26 14 v44 l-26 -14z" fill="#4ade80" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M60 72 v34" stroke="#78350f" stroke-width="4"/>${smug(54, 13)}`),
+});
+
+// 標識（丸・三角・逆三角・ひし形）
+const signPole = (inner) => `<path d="M60 70 v40" stroke="#94a3b8" stroke-width="6"/>${inner}`;
+
+Object.assign(ENEMY_ART, {
+  // ----- 免許：ステージ専用（第1回） -----
+  'menkyo|止まれ無視': sprite('stopx', signPole(`<path d="M20 18 h80 l-40 60z" fill="#dc2626" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M28 22 h64 l-32 48z" fill="none" stroke="#fff" stroke-width="2.5"/>
+${evil(38, 10, '#fff')}`)),
+  'menkyo|左折可まちがい': sprite('leftok', signPole(`<rect x="28" y="18" width="64" height="48" rx="4" fill="#fff" stroke="${OL}" stroke-width="3"/><path d="M76 54 v-18 h-30 l8 -8 M46 36 l8 8" stroke="#2563eb" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<g fill="${OL}"><circle cx="52" cy="52" r="2"/><circle cx="64" cy="52" r="2"/></g>`)),
+  'menkyo|金の信号機': gold('goldlight', `
+<path d="M60 84 v24" stroke="${OL}" stroke-width="6"/><rect x="18" y="40" width="84" height="40" rx="14" fill="url(#eg-goldlight)" stroke="${OL}" stroke-width="3"/>
+<g stroke="${OL}" stroke-width="2"><circle cx="38" cy="60" r="10" fill="#fef9c3"/><circle cx="60" cy="60" r="10" fill="#fef9c3"/><circle cx="82" cy="60" r="10" fill="#fef9c3"/></g>${smug(58, 0).replace(/M54 58 q6 -4 12 0/, '')}<path d="M55 64 q5 4 10 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'menkyo|ひし形スルー': sprite('diamondsk', `
+<path d="M0 90 h120 v30 h-120z" fill="#64748b"/><path d="M60 72 l24 14 l-24 14 l-24 -14z" fill="#fff" stroke="${OL}" stroke-width="2"/>
+<g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M4 50 h16 M8 64 h14"/></g>${car(30, 64, '#22c55e', 64)}`),
+  'menkyo|路側帯ふみこみ': sprite('sidestrip', `
+<path d="M0 60 h120 v60 h-120z" fill="#64748b"/><path d="M0 70 h120 M0 76 h120" stroke="#fff" stroke-width="3"/>${car(22, 84, '#f97316', 72)}`),
+  'menkyo|金の標識': gold('goldsign', `<path d="M60 74 v34" stroke="${OL}" stroke-width="6"/><circle cx="60" cy="46" r="30" fill="url(#eg-goldsign)" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="46" r="22" fill="none" stroke="#fff" stroke-width="3"/>${smug(44, 8)}`),
+  // ----- 第2回 -----
+  'menkyo|ウインカーなし': sprite('noblinker', `
+<rect x="24" y="44" width="72" height="40" rx="14" fill="#94a3b8" stroke="${OL}" stroke-width="3"/><path d="M28 50 l-12 14 l12 14z M92 50 l12 14 l-12 14z" fill="#475569" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+${evil(62, 14, '#fff')}<path d="M52 76 h16" stroke="${OL}" stroke-width="2"/>`),
+  'menkyo|右側通行': sprite('rightside', `<path d="M0 100 h120 v20 h-120z" fill="#64748b"/><path d="M60 100 v20" stroke="#facc15" stroke-width="4"/>${car(56, 92, '#a855f7', 62)}<path d="M20 50 h30 l-8 -8 M50 50 l-8 8" stroke="#ef4444" stroke-width="4" fill="none" stroke-linecap="round"/>`),
+  'menkyo|金のウインカー': gold('goldblink', `
+<path d="M40 30 l-30 34 l30 34z" fill="url(#eg-goldblink)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M80 30 l30 34 l-30 34z" fill="url(#eg-goldblink)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<circle cx="60" cy="64" r="18" fill="url(#eg-goldblink)" stroke="${OL}" stroke-width="3"/>${smug(62, 6)}`),
+  'menkyo|バス専用ふみこみ': sprite('buslane', `
+<path d="M0 100 h120 v20 h-120z" fill="#b91c1c"/><path d="M10 40 h96 q6 0 6 6 v48 h-102z" fill="#38bdf8" stroke="${OL}" stroke-width="3"/><g fill="#e0f2fe" stroke="${OL}" stroke-width="2"><rect x="18" y="48" width="18" height="16"/><rect x="40" y="48" width="18" height="16"/><rect x="62" y="48" width="18" height="16"/><rect x="84" y="48" width="18" height="22"/></g>
+<g fill="#1f2937" stroke="${OL}" stroke-width="2"><circle cx="30" cy="96" r="9"/><circle cx="92" cy="96" r="9"/></g><path d="M86 56 l5 1 M98 56 l-5 1" stroke="${OL}" stroke-width="2"/>`),
+  'menkyo|若葉いじめ': sprite('bully', `${road}${car(4, 92, '#fde047', 54)}${car(52, 84, '#1f2937', 64)}<path d="M52 66 l6 -6 M58 70 l8 -4" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>`),
+  'menkyo|金のハンドル': gold('goldwheel', `
+<circle cx="60" cy="62" r="36" fill="none" stroke="${OL}" stroke-width="12"/><circle cx="60" cy="62" r="36" fill="none" stroke="url(#eg-goldwheel)" stroke-width="8"/>
+<path d="M28 66 h64 M60 66 v30" stroke="${OL}" stroke-width="10"/><path d="M28 66 h64 M60 66 v30" stroke="url(#eg-goldwheel)" stroke-width="6"/><circle cx="60" cy="64" r="14" fill="url(#eg-goldwheel)" stroke="${OL}" stroke-width="2.5"/>${smug(62, 5)}`),
+  // ----- 第3回 -----
+  'menkyo|空走おくれ': sprite('sleepdrive', `${road}${car(18, 88, '#60a5fa', 84)}<g font-weight="900" fill="#e0e7ff"><text x="82" y="38" font-size="14">z</text><text x="94" y="26" font-size="10">z</text></g>`),
+  'menkyo|カーブ突っこみ': sprite('curve', `
+<path d="M10 110 q0 -70 70 -80" stroke="#64748b" stroke-width="30" fill="none"/><path d="M10 110 q0 -70 70 -80" stroke="#fff" stroke-width="2.5" fill="none" stroke-dasharray="8 8"/>
+<g transform="rotate(-30 70 70)">${car(46, 78, '#ef4444', 60)}</g>`),
+  'menkyo|金のスピードメーター': gold('goldmeter', `
+<path d="M18 84 a42 42 0 0 1 84 0z" fill="url(#eg-goldmeter)" stroke="${OL}" stroke-width="3"/><g stroke="${OL}" stroke-width="2">${Array.from({ length: 7 }, (_, i) => { const a = Math.PI + i * Math.PI / 6; return `<path d="M${(60 + Math.cos(a) * 34).toFixed(1)} ${(84 + Math.sin(a) * 34).toFixed(1)} L${(60 + Math.cos(a) * 40).toFixed(1)} ${(84 + Math.sin(a) * 40).toFixed(1)}"/>`; }).join('')}</g>
+<path d="M60 84 l-16 -22" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/>${smug(70, 12)}`),
+  'menkyo|踏切エンスト': sprite('crossing', `
+<path d="M10 90 h100" stroke="#78350f" stroke-width="6"/><path d="M10 100 h100" stroke="#94a3b8" stroke-width="4"/>
+<path d="M30 30 l60 30 M90 30 l-60 30" stroke="${OL}" stroke-width="10" stroke-linecap="round"/><path d="M30 30 l60 30 M90 30 l-60 30" stroke="#fde047" stroke-width="6" stroke-linecap="round" stroke-dasharray="8 6"/>
+<circle cx="60" cy="45" r="12" fill="#ef4444" stroke="${OL}" stroke-width="2.5"/><circle cx="56" cy="44" r="1.8" fill="${OL}"/><circle cx="64" cy="44" r="1.8" fill="${OL}"/>`),
+  'menkyo|右折せっかち': sprite('hastyturn', `
+<path d="M60 108 v-30 q0 -20 20 -20 h30" stroke="#64748b" stroke-width="26" fill="none"/>
+<g transform="rotate(-40 66 74)">${car(36, 84, '#f97316', 58)}</g><g stroke="#fde047" stroke-width="3" stroke-linecap="round"><path d="M20 70 l-8 -4 M22 82 h-10"/></g>`),
+  'menkyo|金の踏切': gold('goldbell', `
+<path d="M60 22 q-24 0 -26 30 l-6 22 h64 l-6 -22 q-2 -30 -26 -30z" fill="url(#eg-goldbell)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><circle cx="60" cy="82" r="7" fill="url(#eg-goldbell)" stroke="${OL}" stroke-width="2"/>${smug(52, 8)}`),
+  // ----- 第4回 -----
+  'menkyo|横断歩道スルー': sprite('zebrax', `
+<path d="M0 60 h120 v60 h-120z" fill="#64748b"/><g fill="#fff">${[0, 1, 2, 3, 4].map((i) => `<rect x="${8 + i * 22}" y="64" width="12" height="40"/>`).join('')}</g>
+<g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M2 30 h16 M6 44 h14"/></g>${car(24, 56, '#dc2626', 70)}`),
+  'menkyo|つえの人見落とし': sprite('canemiss', `
+<path d="M0 90 h120 v30 h-120z" fill="#64748b"/>${car(8, 92, '#334155', 66)}<path d="M98 30 l8 60" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M98 30 l8 60" stroke="#ef4444" stroke-width="5" stroke-dasharray="6 10"/>
+<text x="64" y="34" font-size="16" font-weight="900" fill="#fde047">!</text>`),
+  'menkyo|金の横断歩道': gold('goldzebra', `
+<rect x="14" y="40" width="92" height="50" rx="4" fill="#475569" stroke="${OL}" stroke-width="3"/><g fill="url(#eg-goldzebra)" stroke="${OL}" stroke-width="1.5">${[0, 1, 2, 3].map((i) => `<rect x="${22 + i * 22}" y="46" width="12" height="38"/>`).join('')}</g>${smug(64, 0).replace('M54 64 q6 -4 12 0', '')}`),
+  'menkyo|消火栓ふさぎ': sprite('hydrant', `
+<path d="M38 108 v-56 q0 -22 22 -22 q22 0 22 22 v56z" fill="#ef4444" stroke="${OL}" stroke-width="3"/><rect x="30" y="44" width="60" height="10" rx="3" fill="#b91c1c" stroke="${OL}" stroke-width="2.5"/><path d="M82 70 h12 v12 h-12 M38 70 h-12 v12 h12" fill="#b91c1c" stroke="${OL}" stroke-width="2.5"/>
+${evil(74, 9, '#fde047')}<path d="M52 92 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'menkyo|酒気帯び': sprite('drunk', `
+<path d="M34 34 h48 v58 q0 12 -12 12 h-24 q-12 0 -12 -12z" fill="#fbbf24" stroke="${OL}" stroke-width="3"/><path d="M82 46 q16 0 16 14 q0 14 -16 14" fill="none" stroke="${OL}" stroke-width="5"/>
+<path d="M30 34 q4 -14 16 -10 q6 -10 18 -4 q12 -6 18 6 q6 0 4 8z" fill="#fff" stroke="${OL}" stroke-width="2.5"/>
+<g fill="none" stroke="${OL}" stroke-width="2.2"><path d="M46 64 m-4 0 a4 4 0 1 1 4 4"/><path d="M70 64 m-4 0 a4 4 0 1 1 4 4"/></g><path d="M50 82 q8 6 16 0" stroke="${OL}" stroke-width="2" fill="none"/><ellipse cx="40" cy="76" rx="5" ry="3" fill="#ef4444" opacity=".6"/><ellipse cx="78" cy="76" rx="5" ry="3" fill="#ef4444" opacity=".6"/>`),
+  'menkyo|金のパーキング': gold('goldpark', `<rect x="24" y="24" width="72" height="72" rx="10" fill="url(#eg-goldpark)" stroke="${OL}" stroke-width="3"/><text x="60" y="80" text-anchor="middle" font-size="44" font-weight="900" fill="#78350f">P</text>${smug(40, 18)}`),
+  // ----- 第5回 -----
+  'menkyo|合流もたつき': sprite('merge', `<path d="M0 70 h120 v50 h-120z" fill="#64748b"/><path d="M0 96 l60 -8 h60" stroke="#fff" stroke-width="3" stroke-dasharray="8 6"/>${car(8, 102, '#84cc16', 56)}${car(56, 82, '#3b82f6', 60)}`),
+  'menkyo|路肩走り': sprite('shoulder', `<path d="M0 80 h120 v40 h-120z" fill="#64748b"/><path d="M0 88 h120" stroke="#fff" stroke-width="3"/><path d="M0 80 h120" stroke="#78716c" stroke-width="10"/>${car(24, 76, '#ef4444', 70)}`),
+  'menkyo|金の料金所': gold('goldtoll', `
+<path d="M14 52 h92 l-8 -18 h-76z" fill="url(#eg-goldtoll)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><g stroke="${OL}" stroke-width="2.5" fill="url(#eg-goldtoll)"><rect x="22" y="52" width="16" height="50"/><rect x="82" y="52" width="16" height="50"/></g>
+<path d="M38 70 h44" stroke="#dc2626" stroke-width="5" stroke-dasharray="6 6"/>${smug(42, 14)}`),
+  'menkyo|凍結スリップ': sprite('ice', `
+<path d="M10 96 h100 l-6 12 h-88z" fill="#bae6fd" stroke="${OL}" stroke-width="2.5"/><g transform="rotate(14 60 70)">${car(24, 84, '#f472b6', 72)}</g><g fill="#fff"><path d="M20 40 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3z"/><path d="M100 30 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2z"/></g>`),
+  'menkyo|蒸発現象': sprite('vanish', `
+<path d="M0 60 l40 -20 v40z M120 60 l-40 -20 v40z" fill="#fef9c3" opacity=".7"/>
+<path d="M44 104 q-4 -40 16 -46 q20 6 16 46z" fill="#e2e8f0" fill-opacity=".45" stroke="${OL}" stroke-width="2.5" stroke-dasharray="4 4"/><circle cx="60" cy="46" r="12" fill="#e2e8f0" fill-opacity=".45" stroke="${OL}" stroke-width="2.5" stroke-dasharray="4 4"/>
+<circle cx="56" cy="46" r="1.8" fill="${OL}"/><circle cx="64" cy="46" r="1.8" fill="${OL}"/>`),
+  'menkyo|金のヘッドライト': gold('goldlamp', `
+<path d="M70 62 l44 -24 v48z" fill="#fef9c3" opacity=".8"/><circle cx="50" cy="62" r="30" fill="url(#eg-goldlamp)" stroke="${OL}" stroke-width="3"/><circle cx="50" cy="62" r="18" fill="#fffbeb" stroke="${OL}" stroke-width="2"/>${smug(60, 6).replace(/60 -/g, '50 -').replace(/60 \+/g, '50 +')}`),
+  // ----- 第6回 -----
+  'menkyo|クリープ暴走': sprite('creep', `
+<path d="M24 96 q-6 -30 18 -40 q14 -20 36 -10 q22 8 20 30 q6 4 4 20z" fill="#16a34a" stroke="${OL}" stroke-width="3"/><g fill="#4ade80" stroke="#14532d" stroke-width="1.5"><path d="M50 52 l10 6 v10 l-10 6 l-10 -6 v-10z"/><path d="M72 56 l8 5 v8 l-8 5 l-8 -5 v-8z"/></g>
+<circle cx="100" cy="82" r="11" fill="#86efac" stroke="${OL}" stroke-width="2.5"/><circle cx="102" cy="80" r="2" fill="${OL}"/><text x="18" y="40" font-size="13" font-weight="900" fill="#fde047">D</text>`),
+  'menkyo|フェード現象': sprite('fade', `
+<circle cx="60" cy="68" r="34" fill="#94a3b8" stroke="${OL}" stroke-width="3"/><g fill="#475569">${Array.from({ length: 8 }, (_, i) => { const a = i / 8 * Math.PI * 2; return `<circle cx="${(60 + Math.cos(a) * 24).toFixed(1)}" cy="${(68 + Math.sin(a) * 24).toFixed(1)}" r="3"/>`; }).join('')}</g>
+<path d="M40 30 q-6 -14 4 -22 q2 10 8 10 q0 -10 8 -14 q2 12 10 14 q4 -8 10 -6 q-4 10 -2 18" fill="#f97316" stroke="${OL}" stroke-width="2"/>${evil(66, 9, '#fde047')}`),
+  'menkyo|金のエンジン': gold('goldgear', `
+<g transform="translate(60 64)"><path d="${Array.from({ length: 10 }, (_, i) => { const a1 = (i / 10) * Math.PI * 2, a2 = ((i + 0.5) / 10) * Math.PI * 2; return `${i ? 'L' : 'M'}${(Math.cos(a1) * 38).toFixed(1)} ${(Math.sin(a1) * 38).toFixed(1)} L${(Math.cos(a2) * 30).toFixed(1)} ${(Math.sin(a2) * 30).toFixed(1)}`; }).join(' ')}z" fill="url(#eg-goldgear)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><circle r="16" fill="#fef9c3" stroke="${OL}" stroke-width="2.5"/></g>${smug(62, 5)}`),
+  'menkyo|ひき逃げ未遂': sprite('hitrun', `<g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M90 60 h20 M96 74 h18"/></g>${road}<g transform="translate(120 0) scale(-1 1)">${car(30, 90, '#1f2937', 70)}</g><text x="20" y="44" font-size="16" font-weight="900" fill="#ef4444">!</text>`),
+  'menkyo|自賠責なし': sprite('noinsur', `
+<path d="M32 22 h44 l12 12 v74 h-56z" fill="#fff" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M32 22 h56 v86 h-56z" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="6 4"/>
+${evil(58, 10, '#a78bfa')}<path d="M50 74 q10 -5 20 0" stroke="${OL}" stroke-width="2" fill="none"/><g stroke="#cbd5e1" stroke-width="2.5"><path d="M40 90 h40 M40 98 h30"/></g>`),
+  'menkyo|金の車検証': gold('goldcert', `
+<path d="M28 26 h64 v76 h-64z" fill="url(#eg-goldcert)" stroke="${OL}" stroke-width="3"/><circle cx="76" cy="86" r="10" fill="#dc2626" stroke="${OL}" stroke-width="2"/><g stroke="#92400e" stroke-width="2.5"><path d="M36 64 h48 M36 72 h36"/></g>${smug(44, 10)}`),
+  // ----- 第7回 -----
+  'menkyo|ボールの影': sprite('ballshadow', `
+<circle cx="60" cy="72" r="26" fill="#a3e635" stroke="${OL}" stroke-width="3"/><path d="M38 60 q22 10 44 0 M38 84 q22 -10 44 0" stroke="#fff" stroke-width="3" fill="none"/>
+<path d="M90 28 q-10 -2 -14 8" stroke="${OL}" stroke-width="0"/><g fill="#1e293b" opacity=".75"><circle cx="96" cy="30" r="10"/><path d="M86 70 q0 -30 10 -30 q10 0 10 30z"/></g><circle cx="93" cy="29" r="1.6" fill="#fde047"/><circle cx="99" cy="29" r="1.6" fill="#fde047"/>
+${evil(72, 9, '#fff')}`),
+  'menkyo|バスのかげ': sprite('busshadow', `
+<path d="M6 42 h76 q6 0 6 6 v48 h-82z" fill="#22c55e" stroke="${OL}" stroke-width="3"/><g fill="#dcfce7" stroke="${OL}" stroke-width="2"><rect x="14" y="50" width="18" height="16"/><rect x="36" y="50" width="18" height="16"/><rect x="58" y="50" width="18" height="16"/></g><g fill="#1f2937" stroke="${OL}" stroke-width="2"><circle cx="24" cy="96" r="8"/><circle cx="70" cy="96" r="8"/></g>
+<g fill="#1e293b"><circle cx="100" cy="62" r="9"/><path d="M90 100 q0 -30 10 -30 q10 0 10 30z"/></g><circle cx="97" cy="61" r="1.6" fill="#fde047"/><circle cx="103" cy="61" r="1.6" fill="#fde047"/>`),
+  'menkyo|金の安全運転': gold('goldtrophy', `
+<path d="M40 26 h40 v24 q0 22 -20 24 q-20 -2 -20 -24z" fill="url(#eg-goldtrophy)" stroke="${OL}" stroke-width="3"/><path d="M40 32 q-16 0 -14 14 q2 10 16 10 M80 32 q16 0 14 14 q-2 10 -16 10" fill="none" stroke="${OL}" stroke-width="4"/>
+<path d="M54 74 h12 v14 h-12z M42 88 h36 v14 h-36z" fill="url(#eg-goldtrophy)" stroke="${OL}" stroke-width="3"/>${smug(44, 7)}`),
+  'menkyo|雨夜のまぼろし': sprite('rainnight', `
+<g stroke="#93c5fd" stroke-width="2.5" stroke-linecap="round">${[[14, 20], [34, 30], [90, 18], [104, 40], [24, 60], [100, 76]].map(([x, y]) => `<path d="M${x} ${y} l-4 10"/>`).join('')}</g>
+<path d="M40 104 q-4 -44 20 -50 q24 6 20 50z" fill="#334155" fill-opacity=".6" stroke="${OL}" stroke-width="2.5"/><circle cx="60" cy="42" r="14" fill="#334155" fill-opacity=".6" stroke="${OL}" stroke-width="2.5"/>
+<circle cx="55" cy="42" r="2" fill="#fde047"/><circle cx="65" cy="42" r="2" fill="#fde047"/>`),
+  'menkyo|トラックのかげ': sprite('truckshadow', `${road}
+<rect x="4" y="38" width="60" height="56" rx="4" fill="#e2e8f0" stroke="${OL}" stroke-width="3"/><path d="M64 54 h20 l14 18 v22 h-34z" fill="#3b82f6" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<g fill="#1f2937" stroke="${OL}" stroke-width="2"><circle cx="20" cy="96" r="8"/><circle cx="84" cy="96" r="8"/></g><g transform="translate(108 70)"><circle r="8" fill="#1e293b"/><circle cx="-3" r="1.4" fill="#fde047"/><circle cx="3" r="1.4" fill="#fde047"/></g>`),
+  'menkyo|金の免許証': gold('goldlicense', `
+<rect x="16" y="34" width="88" height="56" rx="6" fill="url(#eg-goldlicense)" stroke="${OL}" stroke-width="3"/><rect x="24" y="44" width="26" height="34" rx="3" fill="#fef9c3" stroke="${OL}" stroke-width="2"/>
+<g stroke="#92400e" stroke-width="2.5"><path d="M58 50 h38 M58 60 h30 M58 70 h34"/></g><path d="M30 58 q3 -3 6 0 M40 58 q3 -3 6 0 M32 68 q5 4 10 0" stroke="${OL}" stroke-width="1.8" fill="none"/>`),
+});
