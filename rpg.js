@@ -23,6 +23,17 @@ export const CHARS = {
   konko: { name: 'コンコ', icon: '🦊', rar: 2, subj: 'db', hp: 70, atk: 19, skill: { kind: 'dmg', pow: 3, cost: 4, name: 'きつね火' } },
   kuma: { name: 'クマ', icon: '🐻', rar: 2, subj: 'db', hp: 95, atk: 14, skill: { kind: 'guard', pow: 3, cost: 3, name: 'どっしり' } },
   panda: { name: 'パンダ先輩', icon: '🐼', rar: 2, subj: 'sd', hp: 85, atk: 15, skill: { kind: 'heal', pow: 0.35, cost: 4, name: 'ささの差し入れ' } },
+  // v4.10.0 で追加：C/C++・DB・設計がどれも ★3・★★3・★★★2 になるように
+  debugten: { name: 'デバッグてんとう', icon: '🐞', rar: 1, subj: 'ccpp', hp: 50, atk: 11, skill: { kind: 'weaken', pow: 3, cost: 3, name: 'バグ報告' } },
+  inko: { name: 'インデックスインコ', icon: '🦜', rar: 1, subj: 'db', hp: 48, atk: 11, skill: { kind: 'expup', pow: 1.5, cost: 3, name: '索引で効率化' } },
+  yadokari: { name: 'カプセル化ヤドカリ', icon: '🦀', rar: 1, subj: 'sd', hp: 60, atk: 9, skill: { kind: 'guard', pow: 2, cost: 3, name: 'こうらに隠れる' } },
+  hebi: { name: '再帰ヘビ', icon: '🐍', rar: 2, subj: 'ccpp', hp: 70, atk: 18, skill: { kind: 'dot', pow: 1.5, cost: 4, name: '再帰呼び出し' } },
+  azarashi: { name: 'ジョイン・アザラシ', icon: '🦭', rar: 2, subj: 'db', hp: 80, atk: 15, skill: { kind: 'shield', pow: 1, cost: 3, name: 'LEFT JOIN' } },
+  kangaroo: { name: '継承カンガルー', icon: '🦘', rar: 2, subj: 'sd', hp: 75, atk: 17, skill: { kind: 'copy', pow: 1, cost: 4, name: '継承' } },
+  tako: { name: 'ポリモーフィ・タコ', icon: '🐙', rar: 2, subj: 'sd', hp: 72, atk: 17, skill: { kind: 'poly', pow: 4, cost: 4, name: '多態性' } },
+  gc: { name: 'ガベージコレクタ', icon: '🦝', rar: 3, subj: 'ccpp', hp: 125, atk: 26, skill: { kind: 'revive', pow: 0.3, cost: 5, name: 'メモリ回収' } },
+  zou: { name: 'トランザクション象', icon: '🐘', rar: 3, subj: 'db', hp: 140, atk: 24, skill: { kind: 'rollback', pow: 1, cost: 4, name: 'ロールバック' } },
+  taka: { name: 'デザインパターン鷹', icon: '🦅', rar: 3, subj: 'sd', hp: 105, atk: 30, skill: { kind: 'triple', pow: 3, cost: 4, name: 'シングルトン' } },
   robo: { name: 'ロボ博士', icon: '🤖', rar: 3, subj: 'ccpp', hp: 100, atk: 28, skill: { kind: 'dmg', pow: 4, cost: 4, name: 'コンパイル砲' } },
   kujira: { name: 'クジラ', icon: '🐳', rar: 3, subj: 'db', hp: 130, atk: 22, skill: { kind: 'heal', pow: 0.6, cost: 4, name: 'しおふき' } },
   chou: { name: 'チョウ', icon: '🦋', rar: 3, subj: 'sd', hp: 90, atk: 26, skill: { kind: 'time', pow: 15, cost: 3, name: 'りんぷん' } },
@@ -70,6 +81,15 @@ const SKILL_DESC = {
   hint: () => '不正解の選択肢を2つ消す（選択肢は2つ以上残す。○× の問題では制限時間+10秒）',
   healguard: () => 'パーティのHPを全回復し、次の2回受けるダメージ半分',
   charge: () => 'ほかの仲間全員のスキルのゲージを1たまった状態にする（正解1回ぶん）',
+  weaken: (k) => `${k.pow}ターンのあいだ、敵全員の攻撃力−20%`,
+  dot: (k) => `3ターンのあいだ、毎ターン敵全員に攻撃力×${k.pow} のダメージ`,
+  revive: (k) => `その戦いで1回だけ、HPが0になってもHP${Math.round(k.pow * 100)}%で復活`,
+  expup: (k) => `このバトルでもらえる経験値×${k.pow}`,
+  shield: () => '次の1回、ミスしても（ターン攻撃でも）ダメージ0',
+  rollback: () => '直前に受けたダメージをなかったことにする（その分だけ回復）',
+  copy: () => 'いちばんゲージがたまっている仲間のスキルを受け継いで発動',
+  poly: (k) => `HPが半分以下なら30%回復、そうでなければ攻撃力×${k.pow} のダメージ`,
+  triple: (k) => `次の1回の正解で、全員の攻撃が${k.pow}倍`,
   native: (k) => `${k.pow}ターンのあいだ、TOEIC の章で正解したときの攻撃が2倍`,
   speedread: () => 'その戦いのあいだ、答えの速さボーナスの上限が×1.4→×1.8に',
   traffic: (k) => `敵全員の「あと◯ターンで攻撃」を${k.pow}ターン遅らせ、次に受けるダメージを0にする`,
@@ -282,7 +302,7 @@ export function makeRPG(ctx) {
     return ups;
   }
   // 戦闘力：HP÷2 ＋ 攻撃×5（今の科目が得意なら×1.5、全科目なら×1.2）＋ スキルの強さ
-  const SKW = { dmg: 25, heal: 120, time: 5, guard: 18, hint: 50, healguard: 160, charge: 90, nuke: 32, stardust: 30, native: 45, speedread: 40, traffic: 45, homeo: 45, inertia: 40 };
+  const SKW = { dmg: 25, heal: 120, time: 5, guard: 18, hint: 50, healguard: 160, charge: 90, nuke: 32, stardust: 30, native: 45, speedread: 40, traffic: 45, weaken: 12, dot: 30, revive: 55, expup: 8, shield: 30, rollback: 50, copy: 40, poly: 35, triple: 30, homeo: 45, inertia: 40 };
   function power(id, subj = R().subj) {
     const m = member(id), k = m.skill;
     const bonus = m.bonus ? m.bonus[subj] ?? m.bonus.other : m.subj === subj ? 1.3 : m.subj === 'all' ? 1.2 : 1;
@@ -978,7 +998,7 @@ export function makeRPG(ctx) {
     const maxHp = t.reduce((a, x) => a + x.hp, 0);
     // ウェーブ：雑魚ステージは3ウェーブ、ボス戦は1ウェーブ、中間ボスは1体ずつ
     const waves = isMid || isRev || isLast ? foes.map((_, i) => [i]) : boss ? [foes.map((_, i) => i)] : [0, 1, 2].map((w) => Array.from({ length: slots }, (_, k) => w * slots + k));
-    const st = { foes, waves, wave: 0, active: [...waves[0]], fi: 0, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: isRev ? 60 : Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0, cdMax: 3, cut: 1, chainN: 0, marks: 0, examN: 0, examOk: 0, native: 0, speedCap: 0.4, nullify: 0 };
+    const st = { foes, waves, wave: 0, active: [...waves[0]], fi: 0, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: isRev ? 60 : Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0, cdMax: 3, cut: 1, chainN: 0, marks: 0, examN: 0, examOk: 0, native: 0, speedCap: 0.4, nullify: 0, weaken: 0, dot: [], revive: 0, expMul: 1, lastDmg: 0, triple: 0 };
     const deckObj = DECKS.find((d) => d.id === subj) || DECKS.find((d) => d.id === subj + lec) || (subj === 'toeic' && DECKS.find((d) => d.id === 'toeic3')) || DECKS[0]; // TOEIC リーディングはレベルごとの単語帳（Part 6・7 は Lv.3）
     const deck = deckObj.words, deckId = deckObj.id;
     // 雑魚戦の単語はその回のものだけ（単語に回の番号が付いている科目）。選択肢のハズレは科目全体から
@@ -1080,14 +1100,16 @@ export function makeRPG(ctx) {
       // 場にいる敵がみんなで反撃（2体以上のときは1体あたり7割）。who：攻撃してくる敵（ゲキムズのターン攻撃）
       const live = who || st.active.filter((i) => foes[i].cur > 0);
       if (!live.length) return;
-      if (st.nullify) { st.nullify--; pop('🚓 ノーダメージ', 'info'); drawBuffs(); return; } // 白バイ隊長「交通整理」
+      if (st.nullify) { st.nullify--; pop('🛡️ ノーダメージ', 'info'); drawBuffs(); return; } // 白バイ隊長「交通整理」・ジョイン・アザラシ「LEFT JOIN」
       const base = live.length > 1 ? live.reduce((a, i) => a + foes[i].atk, 0) * 0.7 : foes[live[0]].atk;
       let d = base * (0.85 + Math.random() * 0.3) * mult;
       if (st.guard) { d /= 2; st.guard--; }
       if (st.inertia) d /= 2; // イナーシャ：受けるダメージ半分
+      if (st.weaken) d *= 0.8; // デバッグてんとう「バグ報告」
       const before = st.hp;
-      st.hp -= Math.round(d);
+      st.hp -= Math.round(d); st.lastDmg = Math.round(d);
       if (st.homeo) st.hp = Math.max(st.hp, Math.min(before, Math.ceil(st.maxHp * 0.3))); // ホメオスタシス：30%より下がらない
+      if (st.hp <= 0 && st.revive) { st.hp = Math.round(st.maxHp * st.revive); st.revive = 0; setTimeout(() => pop('🦝 復活！', 'heal'), 300); drawBuffs(); } // ガベージコレクタ「メモリ回収」
       bgm.sfx('ouch');
       if (!st.pinched && st.hp > 0 && st.hp / st.maxHp < 0.3) { st.pinched = true; setTimeout(() => hsay('pinch'), 700); }
       const bt = document.querySelector('.rp-battle'); if (bt) { bt.classList.remove('ouch'); void bt.offsetWidth; bt.classList.add('ouch'); }
@@ -1103,7 +1125,7 @@ export function makeRPG(ctx) {
     const cdShort = (f) => (f.cd === 1 ? '⚠️ 次で攻撃' : `⏳ あと${f.cd}ターン`); // 敵が2体以上のときは短く
     const cdHTML = (i) => (turnAtk && foes[i].cd ? `<i class="rp-cd${foes[i].cd === 1 ? ' soon' : ''}" data-cd="${i}">${st.active.length > 1 ? cdShort(foes[i]) : cdTxt(foes[i])}</i>` : '');
     function drawCd() { document.querySelectorAll('[data-cd]').forEach((el) => { const f = foes[+el.dataset.cd]; el.textContent = st.active.length > 1 ? cdShort(f) : cdTxt(f); el.classList.toggle('soon', f.cd === 1); }); }
-    function buffHTML() { return `${st.native ? `<span>🎧 ネイティブ あと${st.native}</span>` : ''}${st.nullify ? '<span>🚓 次のダメージ0</span>' : ''}${st.speedCap > 0.4 ? '<span>📕 速読</span>' : ''}${st.homeo ? `<span>💚 恒常性 あと${st.homeo}</span>` : ''}${st.inertia ? `<span class="in">⚙️ 慣性 あと${st.inertia}</span>` : ''}`; }
+    function buffHTML() { return `${st.weaken ? `<span>🐞 敵の攻撃−20% あと${st.weaken}</span>` : ''}${st.dot.length ? `<span>🐍 再帰 あと${Math.max(...st.dot.map((x) => x.n))}</span>` : ''}${st.revive ? '<span>🦝 復活まち</span>' : ''}${st.triple ? `<span>🦅 次の正解×${st.triple}</span>` : ''}${st.expMul > 1 ? `<span>🦜 経験値×${st.expMul}</span>` : ''}${st.native ? `<span>🎧 ネイティブ あと${st.native}</span>` : ''}${st.nullify ? `<span>🛡️ 次のダメージ0${st.nullify > 1 ? `×${st.nullify}` : ''}</span>` : ''}${st.speedCap > 0.4 ? '<span>📕 速読</span>' : ''}${st.homeo ? `<span>💚 恒常性 あと${st.homeo}</span>` : ''}${st.inertia ? `<span class="in">⚙️ 慣性 あと${st.inertia}</span>` : ''}`; }
     function drawBuffs() { const el = document.getElementById('rp-buffs'); if (el) el.innerHTML = buffHTML(); }
     async function enemyTurn() {
       if (!turnAtk) return;
@@ -1250,7 +1272,7 @@ export function makeRPG(ctx) {
           line = `<div class="rp-after ok"><b>復讐成功！${F.nemesis ? '（宿敵撃破）' : ''}</b></div>` + await revDetail(i, true);
         } else {
         // 仲間が1人ずつ攻撃。狙った敵が倒れたら、残りの攻撃は自動で次の敵へ
-        const bonus = speed * mult * (1 + Math.min(st.combo - 1, 5) * 0.1) * (F.double ? 2 : 1) * (st.native && /^toeic/.test(subj) ? 2 : 1);
+        const bonus = speed * mult * (1 + Math.min(st.combo - 1, 5) * 0.1) * (F.double ? 2 : 1) * (st.native && /^toeic/.test(subj) ? 2 : 1) * (st.triple ? st.triple : 1);
         const lbl = mult > 1 ? 'チャンス！' : st.combo > 1 ? `${st.combo}コンボ` : speed > 1.3 ? 'はやい！' : '';
         for (const [k, x] of t.entries()) {
           if (st.over) return;
@@ -1259,6 +1281,7 @@ export function makeRPG(ctx) {
           const tm = document.querySelectorAll('.rp-tm')[k]; if (tm) { tm.classList.remove('hit1'); void tm.offsetWidth; tm.classList.add('hit1'); }
           await wait(150);
         }
+        if (st.triple) { st.triple = 0; drawBuffs(); } // シングルトンは1回だけ
         // ラスボスの仕掛け（正解したとき）
         const tgt = () => (foes[st.fi].cur > 0 ? st.fi : st.active.find((i) => foes[i].cur > 0));
         st.cut = 1;
@@ -1292,6 +1315,12 @@ export function makeRPG(ctx) {
       await enemyTurn();
       if (st.over) return;
       if (st.native) st.native--;
+      if (st.weaken) st.weaken--;
+      if (st.dot.length) { // 再帰ヘビ「再帰呼び出し」：毎ターン敵全員にダメージ
+        const dmg = st.dot.reduce((a, x) => a + x.dmg, 0);
+        st.active.filter((i) => foes[i].cur > 0).forEach((i, j) => hitEnemy(dmg, j ? '' : '🐍 再帰', false, i));
+        st.dot.forEach((x) => x.n--); st.dot = st.dot.filter((x) => x.n > 0);
+      }
       // ホメオスタシス・イナーシャの残りターン
       if (st.homeo) { if (st.hp > 0) { st.hp = Math.min(st.maxHp, st.hp + st.maxHp * 0.05); pop('💚 +5%', 'heal'); } st.homeo--; }
       if (st.inertia) st.inertia--;
@@ -1436,10 +1465,23 @@ export function makeRPG(ctx) {
       document.body.appendChild(el); setTimeout(() => el.remove(), 1600);
     }
     function useSkill(id) {
-      const x = t.find((m) => m.id === id); if (!x || st.gauge[id] < x.skill.cost || st.over) return;
+      let x = t.find((m) => m.id === id); if (!x || st.gauge[id] < x.skill.cost || st.over) return;
       st.gauge[id] = 0;
-      const k = x.skill;
-      if (k.kind === 'heal') { st.hp = Math.min(st.maxHp, st.hp + st.maxHp * k.pow); pop('回復！', 'heal'); bgm.sfx('heal'); drawHp(); }
+      let k = x.skill;
+      const self = x;
+      if (k.kind === 'copy') { // 継承カンガルー：いちばんゲージがたまっている仲間のスキルを受け継ぐ（その仲間のゲージは減らない）
+        const src = t.filter((m) => m.id !== x.id && m.skill.kind !== 'copy').sort((a, b) => st.gauge[b.id] / b.skill.cost - st.gauge[a.id] / a.skill.cost)[0];
+        if (src) { x = src; k = src.skill; pop(`🦘 継承：${src.skill.name}`, 'info'); }
+      }
+      if (k.kind === 'poly') k = st.hp <= st.maxHp / 2 ? { ...k, kind: 'heal', pow: 0.3 } : { ...k, kind: 'dmg' }; // タコ「多態性」
+      if (k.kind === 'weaken') { st.weaken = k.pow; pop('🐞 バグ報告！', 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'dot') { st.dot.push({ n: 3, dmg: atkOf(x) * k.pow }); pop('🐍 再帰呼び出し！', 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'revive') { st.revive = Math.max(st.revive, k.pow); pop('🦝 メモリ回収！', 'heal'); bgm.sfx('heal'); drawBuffs(); }
+      else if (k.kind === 'expup') { st.expMul = Math.max(st.expMul, k.pow); pop('🦜 経験値UP！', 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'shield') { st.nullify += k.pow; pop('🦭 LEFT JOIN！', 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'rollback') { const back = st.lastDmg || 0; st.hp = Math.min(st.maxHp, st.hp + back); st.lastDmg = 0; pop(back ? `🐘 ロールバック +${back}` : '🐘 ロールバック', 'heal'); bgm.sfx('heal'); drawHp(); }
+      else if (k.kind === 'triple') { st.triple = k.pow; pop('🦅 シングルトン！', 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'heal') { st.hp = Math.min(st.maxHp, st.hp + st.maxHp * k.pow); pop('回復！', 'heal'); bgm.sfx('heal'); drawHp(); }
       else if (k.kind === 'dmg') {
         bgm.sfx('skill');
         const live = st.active.filter((i) => foes[i].cur > 0);
@@ -1472,8 +1514,8 @@ export function makeRPG(ctx) {
         else { st.bonusT += 10; st.left += 10; st.total += 10; pop('ひらめき！ +10秒', 'info'); } // ○× の問題では制限時間+10秒
         bgm.sfx('skill');
       }
-      if (x.rar === 4) cutIn(x); else toast(`${x.name}「${k.name}」`);
-      hsay(x.id === 'hero' ? (k.kind === 'hint' ? 'hint' : k.kind === 'dmg' ? 'shot' : k.kind === 'healguard' ? 'thanks' : k.kind === 'stardust' ? 'stardust' : 'today') : k.kind === 'heal' ? 'heal' : 'skill');
+      if (self.rar === 4) cutIn(self); else toast(`${self.name}「${self.skill.name}」${x !== self ? `→ ${x.skill.name}` : ''}`);
+      hsay(self.id === 'hero' ? (k.kind === 'hint' ? 'hint' : k.kind === 'dmg' ? 'shot' : k.kind === 'healguard' ? 'thanks' : k.kind === 'stardust' ? 'stardust' : 'today') : k.kind === 'heal' ? 'heal' : 'skill');
       drawTeam();
     }
 
@@ -1504,7 +1546,7 @@ export function makeRPG(ctx) {
         stars = 1 + (st.hp / st.maxHp >= 0.5 ? 1 : 0) + (st.miss === 0 ? 1 : 0);
         newBest = stars > (r.stars[dk] || 0);
         coins = Math.round((boss ? 120 : 40) * (1 + lvIdx * 0.15) * D.rew) * (first ? 2 : 1) + st.rares * 150;
-        exp = Math.round((boss ? 80 : 30) * D.rew * (1 + lvIdx * 0.1)); // 強い章ほど経験値も多め
+        exp = Math.round((boss ? 80 : 30) * D.rew * (1 + lvIdx * 0.1) * st.expMul); // 強い章ほど経験値も多め（インコのスキルで×1.5）
         food = first ? 2 : 1;
         r.coins += coins; r.clear[id] = 1; if (newBest) r.stars[dk] = stars;
         const grow = (id, o, name) => { if (addExp(id, o, exp)) ups.push(`${name} Lv.${o.lv}`); };
