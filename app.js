@@ -8,6 +8,9 @@ const VERSION = NOTES[0].version;
 
 const KEY = 'oretachi:v1';
 const SKEY = 'oretachi:session';
+// バックアップ：この3つ（成績・途中の問題・ヒマコロシ＝冒険と歴史）を1つのファイルに書き出す
+const BACKUP_KEYS = ['oretachi:v1', 'oretachi:session', 'oretachi:hima'];
+const BKEY = 'oretachi:lastBackup';
 const $app = document.getElementById('app');
 
 /* ---------- 保存 ---------- */
@@ -834,6 +837,29 @@ function viewNotes() {
     </main>`;
 }
 
+/* ---------- バックアップと引き継ぎ ---------- */
+function exportBackup() {
+  const data = {}; for (const k of BACKUP_KEYS) { const v = localStorage.getItem(k); if (v != null) data[k] = v; }
+  const d = new Date(), ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  const blob = new Blob([JSON.stringify({ app: 'oretachi', version: VERSION, date: d.toISOString(), data })], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `oretachi-backup-${ymd}.json`;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  try { localStorage.setItem(BKEY, String(Date.now())); } catch {}
+  toast('💾 バックアップを書き出しました（ダウンロードやファイルに保存されます）');
+  if (location.hash.startsWith('#/settings')) viewSettings();
+}
+async function importBackup(file) {
+  let obj;
+  try { obj = JSON.parse(await file.text()); } catch { alert('このファイルは読み込めません（バックアップのファイルを選んでください）'); return; }
+  if (!obj || obj.app !== 'oretachi' || !obj.data || !Object.keys(obj.data).some((k) => BACKUP_KEYS.includes(k))) { alert('俺たちの秋学期のバックアップではないようです'); return; }
+  const when = obj.date ? new Date(obj.date).toLocaleString('ja-JP') : '不明';
+  if (!confirm(`${when} に書き出したバックアップ（v${obj.version || '?'}）を読み込みます。\n今この端末にある記録は、バックアップの内容に置きかわります。よろしいですか？`)) return;
+  for (const k of BACKUP_KEYS) { if (obj.data[k] != null) localStorage.setItem(k, obj.data[k]); else localStorage.removeItem(k); }
+  alert('読み込みました。アプリを開き直します。');
+  location.hash = '#/'; location.reload();
+}
+document.addEventListener('change', (e) => { if (e.target.id === 'restore-file' && e.target.files?.[0]) importBackup(e.target.files[0]); });
+
 /* ---------- 設定 ---------- */
 function viewSettings() {
   $app.innerHTML = `
@@ -862,8 +888,12 @@ function viewSettings() {
       </div>
       <h3 class="sec">データ</h3>
       <div class="card">
-        <p class="small muted" style="margin-top:0">成績と間違えた問題の記録は、この端末のブラウザの中だけに保存されます。</p>
-        <button class="btn sub wide" data-act="reset">記録をすべて消す</button>
+        <p class="small muted" style="margin-top:0">成績・ヒマコロシ・冒険の記録は、この端末のブラウザの中だけに保存されます。ブラウザのデータを消したり機種を変えたりする前に、バックアップを書き出しておこう。</p>
+        <button class="btn wide" data-act="backup">💾 バックアップを書き出す</button>
+        <button class="btn sub wide mt" data-act="restore">📂 バックアップから読み込む</button>
+        <input type="file" id="restore-file" accept=".json,application/json" hidden>
+        <p class="small muted center" style="margin:8px 0 0">${(() => { const t = +localStorage.getItem(BKEY) || 0; return t ? `最後に書き出した日：${new Date(t).toLocaleDateString('ja-JP')}` : 'まだ書き出していません'; })()}</p>
+        <button class="btn sub wide mt" data-act="reset">記録をすべて消す</button>
       </div>
       <h3 class="sec">クレジット</h3>
       <div class="card small">
@@ -954,6 +984,8 @@ document.addEventListener('click', async (e) => {
     case 'fnone': fieldSel.lectures.clear(); return viewField(s);
     case 'tall': Object.keys(s.types).forEach((k) => fieldSel.types.add(k)); return viewField(s);
     case 'tnone': fieldSel.types.clear(); return viewField(s);
+    case 'backup': return exportBackup();
+    case 'restore': { const f = document.getElementById('restore-file'); if (f) { f.value = ''; f.click(); } return; }
     case 'reset':
       if (confirm('成績と間違えた問題の記録をすべて消しますか？')) { store.stats = {}; store.history = []; save(); toast('消しました'); }
       return;

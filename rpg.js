@@ -201,11 +201,11 @@ const MID = {
     { art: 'ticket', name: '無賃乗車NULL', lec: 3, desc: '切符に何も書いていない（NULL）お化け。= では見つからない。' },
     { art: 'suitcase', name: '荷物ごちゃまぜORDER', lec: 4, desc: '荷物をばらばらに並べるトランク。ORDER BY で並べ直そう。' },
     { art: 'stationmaster', name: '終点の集計駅長', lec: 6, desc: '終点で乗客を GROUP BY でまとめて数える駅長。' },
-    { art: 'yankee', name: '隣の部屋のヤンキー', final: true, desc: '夜中にラジカセを鳴らす隣の部屋の住人。第2〜7回のすべてで勝負を挑んでくる。' },
+    { art: 'yankee', name: '隣の部屋のヤンキー', final: true, entry: 'yankee', desc: '夜中にラジカセを鳴らす隣の部屋の住人。第2〜7回のすべてで勝負を挑んでくる。' },
   ] },
   sd: { after: '7', title: '設計図の塔 ボスラッシュ', reward: 'spec', foes: [
     { boss: '1' }, { boss: '2' }, { boss: '4' }, { boss: '5' }, { boss: '6' }, { boss: '7' },
-    { art: 'spec', name: '設計竜スペック', final: true, desc: '設計図の翼をもつ竜。すべての UML を操る、塔のいちばん上の主。' },
+    { art: 'spec', name: '設計竜スペック', final: true, entry: 'spec', desc: '設計図の翼をもつ竜。すべての UML を操る、塔のいちばん上の主。' },
   ] },
 };
 const midFoes = (subj) => (MID[subj]?.foes || []).map((f) => (f.boss ? { name: ENEMIES[subj].boss[f.boss][0], icon: ENEMIES[subj].boss[f.boss][1], lec: +f.boss, desc: ENEMIES[subj].boss[f.boss][2], rush: true } : { ...f, icon: MID_ART[f.art] }));
@@ -1343,6 +1343,41 @@ export function makeRPG(ctx) {
         el.onclick = end;
       });
     }
+    // 中間ボスの最後の敵の登場演出（約8秒・タップでスキップ）
+    //  ヤンキー：夜のアパート → 壁ドン2回で画面が揺れる → ラジカセの爆音（音符があふれる） → ドアが開いて登場
+    //  スペック：塔を下から上へ → 最上階で設計図の線がつながる → 光って登場
+    function midShow(F) {
+      return new Promise((done) => {
+        const el = document.createElement('div');
+        el.className = `rp-midshow ms-${F.entry}`;
+        const ya = F.entry === 'yankee';
+        el.innerHTML = ya
+          ? `<div class="ms-moon"></div><div class="ms-apt">${Array.from({ length: 12 }, (_, i) => `<i class="${i === 5 ? 'on' : ''}"></i>`).join('')}</div><div class="ms-zzz">Zzz…</div>
+             <div class="ms-don d1">ドンッ!!</div><div class="ms-don d2">ドンッ!!</div>
+             <div class="ms-notes">${Array.from({ length: 18 }, (_, i) => `<b style="left:${(i * 37) % 96}%;animation-delay:${(i % 6) * 0.12}s">${'♪♫♬'[i % 3]}</b>`).join('')}</div>
+             <div class="ms-door"><i></i><i></i></div>`
+          : `<div class="ms-tower">${Array.from({ length: 8 }, (_, i) => `<div class="fl"><span>${8 - i}F</span></div>`).join('')}</div>
+             <svg class="ms-plan" viewBox="0 0 200 200"><g fill="none" stroke="#93c5fd" stroke-width="2"><path class="ln" d="M40 150 L70 90 L100 60 L130 90 L160 150 Z"/><path class="ln" d="M70 90 L40 60 M130 90 L160 60 M100 60 L100 30"/><path class="ln" d="M80 120 h40 M85 135 h30"/><circle class="ln" cx="100" cy="100" r="64"/></g></svg>`;
+        el.innerHTML += `<div class="ms-boss">${F.icon}</div><div class="ms-nm"><small>${ya ? '夜行列車のトラブル ・ 最後の敵' : '設計図の塔 ・ 最上階の主'}</small><b>${esc(F.name)}</b></div><button class="gt-skip">スキップ ▶</button>`;
+        (document.getElementById('hk-ov') || document.body).appendChild(el);
+        const ts = []; let fin = false; const at = (ms, fn) => ts.push(setTimeout(fn, ms));
+        const end = () => { if (fin) return; fin = true; ts.forEach(clearTimeout); el.classList.add('out'); setTimeout(() => { el.remove(); done(); }, 300); };
+        if (ya) {
+          at(1300, () => { el.classList.add('don1'); bgm.sfx('boom'); });
+          at(2300, () => { el.classList.add('don2'); bgm.sfx('boom'); });
+          at(3300, () => { el.classList.add('radio'); bgm.sfx('charge'); });
+          at(5400, () => { el.classList.add('door'); bgm.sfx('gah'); });
+          at(5900, () => { el.classList.add('reveal'); bgm.sfx('pose'); });
+        } else {
+          bgm.sfx('charge');
+          at(3000, () => { el.classList.add('top'); bgm.sfx('skill'); });
+          at(5000, () => { el.classList.add('flash'); bgm.sfx('boom'); });
+          at(5400, () => { el.classList.add('reveal'); bgm.sfx('pose'); });
+        }
+        at(8200, end);
+        el.onclick = end;
+      });
+    }
     // 合体演出：倒した5人が集まって光り、巨大な戦士になる（タップでスキップ）
     function gattaiShow(F) {
       return new Promise((done) => {
@@ -1384,6 +1419,7 @@ export function makeRPG(ctx) {
           }
           if (!st.active.includes(st.fi)) st.fi = st.active[0];
           if (comers.some((i) => foes[i].gattai)) { gattaiShow(foes[comers[0]]).then(() => { if (st.over) return; layout(); hsay('gattai'); nextQuestion(); }); return; }
+          if (comers.some((i) => foes[i].entry)) { midShow(foes[comers[0]]).then(() => { if (st.over) return; layout(); hsay('mid'); nextQuestion(); }); return; }
           layout();
           if (comers.length) { pop(comers.some((i) => foes[i].gattai) ? '合体！' : isLast ? `第${comers[0] + 1}形態！` : isMid ? 'つぎの敵！' : waveTxt(), 'info'); if (isLast) { const fl = document.querySelector('.rp-field'); if (fl) fl.classList.add('nuke'); bgm.sfx('boom'); } if (comers.some((i) => foes[i].gattai)) hsay('gattai'); else if (comers.some((i) => foes[i].rare)) hsay('rare'); }
           nextQuestion();

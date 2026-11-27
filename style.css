@@ -1586,3 +1586,60 @@ body.rp-night.rp-day {
 .ls-biker.reveal .ls-fire { opacity: 1; animation: lsFl .25s infinite alternate; }
 @keyframes lsFl { to { transform: translateX(-50%) scaleY(1.2); } }
 .rp-zlisten { display: flex; flex-direction: column; align-items: center; gap: 6px; } .rp-zlisten small { opacity: .75; font-size: 12px; font-weight: 700; }
+
+/* ---------- 中間ボスの登場演出（ヤンキー・スペック） ---------- */
+.rp-midshow { position: fixed; inset: 0; z-index: 200; overflow: hidden; cursor: pointer; animation: gtIn .3s; }
+.rp-midshow.out { animation: gtOut .3s forwards; }
+.rp-midshow > * { pointer-events: none; }
+.rp-midshow .gt-skip { pointer-events: auto; }
+.ms-boss { position: absolute; left: 50%; top: 42%; width: 190px; transform: translate(-50%, -50%) scale(0); z-index: 3; }
+.ms-boss svg { width: 100%; height: auto; display: block; }
+.ms-nm { position: absolute; left: 0; right: 0; top: calc(42% + 112px); text-align: center; color: #fff; opacity: 0; z-index: 3; }
+.ms-nm small { display: block; font-size: 12px; letter-spacing: .15em; color: #fde68a; }
+.ms-nm b { display: inline-block; margin-top: 4px; padding: 6px 18px; font-size: 24px; font-weight: 900; background: linear-gradient(90deg, transparent, #7f1d1d 15%, #7f1d1d 85%, transparent); }
+.rp-midshow.reveal .ms-boss { animation: lsIn .8s cubic-bezier(.2, 1.5, .4, 1) forwards; }
+.rp-midshow.reveal .ms-nm { animation: lsNm .5s .4s ease-out forwards; }
+/* ヤンキー：夜のアパート */
+.ms-yankee { background: linear-gradient(#0b1026, #1e1b4b); }
+.ms-moon { position: absolute; right: 14%; top: 8%; width: 54px; height: 54px; border-radius: 50%; background: #fef9c3; box-shadow: 0 0 30px #fef08a; }
+.ms-apt { position: absolute; left: 50%; bottom: 0; width: 280px; height: 62%; transform: translateX(-50%); background: #334155; border: 3px solid #0f172a; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding: 22px; box-sizing: border-box; }
+.ms-apt i { background: #1e293b; border: 2px solid #0f172a; }
+.ms-apt i.on { background: #fde047; box-shadow: 0 0 16px #facc15; }
+.ms-zzz { position: absolute; left: 22%; top: 30%; color: #c7d2fe; font-size: 22px; font-weight: 800; animation: zz 1.2s ease-in-out infinite alternate; }
+@keyframes zz { to { transform: translateY(-8px); opacity: .5; } }
+.ms-don { position: absolute; left: 0; right: 0; text-align: center; font-size: 56px; font-weight: 900; color: #f43f5e; -webkit-text-stroke: 2px #fff; opacity: 0; transform: scale(2); }
+.ms-don.d1 { top: 20%; } .ms-don.d2 { top: 34%; transform: scale(2) rotate(-8deg); }
+.don1 .ms-don.d1, .don2 .ms-don.d2 { animation: don .5s cubic-bezier(.2, 1.6, .4, 1) forwards; }
+@keyframes don { to { opacity: 1; transform: scale(1) rotate(var(--r, 0deg)); } }
+.don1, .don2 { animation: gtQuake .45s; }
+.don1 .ms-zzz { display: none; }
+.ms-notes { position: absolute; inset: 0; opacity: 0; }
+.radio .ms-notes { opacity: 1; }
+.ms-notes b { position: absolute; bottom: -40px; font-size: 34px; color: #f472b6; text-shadow: 0 0 10px #f472b6; animation: note 1.4s linear infinite; }
+.ms-notes b:nth-child(3n) { color: #38bdf8; text-shadow: 0 0 10px #38bdf8; } .ms-notes b:nth-child(3n+1) { color: #facc15; text-shadow: 0 0 10px #facc15; }
+@keyframes note { to { transform: translateY(-110vh) rotate(30deg); } }
+.radio .ms-apt { animation: gtQuake .3s infinite; }
+.radio .ms-don { opacity: 0 !important; transition: opacity .3s; }
+.ms-door { position: absolute; left: 50%; top: 42%; width: 150px; height: 210px; transform: translate(-50%, -50%); display: flex; opacity: 0; z-index: 2; }
+.ms-door i { flex: 1; background: linear-gradient(90deg, #92400e, #b45309); border: 3px solid #451a03; }
+.door .ms-door { opacity: 1; }
+.door .ms-door i:first-child { animation: dL .6s .2s ease-in forwards; transform-origin: left; }
+.door .ms-door i:last-child { animation: dR .6s .2s ease-in forwards; transform-origin: right; }
+@keyframes dL { to { transform: perspective(300px) rotateY(80deg); } }
+@keyframes dR { to { transform: perspective(300px) rotateY(-80deg); } }
+.reveal .ms-door { background: radial-gradient(#fef08a, transparent 70%); }
+/* スペック：設計図の塔 */
+.ms-spec { background: linear-gradient(#1e1b4b, #312e81); }
+.ms-tower { position: absolute; left: 50%; bottom: 0; width: 200px; transform: translateX(-50%); animation: climb 3s ease-in-out forwards; }
+.ms-tower .fl { height: 120px; border: 3px solid #c4b5fd; border-bottom: 0; background: repeating-linear-gradient(90deg, rgba(196, 181, 253, .15) 0 20px, transparent 20px 40px); position: relative; }
+.ms-tower .fl span { position: absolute; right: 8px; bottom: 6px; color: #e9d5ff; font-weight: 900; }
+@keyframes climb { from { transform: translateX(-50%) translateY(0); } to { transform: translateX(-50%) translateY(820px); } }
+.ms-plan { position: absolute; left: 50%; top: 42%; width: 260px; transform: translate(-50%, -50%); opacity: 0; }
+.top .ms-plan { opacity: 1; background: repeating-linear-gradient(0deg, rgba(147, 197, 253, .15) 0 1px, transparent 1px 20px), repeating-linear-gradient(90deg, rgba(147, 197, 253, .15) 0 1px, transparent 1px 20px); border-radius: 50%; }
+.ms-plan .ln { stroke-dasharray: 420; stroke-dashoffset: 420; }
+.top .ms-plan .ln { animation: draw 1.8s ease-out forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.ms-spec.flash::after { content: ''; position: absolute; inset: 0; background: #fff; animation: fla .6s forwards; }
+@keyframes fla { to { opacity: 0; } }
+.reveal .ms-plan { opacity: .35; }
+.top .ms-tower { opacity: .25; transition: opacity .6s; }
