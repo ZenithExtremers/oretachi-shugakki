@@ -243,32 +243,55 @@ ${eyes(57, '#0ea5e9')}
 
 // ===== ガチャ限定の★★★★（v4.11.0）：シナプス（秋学期）・エティモロジー（TOEIC）・ドア・イン・ザ・フェイス（免許） =====
 Object.assign(CHAR_ART, {
-  // シナプス：2つの神経細胞がつながる場所。光の粒（神経伝達物質）がとびかう
+  // シナプス：2つの神経細胞がつながる場所。左の軸索の先から光の粒（神経伝達物質）が飛び、右の受け手が光る
   synapse: wrap4('synapse', '#fbcfe8', '#7e22ce', `
-<g stroke="#f0abfc" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"><path d="M10 30 Q30 40 34 52 M8 70 Q24 66 34 60 M20 100 Q30 84 38 72"/><path d="M110 36 Q92 44 86 56 M112 82 Q96 76 86 68 M100 108 Q90 92 82 76"/></g>
-<circle cx="38" cy="62" r="16" fill="#c084fc" stroke="${OL}" stroke-width="2.5"/><circle cx="38" cy="62" r="7" fill="#7e22ce"/>
-<path d="M52 60 Q60 56 64 60" stroke="#e9d5ff" stroke-width="6" fill="none" stroke-linecap="round"/>
-<path d="M70 50 q12 -4 14 10 q2 14 -14 12 z" fill="#f0abfc" stroke="${OL}" stroke-width="2.5"/>
-<g fill="#fde047">${[[60, 50], [64, 66], [58, 58], [66, 56], [62, 72]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6"/>`).join('')}</g>
-<g fill="#fff" opacity=".9"><circle cx="24" cy="40" r="2"/><circle cx="96" cy="94" r="2"/><circle cx="92" cy="30" r="1.6"/></g>`),
+<g fill="none" stroke-linecap="round">
+<path d="M-4 22 Q14 30 22 44 M-6 54 Q10 52 22 56 M2 96 Q12 80 24 70" stroke="#e879f9" stroke-width="4" opacity=".55"/>
+<path d="M8 28 l-6 -8 M12 34 l-10 2 M6 88 l-8 4 M10 84 l-4 10" stroke="#e879f9" stroke-width="2.5" opacity=".55"/>
+<path d="M124 20 Q104 30 98 46 M126 64 Q112 60 100 62 M118 108 Q106 92 98 78" stroke="#f0abfc" stroke-width="4" opacity=".55"/>
+<path d="M114 26 l6 -10 M110 34 l12 0 M114 98 l10 4" stroke="#f0abfc" stroke-width="2.5" opacity=".55"/></g>
+<circle cx="26" cy="58" r="17" fill="#a855f7" stroke="${OL}" stroke-width="3"/><circle cx="26" cy="58" r="7" fill="#581c87" stroke="${OL}" stroke-width="1.5"/><circle cx="23" cy="55" r="2" fill="#e9d5ff"/>
+<path d="M42 58 Q48 54 52 58" stroke="${OL}" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M42 58 Q48 54 52 58" stroke="#c084fc" stroke-width="7" fill="none" stroke-linecap="round"/>
+<path d="M52 44 q14 -2 14 14 q0 16 -14 14 q-6 -14 0 -28z" fill="#d8b4fe" stroke="${OL}" stroke-width="3"/>
+<g fill="#fde047" stroke="#a16207" stroke-width=".8"><circle cx="56" cy="52" r="3"/><circle cx="58" cy="62" r="3"/><circle cx="55" cy="68" r="2.4"/></g>
+<path d="M98 34 q-18 2 -24 24 q6 22 24 24 q8 -24 0 -48z" fill="#f0abfc" stroke="${OL}" stroke-width="3"/>
+<g stroke="${OL}" stroke-width="1.5" fill="#86efac"><path d="M76 46 h5 v4 h-5z M74 56 h5 v4 h-5z M74 66 h5 v4 h-5z M77 76 h5 v4 h-5z"/></g>
+<g fill="#fef08a">${[[68, 48], [70, 58], [66, 64], [71, 70], [64, 54], [69, 78]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.4"/>`).join('')}</g>
+<g fill="#fff" opacity=".9">${[[66, 44], [64, 74], [72, 52]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.2"/>`).join('')}</g>
+<path d="M30 24 l-6 10 h8 l-6 10" stroke="#fde047" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M98 92 l-5 8 h7 l-5 8" stroke="#fde047" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="100" cy="58" r="22" fill="#fde047" opacity=".18"/>
+<g fill="#fff" opacity=".8"><circle cx="40" cy="96" r="1.8"/><circle cx="88" cy="20" r="1.6"/><circle cx="16" cy="88" r="1.4"/></g>`),
 
-  // エティモロジー：語源の大樹。根っこがアルファベットになっている
-  etymo: wrap4('etymo', '#d9f99d', '#166534', `
-<circle cx="60" cy="44" r="30" fill="#22c55e" stroke="${OL}" stroke-width="2.5"/><circle cx="40" cy="52" r="16" fill="#16a34a" stroke="${OL}" stroke-width="2"/><circle cx="82" cy="50" r="17" fill="#16a34a" stroke="${OL}" stroke-width="2"/>
-<g fill="#facc15"><circle cx="52" cy="34" r="3"/><circle cx="72" cy="40" r="3"/><circle cx="60" cy="54" r="3"/></g>
-<path d="M54 70 h12 l2 26 h-16 z" fill="#92400e" stroke="${OL}" stroke-width="2.5"/>
-<path d="M54 94 Q40 100 26 112 M60 96 V116 M66 94 Q80 100 94 112" stroke="#92400e" stroke-width="5" fill="none" stroke-linecap="round"/>
-<g font-family="serif" font-weight="900" font-size="12" fill="#fef3c7" stroke="${OL}" stroke-width=".6"><text x="18" y="112">re</text><text x="54" y="112">port</text><text x="88" y="112">er</text></g>`),
+  // エティモロジー：語源の大樹。葉のあいだに語の実がなり、光る根っこが語根（port・spect・dict）になっている
+  etymo: wrap4('etymo', '#ecfccb', '#166534', `
+<circle cx="60" cy="40" r="34" fill="#fef9c3" opacity=".25"/>
+<path d="M6 92 Q60 80 114 92 V120 H6z" fill="#3f2a14"/>
+<g stroke="${OL}" stroke-width="2.5"><circle cx="34" cy="46" r="17" fill="#15803d"/><circle cx="86" cy="46" r="17" fill="#15803d"/><circle cx="46" cy="30" r="18" fill="#16a34a"/><circle cx="74" cy="30" r="18" fill="#16a34a"/><circle cx="60" cy="44" r="20" fill="#22c55e"/></g>
+<g fill="none" stroke="#86efac" stroke-width="2" stroke-linecap="round" opacity=".8"><path d="M40 22 q6 -4 12 -2 M68 20 q6 -3 12 1 M52 40 q6 -4 14 -1"/></g>
+<g font-family="serif" font-weight="900" font-size="7.5" text-anchor="middle" stroke="${OL}" stroke-width=".4">${[[36, 44, 'trans'], [84, 44, 'im'], [60, 52, 'ex'], [48, 26, 'pro'], [74, 28, 'in']].map(([x, y, t]) => `<circle cx="${x}" cy="${y - 2.5}" r="7" fill="url(#gd-etymo)"/><text x="${x}" y="${y}" fill="#422006">${t}</text>`).join('')}</g>
+<path d="M53 62 Q56 76 50 92 H70 Q64 76 67 62z" fill="#92400e" stroke="${OL}" stroke-width="2.5"/>
+<path d="M58 68 q2 8 -1 16 M63 70 q1 6 0 12" stroke="#78350f" stroke-width="1.5" fill="none"/>
+<g fill="none" stroke-linecap="round"><path d="M52 92 Q40 96 30 104 M60 92 V104 M68 92 Q80 96 90 104" stroke="${OL}" stroke-width="7"/><path d="M52 92 Q40 96 30 104 M60 92 V104 M68 92 Q80 96 90 104" stroke="#a3e635" stroke-width="4"/></g>
+<g font-family="serif" font-weight="900" font-size="10" text-anchor="middle" fill="#fef08a" stroke="${OL}" stroke-width="3" paint-order="stroke"><text x="37" y="102">port</text><text x="60" y="113">spect</text><text x="83" y="102">dict</text></g>
+<g fill="#fef08a"><circle cx="14" cy="30" r="1.8"/><circle cx="106" cy="24" r="1.8"/><circle cx="100" cy="72" r="1.4"/><circle cx="18" cy="74" r="1.4"/></g>`),
 
-  // ドア・イン・ザ・フェイス：目の前でバタンと閉まる大きな扉と、すき間からさしこむ光
-  ditf: wrap4('ditf', '#fde68a', '#92400e', `
-<rect x="24" y="16" width="72" height="100" fill="#451a03" stroke="${OL}" stroke-width="3"/>
-<rect x="30" y="22" width="60" height="94" fill="#b45309" stroke="${OL}" stroke-width="2.5"/>
-<rect x="36" y="30" width="48" height="34" rx="3" fill="#d97706" stroke="${OL}" stroke-width="2"/><rect x="36" y="72" width="48" height="36" rx="3" fill="#d97706" stroke="${OL}" stroke-width="2"/>
-<circle cx="80" cy="68" r="4.5" fill="url(#gd-ditf)" stroke="${OL}" stroke-width="1.5"/>
-<path d="M90 22 L112 6 L112 120 L90 116 Z" fill="#fef08a" opacity=".55"/>
-<g stroke="#f43f5e" stroke-width="4" stroke-linecap="round"><path d="M10 40 l10 6 M8 60 h12 M10 80 l10 -6"/></g>
-<text x="60" y="54" text-anchor="middle" font-size="15" font-weight="900" fill="#fef3c7" stroke="${OL}" stroke-width=".8">NO!</text>`),
+  // ドア・イン・ザ・フェイス：大きな顔のまん中に扉。いったんバタンと閉めて（NO!）、すき間を少しだけ開けて光がもれる
+  ditf: wrap4('ditf', '#fef3c7', '#b45309', `
+<g stroke="#fde047" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M60 2 v10 M14 18 l7 7 M106 18 l-7 7 M2 62 h10 M108 62 h10"/></g>
+<circle cx="60" cy="64" r="44" fill="#fde7d4" stroke="${OL}" stroke-width="3"/>
+<path d="M20 50 q2 -36 40 -36 q38 0 40 36 q-10 -14 -22 -16 l-4 8 l-6 -9 l-8 9 l-6 -9 l-6 9 l-6 -8 q-14 4 -22 16z" fill="#7c2d12" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M30 44 l14 4 M90 44 l-14 4" stroke="${OL}" stroke-width="3" stroke-linecap="round"/>
+<g><ellipse cx="38" cy="54" rx="5" ry="6" fill="#fff" stroke="${OL}" stroke-width="2"/><circle cx="39" cy="55" r="3" fill="${OL}"/><ellipse cx="82" cy="54" rx="5" ry="6" fill="#fff" stroke="${OL}" stroke-width="2"/><circle cx="81" cy="55" r="3" fill="${OL}"/></g>
+<ellipse cx="28" cy="70" rx="6" ry="3.5" fill="#fca5a5" opacity=".7"/><ellipse cx="92" cy="70" rx="6" ry="3.5" fill="#fca5a5" opacity=".7"/>
+<rect x="43" y="58" width="34" height="50" rx="2" fill="#451a03" stroke="${OL}" stroke-width="2.5"/>
+<path d="M47 62 h26 v46 h-26z" fill="#fef08a"/>
+<path d="M47 62 L66 66 L66 104 L47 108z" fill="#b45309" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M51 70 l11 2 v12 l-11 -1z M51 89 l11 0 v11 l-11 2z" fill="#d97706" stroke="${OL}" stroke-width="1.5"/>
+<circle cx="62" cy="86" r="2.4" fill="url(#gd-ditf)" stroke="${OL}" stroke-width="1"/>
+<path d="M68 64 L100 76 L100 112 L68 106z" fill="#fef08a" opacity=".45"/>
+<g transform="translate(92 26) rotate(10)"><path d="M-16 -9 h32 v16 h-20 l-6 6 v-6 h-6z" fill="#fff" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/><text x="0" y="3" text-anchor="middle" font-size="10" font-weight="900" fill="#e11d48">NO!</text></g>
+<g stroke="#f43f5e" stroke-width="3" stroke-linecap="round"><path d="M4 92 l9 -4 M2 104 h10"/></g>`),
 });
 
 // ===== ラスボス（TOEIC リスニング・リーディング・免許）と、改心した白バイ隊長。すべてオリジナル =====
