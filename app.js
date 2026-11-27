@@ -423,7 +423,9 @@ function speakLine(t, sp) {
     const u = new SpeechSynthesisUtterance(t); u.lang = 'en-US'; u.rate = window.__sayRate || 0.95; // ラスボス「雑音モード」では速く
     const v = pickVoice(sp); if (v) u.voice = v;
     if (!v || !(sp[0] === 'M' ? MALE : FEMALE).test(v.name)) u.pitch = sp[0] === 'M' ? 0.8 : 1.2; // 男女の声がないときは高さで分ける
-    u.onend = u.onerror = () => res();
+    let fin = false; const end = () => { if (!fin) { fin = true; res(); } };
+    u.onend = u.onerror = end;
+    setTimeout(end, 2500 + t.length * 120 / (u.rate || 1)); // 終わりの合図が来ない端末でも先へ進む
     speechSynthesis.speak(u);
   });
 }
@@ -760,7 +762,8 @@ const HIMA_API = {
     return HIMA_API.renderQ(s, q);
   },
   // 冒険のリスニングの雑魚戦：英語を読み上げる
-  say(text, sp = 'W') { if (!window.speechSynthesis) return; stopSay(); speakLine(text, sp); },
+  say(text, sp = 'W') { if (!window.speechSynthesis) return Promise.resolve(); stopSay(); const tok = SAY.tok; return Promise.race([speakLine(text, sp), new Promise((r) => setTimeout(r, 2000 + text.length * 150))]).then(() => tok); }, // 読み上げが終わったら resolve（終わりの合図が来ない端末のため時間でも打ち切る）
+  sayGroup(gid, btn) { const g = groupById(gid); return g ? sayGroup(g, btn) : Promise.resolve(); },
   // 冒険から「復讐に送る」
   sendRevenge(qid) { if (qid) sendRevenge(qid); },
   async lessonDigest(sid, lec) { return lessonDigest(await getSubject(sid), lec); },

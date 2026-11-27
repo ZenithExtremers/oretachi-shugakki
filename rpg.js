@@ -1164,13 +1164,29 @@ export function makeRPG(ctx) {
         const sayText = c[3] || c[0];
         qEl.innerHTML = `${listenW ? `<div class="rp-zq rp-zlisten"><button class="rp-btn" id="rp-sayw">🔊 もう一度きく</button><small>音声を聞いて、意味を選ぶ</small></div>` : `<div class="rp-zq${q.length > 14 ? ' long' : ''}">${esc(q)}</div>`}
           <div class="hk-choices word rp-zc">${opts.map((o, i) => `<button data-c="${i}">${esc(o)}</button>`).join('')}</div>`;
-        if (listenW) { const sw = document.getElementById('rp-sayw'); sw.onclick = () => api.say?.(sayText); api.say?.(sayText); }
+        if (listenW) { const sw = document.getElementById('rp-sayw'); sw.onclick = () => api.say?.(sayText); st.q.sayText = sayText; }
       }
       document.querySelector('#hk-obody')?.scrollTo({ top: 0 });
       st.busy = false;
-      st.left = Math.round((st.q.real ? 90 * D.time : st.limit) * (F.short ? 0.6 : 1) * st.cut) + st.bonusT + (st.q.listen ? 4 : 0); // 聞きとりは読み上げのぶん+4秒 // 魔導書は短く、ノイズキングはまちがえると減る
+      st.left = Math.round((st.q.real ? 90 * D.time : st.limit) * (F.short ? 0.6 : 1) * st.cut) + st.bonusT; // 魔導書は短く、ノイズキングはまちがえると減る
       st.total = st.left;
       clearInterval(st.timer);
+      // 音声の問題：自動で流して、流れ終わってから制限時間を動かす（聞いているあいだに答えてもよい）
+      const sayBtn = qEl.querySelector('[data-act=say]');
+      if (st.q.sayText || sayBtn) {
+        const a0 = st.ans || 0;
+        const tb0 = document.getElementById('rp-time'); if (tb0) { tb0.style.width = '100%'; tb0.classList.remove('hurry'); }
+        info('🔊 音声を聞いてね');
+        const play = () => (st.q.sayText ? api.say?.(st.q.sayText) : api.sayGroup?.(sayBtn.dataset.g, sayBtn)) || Promise.resolve();
+        let played;
+        if (R().sound === 'silent') { // サイレント（授業中など）は自動で流さない：🔊 を押して聞き終わってから時間が動く
+          info('🔊 を押して音声を聞いてね');
+          const b = st.q.sayText ? document.getElementById('rp-sayw') : sayBtn;
+          played = new Promise((res) => b.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); play().then(res); }, { capture: true, once: true }));
+        } else played = play();
+        await Promise.race([played, wait(90000)]);
+        if (st.over || (st.ans || 0) !== a0 || !document.getElementById('rp-q')) return; // もう答えた・バトルが終わった
+      }
       const tick = () => {
         if (document.hidden) return; // 別のアプリにいるあいだは止める
         st.left -= 0.1;
@@ -1201,7 +1217,7 @@ export function makeRPG(ctx) {
     function anim(el, cls) { if (!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
     async function answer(i, btn) {
       if (st.busy || st.over) return;
-      st.busy = true; clearInterval(st.timer); st.turns++;
+      st.busy = true; clearInterval(st.timer); st.turns++; st.ans = (st.ans || 0) + 1;
       const ok = i === st.q.answer;
       const F = foes[st.fi];
       if (isRev) {
