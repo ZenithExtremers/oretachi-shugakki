@@ -742,3 +742,248 @@ ${evil(62, 8, '#fff').replace(/60 -/g, '80 -').replace(/60 \+/g, '80 +')}<path d
 <g fill="none" stroke-width="5">${[[24, 64], [44, 56], [64, 64], [84, 56], [100, 64]].map(([x, y], i) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="7" stroke="url(#eg-goldjoin)" transform="rotate(${i % 2 ? 20 : -20} ${x} ${y})"/>`).join('')}</g>
 <circle cx="60" cy="92" r="13" fill="url(#eg-goldjoin)" stroke="${OL}" stroke-width="2.5"/>${smug(90, 5)}`),
 });
+
+// UML のクラスの箱（3段）
+const umlBox = (x, y, w, h, c = '#fef3c7') => `<g stroke="${OL}" stroke-width="2.5"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${c}"/><path d="M${x} ${y + h * 0.33} h${w} M${x} ${y + h * 0.66} h${w}"/></g>`;
+const stick = (x, y, c = '#fff') => `<g stroke="${OL}" stroke-width="3" stroke-linecap="round" fill="${c}"><circle cx="${x}" cy="${y}" r="7"/><path d="M${x} ${y + 7} v16 M${x - 10} ${y + 13} h20 M${x} ${y + 23} l-8 12 M${x} ${y + 23} l8 12" fill="none"/></g>`;
+
+Object.assign(ENEMY_ART, {
+  // ----- 設計：どの回にも出る雑魚 -----
+  'sd|仕様あいまい': sprite('vague', `
+<path d="M16 76 q8 -30 30 -26 q8 -20 28 -14 q20 -8 28 12 q14 6 8 26 q-4 16 -22 14 h-54 q-22 0 -18 -12z" fill="#e2e8f0" fill-opacity=".85" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+${evil(64, 12, '#cbd5e1')}<path d="M50 80 q5 -4 10 0 t10 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'sd|分析中毒': sprite('analysis', `
+${blob('#c084fc', 68, 30, 30)}<g fill="none" stroke="${OL}" stroke-width="2.2"><path d="M44 62 m-5 0 a5 5 0 1 1 5 5 a2.5 2.5 0 1 1 -2 -3"/><path d="M76 62 m-5 0 a5 5 0 1 1 5 5 a2.5 2.5 0 1 1 -2 -3"/></g>
+<path d="M52 82 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/><g stroke="#fde047" stroke-width="2.5" stroke-linecap="round"><path d="M36 30 l-6 -8 M60 24 v-10 M84 30 l6 -8"/></g>`),
+  'sd|スパゲッティ': sprite('spaghetti', `
+<ellipse cx="60" cy="96" rx="40" ry="10" fill="#f8fafc" stroke="${OL}" stroke-width="3"/>
+<g fill="none" stroke-linecap="round"><path d="M28 90 q10 -40 30 -20 t20 -20 t14 30 M34 92 q20 -60 40 -10 M50 94 q-10 -40 20 -40 q20 4 10 36" stroke="${OL}" stroke-width="7"/><path d="M28 90 q10 -40 30 -20 t20 -20 t14 30 M34 92 q20 -60 40 -10 M50 94 q-10 -40 20 -40 q20 4 10 36" stroke="#fcd34d" stroke-width="4"/></g>
+<g fill="#ef4444" stroke="${OL}" stroke-width="2"><circle cx="46" cy="66" r="8"/><circle cx="74" cy="66" r="8"/></g><circle cx="46" cy="66" r="2" fill="#fff"/><circle cx="74" cy="66" r="2" fill="#fff"/>`),
+  'sd|多重度ミス': sprite('multip', `
+${umlBox(14, 44, 32, 40)}${umlBox(74, 44, 32, 40)}<path d="M46 64 h28" stroke="${OL}" stroke-width="3"/>
+<path d="M50 40 l20 20 M70 40 l-20 20" stroke="#ef4444" stroke-width="6" stroke-linecap="round"/>${evil(94, 0, '#fff').replace(/cx="60"/g, 'cx="30"').replace(/cx="60"/g, 'cx="90"')}`),
+  'sd|矢印まちがい': sprite('arrowx', `
+<path d="M20 90 l50 -50" stroke="${OL}" stroke-width="10" stroke-linecap="round"/><path d="M20 90 l50 -50" stroke="#f97316" stroke-width="6" stroke-linecap="round"/><path d="M62 30 l22 0 l0 22z" fill="#fff" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M60 96 h40 l-10 -8 M100 96 l-10 8" stroke="${OL}" stroke-width="3" fill="none" stroke-dasharray="5 3"/>${evil(64, 8, '#fff').replace(/60 -/g, '40 -').replace(/60 \+/g, '40 +')}`),
+  'sd|図なし魔': sprite('nodiagram', `
+<path d="M34 24 h42 l12 12 v72 h-54z" fill="#f8fafc" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M76 24 v12 h12" fill="#e2e8f0" stroke="${OL}" stroke-width="2.5"/>
+${evil(60, 10, '#a855f7')}${grin(76, 10)}<path d="M24 30 l-6 -8 M96 30 l6 -8" stroke="#a855f7" stroke-width="3" stroke-linecap="round"/>`),
+  // ----- 設計：回ごとの雑魚 -----
+  'sd|カプセルやぶり': sprite('capbreak', `
+<g transform="rotate(-20 60 60)"><path d="M26 60 a16 16 0 0 1 16 -16 h18 v32 h-18 a16 16 0 0 1 -16 -16z" fill="#f87171" stroke="${OL}" stroke-width="3"/><path d="M64 44 h14 a16 16 0 0 1 0 32 h-14" fill="#fff" stroke="${OL}" stroke-width="3" transform="translate(10 -6) rotate(14 70 60)"/></g>
+<g fill="#fde047" stroke="${OL}" stroke-width="1.2"><circle cx="66" cy="76" r="3"/><circle cx="74" cy="84" r="2.5"/><circle cx="62" cy="88" r="2"/></g>${evil(58, 9, '#fff').replace(/60 -/g, '42 -').replace(/60 \+/g, '42 +')}`),
+  'sd|UML迷子': sprite('umllost', `${umlBox(30, 40, 60, 56, '#ddd6fe')}
+<path d="M30 96 l-6 12 M90 96 l6 12" stroke="${OL}" stroke-width="4" stroke-linecap="round"/>${evil(52, 12, '#fde047')}<path d="M52 82 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'sd|アクター迷子': sprite('actorlost', `<g transform="translate(-60 -40) scale(2)">${stick(60, 38, '#fde68a')}</g><circle cx="55" cy="36" r="2" fill="${OL}"/><circle cx="65" cy="36" r="2" fill="${OL}"/><path d="M54 30 l4 1.5 M66 30 l-4 1.5" stroke="${OL}" stroke-width="2"/><text x="84" y="34" font-size="18" font-weight="900" fill="#fde047">?</text>`),
+  'sd|include逆向き': sprite('includerev', `
+<ellipse cx="34" cy="64" rx="24" ry="14" fill="#fef3c7" stroke="${OL}" stroke-width="3"/><ellipse cx="88" cy="64" rx="24" ry="14" fill="#fef3c7" stroke="${OL}" stroke-width="3"/>
+<path d="M64 64 h-6 M58 64 l8 -6 M58 64 l8 6" stroke="${OL}" stroke-width="2.5" stroke-dasharray="0" fill="none"/>${evil(64, 0, '#fff').replace(/cx="60"/g, 'cx="34"')}
+<g transform="translate(34 62)"><circle cx="-6" r="2" fill="${OL}"/><circle cx="6" r="2" fill="${OL}"/></g><g transform="translate(88 62)"><circle cx="-6" r="2" fill="${OL}"/><circle cx="6" r="2" fill="${OL}"/></g>`),
+  'sd|リンク切れ': sprite('linkbreak', `
+<g stroke="${OL}" stroke-width="3"><rect x="10" y="50" width="34" height="26" rx="4" fill="#bae6fd"/><rect x="76" y="50" width="34" height="26" rx="4" fill="#bae6fd"/></g>
+<path d="M44 63 h10 M66 63 h10" stroke="${OL}" stroke-width="4"/><path d="M54 56 l6 8 l-4 4 l6 8" stroke="#fde047" stroke-width="3" fill="none"/>
+<g transform="translate(27 62)"><circle cx="-5" r="2" fill="${OL}"/><circle cx="5" r="2" fill="${OL}"/></g><g transform="translate(93 62)"><circle cx="-5" r="2" fill="${OL}"/><circle cx="5" r="2" fill="${OL}"/></g>`),
+  'sd|下線わすれ': sprite('nounder', `
+<rect x="20" y="44" width="80" height="34" rx="6" fill="#fef3c7" stroke="${OL}" stroke-width="3"/><path d="M30 86 h60" stroke="#94a3b8" stroke-width="4" stroke-dasharray="6 6"/>${evil(60, 14, '#fff')}`),
+  'sd|可視性まちがい': sprite('visib', `
+<ellipse cx="60" cy="64" rx="40" ry="26" fill="#fff" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="64" r="16" fill="#8b5cf6" stroke="${OL}" stroke-width="2.5"/><circle cx="60" cy="64" r="7" fill="${OL}"/><circle cx="64" cy="60" r="3" fill="#fff"/>
+<path d="M20 50 q40 -20 80 0" stroke="${OL}" stroke-width="3" fill="none"/><path d="M28 44 l-4 -8 M44 38 l-2 -8 M76 38 l2 -8 M92 44 l4 -8" stroke="${OL}" stroke-width="2.5" stroke-linecap="round"/>`),
+  'sd|ひし形まちがい': sprite('diamondx', `
+<path d="M60 18 l32 40 l-32 40 l-32 -40z" fill="#fff" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M60 58 l32 0 l-32 40 l-32 -40z" fill="#1f2937"/>
+${evil(52, 10, '#a855f7')}<path d="M52 72 q8 -4 16 0" stroke="#fff" stroke-width="2" fill="none"/>`),
+  'sd|ライフライン切れ': sprite('lifeline', `
+<rect x="36" y="20" width="48" height="24" rx="3" fill="#fef3c7" stroke="${OL}" stroke-width="3"/><path d="M60 44 v24 M60 84 v24" stroke="${OL}" stroke-width="3" stroke-dasharray="6 4"/><path d="M54 70 l6 6 l-4 4 l6 6" stroke="#ef4444" stroke-width="3" fill="none"/>
+${evil(32, 10, '#fff')}`),
+  'sd|非同期まちがい': sprite('async', `
+<path d="M20 44 h76 v50 h-76z" fill="#fef3c7" stroke="${OL}" stroke-width="3"/><path d="M20 44 l38 28 l38 -28" fill="none" stroke="${OL}" stroke-width="2.5"/>
+<g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M100 54 h14 M104 66 h12 M100 78 h14"/></g>${evil(76, 14, '#a855f7')}`),
+  'sd|番号ずれ': sprite('numoff', `
+<g stroke="${OL}" stroke-width="2.5" font-weight="900" font-size="14">${[[28, 60, '2', '#fda4af'], [60, 44, '1', '#93c5fd'], [92, 66, '3', '#86efac']].map(([x, y, t, c]) => `<circle cx="${x}" cy="${y}" r="16" fill="${c}"/><text x="${x}" y="${y + 5}" text-anchor="middle" fill="${OL}" stroke="none">${t}</text>`).join('')}</g>
+<g fill="${OL}"><circle cx="22" cy="52" r="1.8"/><circle cx="34" cy="52" r="1.8"/><circle cx="86" cy="58" r="1.8"/><circle cx="98" cy="58" r="1.8"/></g>`),
+  'sd|コネクタ迷子': sprite('connector', `
+<path d="M14 64 q12 -20 24 0 t24 0 t24 0 t24 0" stroke="${OL}" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M14 64 q12 -20 24 0 t24 0 t24 0 t24 0" stroke="#a78bfa" stroke-width="5" fill="none" stroke-linecap="round"/>
+<circle cx="106" cy="64" r="10" fill="#a78bfa" stroke="${OL}" stroke-width="2.5"/><circle cx="103" cy="62" r="1.8" fill="${OL}"/><circle cx="109" cy="62" r="1.8" fill="${OL}"/>`),
+  'sd|出口なし': sprite('noexit', `
+<rect x="20" y="40" width="80" height="50" rx="20" fill="#fca5a5" stroke="${OL}" stroke-width="3"/><g stroke="#f59e0b" stroke-width="6"><path d="M14 98 l92 -6" /></g><path d="M14 98 l92 -6" stroke="${OL}" stroke-width="1.5" stroke-dasharray="8 8"/>
+${evil(62, 14, '#fff')}<path d="M50 78 q10 -5 20 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'sd|ガード無視': sprite('guard', `
+<path d="M60 18 l28 12 v26 q0 26 -28 40 q-28 -14 -28 -40 v-26z" fill="#ef4444" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M60 26 l20 8 v20 q0 18 -20 30 q-20 -12 -20 -30 v-20z" fill="#fca5a5"/>
+${evil(52, 9, '#fff')}<path d="M50 68 q10 -5 20 0" stroke="${OL}" stroke-width="2.2" fill="none"/>`),
+  // ----- 設計：回のボス -----
+  'sd|設計図なし魔王': sprite('nodemon', `
+<path d="M16 112 q4 -40 44 -46 q40 6 44 46z" fill="#3f6212" stroke="${OL}" stroke-width="3"/>
+<g stroke="#a3e635" stroke-width="2" fill="none" opacity=".7"><path d="M30 100 l14 -12 M70 96 l18 -10"/></g>
+<path d="M28 34 l-8 -20 l18 10 M92 34 l8 -20 l-18 10" fill="#365314" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M34 54 q0 -28 26 -28 q26 0 26 28 q0 22 -26 26 q-26 -4 -26 -26z" fill="#84cc16" stroke="${OL}" stroke-width="3"/>
+<path d="M44 66 l6 4 M74 66 l-6 4" stroke="#365314" stroke-width="2"/>${evil(50, 10, '#fde047')}${grin(62, 11)}
+<g transform="translate(96 76) rotate(16)"><rect x="-10" y="-14" width="20" height="26" fill="#bfdbfe" stroke="${OL}" stroke-width="2"/><path d="M-10 -14 l20 26 M10 -14 l-20 26" stroke="#ef4444" stroke-width="3"/></g>`, { aura: '#84cc16' }),
+  'sd|境界こわし': sprite('boundary', `
+<rect x="14" y="26" width="92" height="78" rx="4" fill="none" stroke="#38bdf8" stroke-width="4" stroke-dasharray="14 10"/><g fill="#38bdf8" stroke="${OL}" stroke-width="1.5"><path d="M100 30 l10 -6 l-2 8z"/><path d="M12 96 l-6 8 l10 -2z"/></g>
+<path d="M30 56 l-6 -18 l14 10 M90 56 l6 -18 l-14 10" fill="#b91c1c" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M30 74 q0 -30 30 -30 q30 0 30 30 q0 26 -30 30 q-30 -4 -30 -30z" fill="#ef4444" stroke="${OL}" stroke-width="3"/>${evil(70, 11, '#fde047')}${grin(84, 12)}
+<path d="M14 80 l-6 -4 M106 60 l8 -2" stroke="${OL}" stroke-width="5" stroke-linecap="round"/>`, { aura: '#38bdf8' }),
+  'sd|スナップショット幽霊': sprite('snapghost', `
+<rect x="16" y="28" width="88" height="70" rx="6" fill="#1e293b" stroke="${OL}" stroke-width="3"/><circle cx="92" cy="38" r="4" fill="#fde047"/>
+<path d="M36 92 q-4 -46 24 -50 q28 4 24 50 l-6 -6 l-6 8 l-6 -8 l-6 8 l-6 -8 l-6 8z" fill="#e0e7ff" fill-opacity=".85" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+${evil(62, 9, '#818cf8')}${grin(74, 7)}<path d="M8 20 l14 0 M8 20 l0 14 M112 20 l-14 0 M112 20 l0 14 M8 106 l14 0 M112 106 l-14 0" stroke="#fff" stroke-width="3"/>`, { aura: '#818cf8' }),
+  'sd|継承地獄': sprite('inherithell', `
+<g stroke="${OL}" stroke-width="2">${[[60, 18], [40, 40], [80, 40], [30, 62], [50, 62], [70, 62], [90, 62]].map(([x, y]) => `<rect x="${x - 9}" y="${y - 6}" width="18" height="12" rx="2" fill="#fca5a5"/>`).join('')}<path d="M60 24 l-20 10 M60 24 l20 10 M40 46 l-10 10 M40 46 l10 10 M80 46 l-10 10 M80 46 l10 10" fill="none"/></g>
+<path d="M24 112 q-2 -30 36 -36 q38 6 36 36z" fill="#b91c1c" stroke="${OL}" stroke-width="3"/>
+<path d="M34 96 q0 -18 26 -20 q26 2 26 20" fill="#ef4444" stroke="${OL}" stroke-width="3"/>${evil(90, 10, '#fde047')}${grin(100, 10)}
+<path d="M30 82 l-10 -10 M90 82 l10 -10" stroke="#f97316" stroke-width="5" stroke-linecap="round"/>`, { aura: '#ef4444' }),
+  'sd|待ちぼうけデッドロック': sprite('deadlock', `
+<g fill="none" stroke-width="7"><path d="M38 52 v-12 a14 14 0 0 1 28 0 v12" stroke="${OL}"/><path d="M58 52 v-12 a14 14 0 0 1 28 0 v12" stroke="${OL}" transform="translate(0 6)"/></g>
+<g fill="none" stroke-width="4"><path d="M38 52 v-12 a14 14 0 0 1 28 0 v12" stroke="#94a3b8"/><path d="M58 52 v-12 a14 14 0 0 1 28 0 v12" stroke="#cbd5e1" transform="translate(0 6)"/></g>
+<rect x="24" y="52" width="72" height="54" rx="8" fill="#475569" stroke="${OL}" stroke-width="3"/>${evil(76, 14, '#f87171')}${grin(92, 12)}
+<g font-weight="900" fill="#cbd5e1"><text x="96" y="30" font-size="12">z</text><text x="106" y="20" font-size="9">z</text></g>`, { aura: '#64748b' }),
+  'sd|番号ちがい伝令': sprite('wrongmsgr', `
+<path d="M24 64 q-10 -18 4 -30 q4 12 14 14 M96 64 q10 -18 -4 -30 q-4 12 -14 14" fill="#16a34a" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M36 108 q-6 -40 24 -50 q30 10 24 50z" fill="#22c55e" stroke="${OL}" stroke-width="3"/>
+<circle cx="60" cy="44" r="22" fill="#22c55e" stroke="${OL}" stroke-width="3"/><path d="M50 18 l4 -10 l4 10 l4 -10 l4 10" fill="#ef4444" stroke="${OL}" stroke-width="2"/>
+${evil(40, 9, '#fde047')}<path d="M56 50 l14 4 l-14 4z" fill="#f59e0b" stroke="${OL}" stroke-width="2"/>
+<g transform="translate(60 86)"><rect x="-14" y="-10" width="28" height="20" fill="#fef3c7" stroke="${OL}" stroke-width="2"/><text y="5" text-anchor="middle" font-size="12" font-weight="900" fill="#ef4444">3?</text></g>`, { aura: '#22c55e' }),
+  'sd|出口なしステート': sprite('nostate', `
+<rect x="24" y="22" width="72" height="88" rx="6" fill="#78350f" stroke="${OL}" stroke-width="3"/><rect x="32" y="30" width="56" height="74" rx="4" fill="#92400e" stroke="${OL}" stroke-width="2.5"/>
+<g stroke="#475569" stroke-width="4"><path d="M28 52 h64 M28 82 h64"/></g><circle cx="80" cy="70" r="4" fill="#fbbf24" stroke="${OL}" stroke-width="1.5"/>
+${evil(62, 12, '#fde047')}${grin(74, 10)}`, { aura: '#f97316' }),
+  'sd|ゴールデンパターン': gold('goldpat', `
+<path d="M60 18 l12 22 h24 l-18 16 l8 24 l-26 -14 l-26 14 l8 -24 l-18 -16 h24z" fill="url(#eg-goldpat)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+${umlBox(44, 80, 32, 26, '#fde68a')}${smug(54, 7)}`),
+});
+
+Object.assign(ENEMY_ART, {
+  // ----- 設計：ステージ専用（第1回） -----
+  'sd|クラス迷子': sprite('classlost', `
+<path d="M18 46 l42 -22 l42 22z" fill="#e2e8f0" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><g stroke="${OL}" stroke-width="2.5" fill="#f1f5f9"><rect x="26" y="50" width="10" height="44"/><rect x="84" y="50" width="10" height="44"/></g><rect x="18" y="94" width="84" height="10" fill="#cbd5e1" stroke="${OL}" stroke-width="3"/>
+${evil(68, 11, '#a855f7')}<path d="M52 82 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'sd|継承しすぎ': sprite('toomuchinh', `
+<path d="M60 108 v-44" stroke="#78350f" stroke-width="8"/><g fill="#4ade80" stroke="${OL}" stroke-width="2.5">${[[60, 32, 22], [36, 50, 16], [84, 50, 16], [24, 72, 11], [46, 72, 11], [74, 72, 11], [96, 72, 11]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')}</g>
+${evil(32, 9, '#fde047')}<path d="M54 42 q6 -3 12 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'sd|金のオブジェクト': gold('goldobj', `
+<rect x="28" y="52" width="64" height="52" rx="4" fill="url(#eg-goldobj)" stroke="${OL}" stroke-width="3"/><rect x="22" y="40" width="76" height="14" rx="3" fill="#ef4444" stroke="${OL}" stroke-width="3"/><path d="M60 40 v64" stroke="#ef4444" stroke-width="8"/>
+<path d="M60 40 q-16 -18 -22 -4 q8 6 22 4 q16 -18 22 -4 q-8 6 -22 4" fill="#ef4444" stroke="${OL}" stroke-width="2"/>${smug(76, 14)}`),
+  'sd|ポリモ迷子': sprite('polylost', `
+<path d="M24 34 q36 -14 72 0 q4 40 -36 64 q-40 -24 -36 -64z" fill="#fff" stroke="${OL}" stroke-width="3"/><path d="M60 26 v70" stroke="${OL}" stroke-width="2"/><path d="M60 30 q34 -10 36 4 q2 36 -36 58z" fill="#a855f7"/>
+<path d="M36 48 l12 4 M84 48 l-12 4" stroke="${OL}" stroke-width="2.5"/><path d="M38 56 q5 -4 10 0 M72 56 q5 4 10 0" stroke="${OL}" stroke-width="2.5" fill="none"/>
+<path d="M40 74 q8 6 16 0 M66 76 q8 -6 16 0" stroke="${OL}" stroke-width="2.5" fill="none"/>`),
+  'sd|図の種類迷子': sprite('diagkinds', `
+<g stroke="${OL}" stroke-width="2.5">${umlBox(16, 30, 26, 32, '#bfdbfe')}<ellipse cx="86" cy="44" rx="18" ry="10" fill="#fef3c7"/><rect x="18" y="78" width="26" height="16" rx="8" fill="#bbf7d0"/><path d="M72 76 v30 M98 76 v30" stroke-dasharray="4 3"/></g>
+<circle cx="60" cy="64" r="16" fill="#f472b6" stroke="${OL}" stroke-width="3"/><g fill="none" stroke="${OL}" stroke-width="2"><path d="M50 62 m-3 0 a3 3 0 1 1 3 3"/><path d="M70 62 m-3 0 a3 3 0 1 1 3 3"/></g>`),
+  'sd|金のUML': gold('golduml', `
+<path d="M22 100 l76 -76 l8 8 l-76 76z" fill="url(#eg-golduml)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><g stroke="#92400e" stroke-width="2">${[0, 1, 2, 3, 4, 5].map((i) => `<path d="M${32 + i * 11} ${90 - i * 11} l4 4"/>`).join('')}</g>
+<circle cx="60" cy="62" r="14" fill="url(#eg-golduml)" stroke="${OL}" stroke-width="2.5"/>${smug(60, 5)}`),
+  // ----- 第2回 -----
+  'sd|境界はみ出し': sprite('bndover', `
+<rect x="16" y="26" width="70" height="80" rx="4" fill="#e0f2fe" fill-opacity=".4" stroke="#38bdf8" stroke-width="3"/>
+<ellipse cx="80" cy="66" rx="26" ry="16" fill="#fef3c7" stroke="${OL}" stroke-width="3"/>${evil(64, 9, '#a855f7').replace(/60 -/g, '80 -').replace(/60 \+/g, '80 +')}`),
+  'sd|関連線迷子': sprite('assoclost', `
+<path d="M20 80 q20 -40 40 -10 t40 -20" stroke="${OL}" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M20 80 q20 -40 40 -10 t40 -20" stroke="#cbd5e1" stroke-width="6" fill="none" stroke-linecap="round"/>
+<circle cx="100" cy="50" r="12" fill="#cbd5e1" stroke="${OL}" stroke-width="2.5"/><circle cx="96" cy="48" r="1.8" fill="${OL}"/><circle cx="104" cy="48" r="1.8" fill="${OL}"/><path d="M96 55 q4 -2 8 0" stroke="${OL}" stroke-width="1.6" fill="none"/>`),
+  'sd|金のユースケース': gold('golduc', `
+<circle cx="60" cy="62" r="38" fill="url(#eg-golduc)" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="62" r="26" fill="#fff7ed" stroke="${OL}" stroke-width="2"/><circle cx="60" cy="62" r="14" fill="url(#eg-golduc)" stroke="${OL}" stroke-width="2"/>${smug(60, 4)}`),
+  'sd|extend逆向き': sprite('extendrev', `
+<path d="M90 40 q10 40 -30 50 l-20 0" stroke="${OL}" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M90 40 q10 40 -30 50 l-20 0" stroke="#f97316" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="10 5"/>
+<path d="M30 90 l14 -10 v20z" fill="#f97316" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="90" cy="38" r="16" fill="#f97316" stroke="${OL}" stroke-width="3"/>${evil(36, 6, '#fff').replace(/60 -/g, '90 -').replace(/60 \+/g, '90 +')}`),
+  'sd|アクター分身': sprite('actortwins', `<g transform="translate(-44 -30) scale(1.7)">${stick(46, 40, '#fde68a')}</g><g transform="translate(-34 -30) scale(1.7)" opacity=".55">${stick(66, 40, '#fde68a')}</g>`),
+  'sd|金のシナリオ': gold('goldscen', `
+<path d="M60 36 q-20 -10 -40 0 v62 q20 -10 40 0 q20 -10 40 0 v-62 q-20 -10 -40 0z" fill="url(#eg-goldscen)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M60 36 v62" stroke="${OL}" stroke-width="2.5"/>
+<g stroke="#92400e" stroke-width="2"><path d="M28 74 h24 M28 82 h20 M68 74 h24 M68 82 h18"/></g>${smug(56, 18)}`),
+  // ----- 第4回 -----
+  'sd|スナップ迷子': sprite('snaplost', `
+<rect x="20" y="40" width="80" height="58" rx="8" fill="#334155" stroke="${OL}" stroke-width="3"/><rect x="40" y="30" width="24" height="12" rx="3" fill="#475569" stroke="${OL}" stroke-width="2.5"/>
+<circle cx="60" cy="69" r="20" fill="#0ea5e9" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="69" r="11" fill="#0c4a6e"/><circle cx="64" cy="65" r="3.5" fill="#fff"/>
+<path d="M28 52 l10 3 M92 52 l-10 3" stroke="#fde047" stroke-width="2.5" stroke-linecap="round"/>`),
+  'sd|属性値わすれ': sprite('noattr', `
+<path d="M22 50 l20 -18 h52 v52 h-52z" fill="#fde68a" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><circle cx="36" cy="58" r="5" fill="#fff" stroke="${OL}" stroke-width="2"/>
+<path d="M58 70 h28" stroke="#94a3b8" stroke-width="3" stroke-dasharray="4 3"/>${evil(52, 10, '#fff').replace(/60 -/g, '70 -').replace(/60 \+/g, '70 +')}`),
+  'sd|金のスナップショット': gold('goldsnap', `
+<rect x="20" y="30" width="80" height="70" rx="4" fill="url(#eg-goldsnap)" stroke="${OL}" stroke-width="3"/><rect x="30" y="40" width="60" height="44" fill="#e0f2fe" stroke="${OL}" stroke-width="2"/>
+<path d="M30 84 l18 -18 l12 10 l14 -16 l16 24z" fill="#4ade80" stroke="${OL}" stroke-width="1.5"/>${smug(58, 9)}`),
+  'sd|リンク迷子': sprite('knot', `
+<path d="M20 70 q20 -40 40 -10 q20 30 40 -10 q-6 30 -30 22 q-30 -10 -50 -2z" fill="none" stroke="${OL}" stroke-width="10" stroke-linecap="round"/><path d="M20 70 q20 -40 40 -10 q20 30 40 -10 q-6 30 -30 22 q-30 -10 -50 -2z" fill="none" stroke="#fb923c" stroke-width="6" stroke-linecap="round"/>
+<circle cx="60" cy="62" r="12" fill="#fb923c" stroke="${OL}" stroke-width="2.5"/><circle cx="56" cy="61" r="1.8" fill="${OL}"/><circle cx="64" cy="61" r="1.8" fill="${OL}"/>`),
+  'sd|インスタンス迷子': sprite('instlost', `
+<g fill="none" stroke-width="6" stroke-linecap="round"><path d="M44 20 q32 20 0 40 t0 40" stroke="${OL}"/><path d="M76 20 q-32 20 0 40 t0 40" stroke="${OL}"/></g>
+<g fill="none" stroke-width="3.5" stroke-linecap="round"><path d="M44 20 q32 20 0 40 t0 40" stroke="#22d3ee"/><path d="M76 20 q-32 20 0 40 t0 40" stroke="#f472b6"/></g>
+<g stroke="${OL}" stroke-width="2"><path d="M50 32 h20 M48 50 h24 M48 72 h24 M50 90 h20"/></g>${evil(60, 18, '#fde047')}`),
+  'sd|金のインスタンス': gold('goldinst', `
+<path d="M60 22 l10 24 l26 4 l-20 18 l6 26 l-22 -14 l-22 14 l6 -26 l-20 -18 l26 -4z" fill="url(#eg-goldinst)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>${smug(58, 7)}`),
+  // ----- 第5回 -----
+  'sd|多重度ずれ': sprite('multioff', `
+${umlBox(14, 44, 32, 40, '#bfdbfe')}${umlBox(74, 44, 32, 40, '#fbcfe8')}<path d="M46 64 h28" stroke="${OL}" stroke-width="3"/>
+<g font-weight="900" font-size="12" fill="#fde047" stroke="${OL}" stroke-width=".6"><text x="50" y="58">*</text><text x="64" y="58">1</text></g>
+<g fill="${OL}"><circle cx="25" cy="73" r="1.8"/><circle cx="35" cy="73" r="1.8"/><circle cx="85" cy="73" r="1.8"/><circle cx="95" cy="73" r="1.8"/></g>`),
+  'sd|属性迷子': sprite('attrlost', `
+<path d="M34 24 h52 v80 h-52z" fill="#fef9c3" stroke="${OL}" stroke-width="3"/><path d="M34 24 h52 v14 h-52z" fill="#fde047" stroke="${OL}" stroke-width="3"/><g stroke="#cbd5e1" stroke-width="2"><path d="M40 92 h40 M40 98 h30"/></g>
+${evil(62, 10, '#a855f7')}<path d="M52 78 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'sd|金のクラス図': gold('goldclassd', `
+${umlBox(36, 24, 48, 34, '#fde68a')}${umlBox(14, 76, 36, 30, '#fde68a')}${umlBox(70, 76, 36, 30, '#fde68a')}
+<path d="M32 76 v-8 h56 v8 M60 68 v-10" stroke="${OL}" stroke-width="2.5" fill="none"/><path d="M60 58 l-6 8 h12z" fill="#fff" stroke="${OL}" stroke-width="2"/>${smug(40, 9)}`),
+  'sd|汎化逆向き': sprite('genrev', `
+<path d="M60 102 l-34 -56 h68z" fill="#fff" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M60 46 v-26" stroke="${OL}" stroke-width="3"/>
+${evil(62, 11, '#a855f7')}<path d="M52 78 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'sd|依存迷子': sprite('dependlost', `
+<path d="M16 88 l70 -50" stroke="${OL}" stroke-width="4" stroke-dasharray="8 6"/><path d="M76 34 l12 2 l-4 12" stroke="${OL}" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<circle cx="36" cy="74" r="18" fill="#c4b5fd" stroke="${OL}" stroke-width="3"/>${evil(72, 6, '#fff').replace(/60 -/g, '36 -').replace(/60 \+/g, '36 +')}`),
+  'sd|金の継承': gold('goldinh', `
+<path d="M24 74 l8 -40 l16 18 l12 -26 l12 26 l16 -18 l8 40z" fill="url(#eg-goldinh)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><rect x="24" y="74" width="72" height="14" rx="3" fill="url(#eg-goldinh)" stroke="${OL}" stroke-width="3"/>
+<g fill="#ef4444" stroke="${OL}" stroke-width="1.5"><circle cx="60" cy="81" r="4"/><circle cx="40" cy="81" r="3"/><circle cx="80" cy="81" r="3"/></g>${smug(56, 10)}`),
+  // ----- 第6回 -----
+  'sd|返事待ち': sprite('waitreply', `
+<rect x="30" y="18" width="60" height="10" rx="3" fill="#7c3aed" stroke="${OL}" stroke-width="2.5"/><rect x="30" y="94" width="60" height="10" rx="3" fill="#7c3aed" stroke="${OL}" stroke-width="2.5"/>
+<path d="M36 28 h48 q0 22 -16 33 q16 11 16 33 h-48 q0 -22 16 -33 q-16 -11 -16 -33z" fill="#ede9fe" fill-opacity=".85" stroke="${OL}" stroke-width="3"/><path d="M42 94 q4 -12 18 -14 q14 2 18 14z" fill="#a78bfa"/>
+${evil(44, 8, '#fff')}<path d="M54 52 h12" stroke="${OL}" stroke-width="2"/>`),
+  'sd|活性区間迷子': sprite('activation', `
+<path d="M60 18 v92" stroke="${OL}" stroke-width="3" stroke-dasharray="6 4"/><rect x="48" y="36" width="24" height="56" rx="3" fill="#fbbf24" stroke="${OL}" stroke-width="3"/>
+${evil(56, 5, '#fff')}<path d="M55 66 q5 -3 10 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'sd|金のシーケンス': gold('goldseq', `
+<g stroke="${OL}" stroke-width="2.5"><rect x="16" y="22" width="30" height="16" rx="3" fill="url(#eg-goldseq)"/><rect x="74" y="22" width="30" height="16" rx="3" fill="url(#eg-goldseq)"/></g>
+<path d="M31 38 v70 M89 38 v70" stroke="${OL}" stroke-width="2.5" stroke-dasharray="5 4"/><path d="M31 58 h52 l-8 -5 M83 58 l-8 5 M89 82 h-52 l8 -5 M37 82 l8 5" stroke="url(#eg-goldseq)" stroke-width="4" fill="none" stroke-linecap="round"/>
+<circle cx="60" cy="70" r="9" fill="url(#eg-goldseq)" stroke="${OL}" stroke-width="2"/>${smug(68, 4)}`),
+  'sd|alt迷子': sprite('altlost', `
+<rect x="18" y="26" width="84" height="76" rx="4" fill="#ecfccb" fill-opacity=".9" stroke="${OL}" stroke-width="3"/><path d="M18 64 h84" stroke="${OL}" stroke-width="2.5" stroke-dasharray="6 4"/><path d="M18 26 h26 v10 l-6 6 h-20z" fill="#84cc16" stroke="${OL}" stroke-width="2.5"/>
+${evil(52, 12, '#a855f7')}<path d="M52 84 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'sd|生成迷子': sprite('createlost', `
+<path d="M30 74 q0 -40 30 -46 q30 6 30 46z" fill="#fef3c7" stroke="${OL}" stroke-width="3"/><path d="M28 74 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8" fill="none" stroke="${OL}" stroke-width="2.5"/>
+<path d="M30 74 q0 34 30 34 q30 0 30 -34z" fill="#fef3c7" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="74" r="14" fill="#fde047" stroke="${OL}" stroke-width="2.5"/>
+<circle cx="56" cy="72" r="1.8" fill="${OL}"/><circle cx="64" cy="72" r="1.8" fill="${OL}"/><path d="M57 78 l3 3 l3 -3z" fill="#fb923c"/>`),
+  'sd|金の複合フラグメント': gold('goldfrag', `
+<g stroke="${OL}" stroke-width="2.5">${[[22, 36], [62, 36], [22, 70], [62, 70]].map(([x, y]) => `<rect x="${x}" y="${y}" width="36" height="30" rx="2" fill="url(#eg-goldfrag)"/>`).join('')}</g>${smug(64, 12)}`),
+  // ----- 第7回 -----
+  'sd|番号迷子': sprite('numlost', `
+<g stroke="${OL}" stroke-width="2.5" font-weight="900" font-size="12">${[[30, 74, '1.1', '#a5b4fc'], [60, 52, '1', '#fde047'], [90, 74, '2', '#a5b4fc']].map(([x, y, t, c]) => `<circle cx="${x}" cy="${y}" r="16" fill="${c}"/><text x="${x}" y="${y + 4}" text-anchor="middle" fill="${OL}" stroke="none">${t}</text>`).join('')}</g>
+<g fill="${OL}"><circle cx="54" cy="44" r="1.8"/><circle cx="66" cy="44" r="1.8"/></g>`),
+  'sd|リンク切れ伝令': sprite('msgrlost', `
+<path d="M30 60 q-14 -16 -6 -30 q10 4 14 16 M90 60 q14 -16 6 -30 q-10 4 -14 16" fill="#94a3b8" stroke="${OL}" stroke-width="2.5"/>
+<ellipse cx="60" cy="70" rx="30" ry="26" fill="#cbd5e1" stroke="${OL}" stroke-width="3"/><path d="M52 66 l16 4 l-16 4z" fill="#f59e0b" stroke="${OL}" stroke-width="2"/>
+<path d="M40 58 l8 3 M80 58 l-8 3" stroke="${OL}" stroke-width="2.4"/><circle cx="44" cy="64" r="2" fill="${OL}"/><circle cx="76" cy="64" r="2" fill="${OL}"/>`),
+  'sd|金のコミュニケーション': gold('goldcomm', `
+<path d="M60 96 v-30" stroke="${OL}" stroke-width="5"/><path d="M36 56 a24 24 0 0 1 48 0z" fill="url(#eg-goldcomm)" stroke="${OL}" stroke-width="3"/><path d="M28 104 h64" stroke="${OL}" stroke-width="5" stroke-linecap="round"/>
+<g fill="none" stroke="#fde68a" stroke-width="3" stroke-linecap="round"><path d="M88 34 q8 6 0 14 M96 28 q14 12 0 26"/></g>${smug(46, 9)}`),
+  'sd|並び順迷子': sprite('orderlost', `
+<g stroke="${OL}" stroke-width="2.5">${[[24, 60, '#fda4af'], [48, 40, '#fde047'], [72, 74, '#86efac'], [96, 50, '#93c5fd']].map(([x, y, c]) => `<rect x="${x - 10}" y="${y - 10}" width="20" height="20" rx="4" fill="${c}"/>`).join('')}</g>
+<path d="M24 60 L48 40 L72 74 L96 50" stroke="#fff" stroke-width="2" fill="none" stroke-dasharray="3 3"/><g fill="${OL}"><circle cx="44" cy="38" r="1.6"/><circle cx="52" cy="38" r="1.6"/></g>`),
+  'sd|反復迷子': sprite('repeatlost', `
+<path d="M30 60 a30 30 0 1 1 8 20" fill="none" stroke="${OL}" stroke-width="12" stroke-linecap="round"/><path d="M30 60 a30 30 0 1 1 8 20" fill="none" stroke="#2dd4bf" stroke-width="7" stroke-linecap="round"/><path d="M26 74 l12 8 l4 -14z" fill="#2dd4bf" stroke="${OL}" stroke-width="2"/>
+<circle cx="60" cy="60" r="14" fill="#2dd4bf" stroke="${OL}" stroke-width="2.5"/>${evil(60, 5, '#fff')}`),
+  'sd|金の伝令': gold('goldmsgr', `
+<path d="M60 70 q-30 -30 -46 -14 q16 6 22 18 q-10 2 -14 10 q20 4 38 -14 q18 18 38 14 q-4 -8 -14 -10 q6 -12 22 -18 q-16 -16 -46 14z" fill="url(#eg-goldmsgr)" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="60" cy="56" r="14" fill="url(#eg-goldmsgr)" stroke="${OL}" stroke-width="2.5"/>${smug(54, 5)}<path d="M72 58 l8 2 l-8 3z" fill="#f59e0b" stroke="${OL}" stroke-width="1.5"/>`),
+  // ----- 第8回 -----
+  'sd|トリガ迷子': sprite('triggerlost', `
+<path d="M66 14 l-30 50 h22 l-8 44 l36 -58 h-22z" fill="#facc15" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>${evil(52, 7, '#fff')}<path d="M54 64 q5 -3 10 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'sd|entry迷子': sprite('entrylost', `
+<rect x="30" y="24" width="60" height="84" rx="4" fill="#0ea5e9" stroke="${OL}" stroke-width="3"/><path d="M38 32 h44 v76 h-44z" fill="#0c4a6e"/><path d="M38 32 l30 6 v76 l-30 -6z" fill="#38bdf8" stroke="${OL}" stroke-width="2.5"/>
+${evil(60, 0, '#fff').replace(/cx="60"/g, 'cx="52"')}<g transform="translate(52 62)"><circle cx="-5" r="2" fill="${OL}"/><circle cx="5" r="2" fill="${OL}"/><path d="M-4 8 q4 -3 8 0" stroke="${OL}" stroke-width="1.8" fill="none"/></g>`),
+  'sd|金のステート': gold('goldstate', `
+<rect x="20" y="34" width="80" height="54" rx="22" fill="url(#eg-goldstate)" stroke="${OL}" stroke-width="3"/><path d="M20 60 h80" stroke="#92400e" stroke-width="2"/>${smug(46, 14)}`),
+  'sd|遷移ループ': sprite('selfloop', `
+<rect x="24" y="56" width="72" height="44" rx="18" fill="#f472b6" stroke="${OL}" stroke-width="3"/>
+<path d="M44 56 q-6 -36 16 -36 q22 0 16 36" fill="none" stroke="${OL}" stroke-width="4"/><path d="M70 50 l6 8 l6 -8" fill="none" stroke="${OL}" stroke-width="4"/>${evil(76, 12, '#fff')}`),
+  'sd|終了状態迷子': sprite('finallost', `
+<circle cx="60" cy="64" r="36" fill="#fff" stroke="${OL}" stroke-width="4"/><circle cx="60" cy="64" r="26" fill="#1f2937" stroke="${OL}" stroke-width="3"/>
+${evil(60, 9, '#f87171')}<path d="M52 76 q8 -4 16 0" stroke="#f87171" stroke-width="2" fill="none"/>`),
+  'sd|金の遷移': gold('goldtrans', `
+<path d="M14 92 q46 -80 92 0" fill="none" stroke="#f87171" stroke-width="6"/><path d="M22 92 q38 -66 76 0" fill="none" stroke="#fde047" stroke-width="6"/><path d="M30 92 q30 -52 60 0" fill="none" stroke="#4ade80" stroke-width="6"/><path d="M38 92 q22 -38 44 0" fill="none" stroke="#60a5fa" stroke-width="6"/>
+<circle cx="60" cy="78" r="14" fill="url(#eg-goldtrans)" stroke="${OL}" stroke-width="2.5"/>${smug(76, 5)}`),
+});
