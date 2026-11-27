@@ -334,7 +334,7 @@ function startField(s) {
   const f = fieldSel;
   let gs = s.groups.filter((g) => f.match(g)).sort((a, b) => a.lecture - b.lecture);
   if (f.shuffle) gs = shuffle(gs);
-  const labels = [...f.lectures].sort().map((k) => `第${k}回`).concat([...f.types].map((k) => s.types[k]));
+  const labels = [...f.lectures].sort().map((k) => { const ln = s.lectures[k] || ''; return /^第/.test(ln) ? ln.match(/^(第\S+?回)/)[1] : ln || `第${k}回`; }) // TOEIC・免許は「Part 6」「仮免 信号・標識」のように分野名で.concat([...f.types].map((k) => s.types[k]));
   makeSession(s, { kind: 'field', mode: 'practice', title: '分野別' + (labels.length ? '：' + labels.join('・') : ''), groups: gs.map((g) => ({ g, qs: g.questions })) });
 }
 

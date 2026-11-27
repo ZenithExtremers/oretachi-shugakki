@@ -67,7 +67,7 @@ const SKILL_DESC = {
   dmg: (k) => `攻撃力×${k.pow} のダメージ`,
   time: (k) => `制限時間を${k.pow}秒のばす`,
   guard: (k) => `次の${k.pow}回、受けるダメージ半分`,
-  hint: () => '不正解の選択肢を2つ消す',
+  hint: () => '不正解の選択肢を2つ消す（選択肢は2つ以上残す。○× の問題では制限時間+10秒）',
   healguard: () => 'パーティのHPを全回復し、次の2回受けるダメージ半分',
   charge: () => 'ほかの仲間全員のスキルのゲージを1たまった状態にする（正解1回ぶん）',
   native: (k) => `${k.pow}ターンのあいだ、TOEIC の章で正解したときの攻撃が2倍`,
@@ -1429,9 +1429,12 @@ export function makeRPG(ctx) {
       else if (k.kind === 'inertia') { st.inertia = k.pow; pop('⚙️ 慣性！', 'info'); bgm.sfx('skill'); drawBuffs(); }
       else if (k.kind === 'healguard') { st.hp = st.maxHp; st.guard += 2; pop('全回復＆ガード！', 'heal'); bgm.sfx('heal'); drawHp(); }
       else if (k.kind === 'hint') {
-        const wrong = [...document.querySelectorAll('#rp-q [data-c]')].filter((b) => +b.dataset.c !== st.q.answer && !b.disabled);
-        shuffle(wrong).slice(0, k.pow).forEach((b) => { b.disabled = true; b.classList.add('rp-gone'); });
-        pop('ひらめき！', 'info'); bgm.sfx('skill');
+        const all = [...document.querySelectorAll('#rp-q [data-c]')].filter((b) => !b.disabled);
+        const wrong = all.filter((b) => +b.dataset.c !== st.q.answer);
+        const nDel = Math.min(k.pow, all.length - 2); // 選択肢は最低2つ残す（○× で答えがわからないように）
+        if (nDel > 0) { shuffle(wrong).slice(0, nDel).forEach((b) => { b.disabled = true; b.classList.add('rp-gone'); }); pop('ひらめき！', 'info'); }
+        else { st.bonusT += 10; st.left += 10; st.total += 10; pop('ひらめき！ +10秒', 'info'); } // ○× の問題では制限時間+10秒
+        bgm.sfx('skill');
       }
       if (x.rar === 4) cutIn(x); else toast(`${x.name}「${k.name}」`);
       hsay(x.id === 'hero' ? (k.kind === 'hint' ? 'hint' : k.kind === 'dmg' ? 'shot' : k.kind === 'healguard' ? 'thanks' : k.kind === 'stardust' ? 'stardust' : 'today') : k.kind === 'heal' ? 'heal' : 'skill');
