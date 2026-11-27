@@ -356,3 +356,100 @@ const police = lframe('p', '#e0f2fe', '#1d4ed8', `
 
 export const LAST_ART = { noise, tome, biker, police };
 Object.assign(CHAR_ART, { noiseking: noise, tome, police });
+
+// ===== ガチャの仲間（★〜★★★）のオリジナルイラスト（v4.13〜）。ゆるい子はゆるく、かっこいい子はかっこよく =====
+// ★：パステルの丸に黒い線のふち／★★：銀のふちとやわらかい光／★★★：金のふちと光の線（wrap）
+const wrap1 = (id, c1, c2, body) => `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="rp-art r1">
+<defs><radialGradient id="au-${id}" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></radialGradient><clipPath id="cl-${id}"><circle cx="60" cy="60" r="55"/></clipPath></defs>
+<circle cx="60" cy="60" r="57" fill="url(#au-${id})"/>
+<g clip-path="url(#cl-${id})">${body}</g>
+<circle cx="60" cy="60" r="56" fill="none" stroke="${OL}" stroke-width="2.5"/>
+</svg>`;
+const wrap2 = (id, c1, c2, body) => `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="rp-art r2">
+<defs><radialGradient id="au-${id}" cx="50%" cy="42%" r="58%"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></radialGradient><clipPath id="cl-${id}"><circle cx="60" cy="60" r="54"/></clipPath>
+<linearGradient id="sv-${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8fafc"/><stop offset=".5" stop-color="#94a3b8"/><stop offset="1" stop-color="#e2e8f0"/></linearGradient></defs>
+<circle cx="60" cy="60" r="57" fill="url(#au-${id})"/>
+<g fill="#fff" opacity=".7"><circle cx="20" cy="40" r="1.6"/><circle cx="100" cy="30" r="1.4"/><circle cx="96" cy="84" r="1.8"/></g>
+<g clip-path="url(#cl-${id})">${body}</g>
+<circle cx="60" cy="60" r="56" fill="none" stroke="url(#sv-${id})" stroke-width="4"/><circle cx="60" cy="60" r="58.5" fill="none" stroke="${OL}" stroke-width="1"/>
+</svg>`;
+// ゆるい目（まるい黒目に白い光）
+const cute = (y = 58, dx = 11, r = 4.5) => `<circle cx="${60 - dx}" cy="${y}" r="${r}" fill="${OL}"/><circle cx="${60 + dx}" cy="${y}" r="${r}" fill="${OL}"/><circle cx="${61.5 - dx}" cy="${y - 1.6}" r="${r * 0.38}" fill="#fff"/><circle cx="${61.5 + dx}" cy="${y - 1.6}" r="${r * 0.38}" fill="#fff"/>`;
+const blush = (y = 66, dx = 20) => `<ellipse cx="${60 - dx}" cy="${y}" rx="5.5" ry="3" fill="#fb7185" opacity=".45"/><ellipse cx="${60 + dx}" cy="${y}" rx="5.5" ry="3" fill="#fb7185" opacity=".45"/>`;
+
+Object.assign(CHAR_ART, {
+  // ピヨ（★・ゆるい）：たまごのからから出たばかりのひよこ。頭にちょこんと毛
+  piyo: wrap1('piyo', '#fff7d6', '#fde68a', `
+<path d="M24 120 q0 -18 8 -24 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 q8 6 8 24z" fill="#fffbeb" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<ellipse cx="60" cy="66" rx="30" ry="28" fill="#facc15" stroke="${OL}" stroke-width="3"/>
+<path d="M34 72 q-8 -2 -10 6 q8 4 12 -1z M86 72 q8 -2 10 6 q-8 4 -12 -1z" fill="#eab308" stroke="${OL}" stroke-width="2"/>
+<path d="M58 38 q-4 -10 2 -12 q-1 6 4 8 q2 -6 6 -4 q-6 2 -6 9z" fill="#facc15" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+${cute(60, 11, 4.5)}${blush(70, 19)}
+<path d="M54 68 l6 6 l6 -6 q-6 -3 -12 0z" fill="#fb923c" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>`),
+
+  // デバッグてんとう（★・ゆるい）：赤いこうらのてんとう虫が、虫めがねでバグをさがす
+  debugten: wrap1('debugten', '#dcfce7', '#86efac', `
+<path d="M48 30 q-6 -12 -14 -12 M72 30 q6 -12 14 -12" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="34" cy="18" r="3.5" fill="${OL}"/><circle cx="86" cy="18" r="3.5" fill="${OL}"/>
+<path d="M22 88 q0 -44 38 -44 q38 0 38 44 q-38 14 -76 0z" fill="#ef4444" stroke="${OL}" stroke-width="3"/>
+<path d="M60 46 v48" stroke="${OL}" stroke-width="2.5"/>
+<g fill="${OL}"><circle cx="40" cy="64" r="6"/><circle cx="80" cy="64" r="6"/><circle cx="34" cy="82" r="4.5"/><circle cx="86" cy="82" r="4.5"/><circle cx="50" cy="84" r="4"/><circle cx="70" cy="84" r="4"/></g>
+<path d="M28 62 q6 -14 18 -16" stroke="#fecaca" stroke-width="4" fill="none" stroke-linecap="round"/>
+<ellipse cx="60" cy="42" rx="18" ry="14" fill="#1f2937" stroke="${OL}" stroke-width="2.5"/>
+<circle cx="53" cy="41" r="5" fill="#fff"/><circle cx="67" cy="41" r="5" fill="#fff"/><circle cx="54" cy="42" r="2.6" fill="${OL}"/><circle cx="68" cy="42" r="2.6" fill="${OL}"/><circle cx="55" cy="41" r="1" fill="#fff"/><circle cx="69" cy="41" r="1" fill="#fff"/>
+<path d="M56 49 q4 3 8 0" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+<g transform="translate(88 86) rotate(-30) scale(.85)"><path d="M0 9 v14" stroke="#92400e" stroke-width="5" stroke-linecap="round"/><circle r="11" fill="#e0f2fe" fill-opacity=".8" stroke="${OL}" stroke-width="3"/><path d="M-5 -2 l4 -4 M-1 2 l3 -3" stroke="#fff" stroke-width="2" stroke-linecap="round"/><text y="4" text-anchor="middle" font-size="9" fill="#dc2626" font-weight="900">!</text></g>`),
+
+  // ジョイン・アザラシ（★★・ゆるい）：2ひきのアザラシがヒレで手をつなぐ。首輪に「ON」の札
+  azarashi: wrap2('azarashi', '#bae6fd', '#0284c7', `
+<path d="M0 98 q30 -8 60 0 t60 0 v22 h-120z" fill="#e0f2fe" stroke="${OL}" stroke-width="2"/>
+<g transform="translate(-2 4)"><ellipse cx="40" cy="74" rx="24" ry="22" fill="#cbd5e1" stroke="${OL}" stroke-width="3"/><ellipse cx="40" cy="80" rx="15" ry="12" fill="#f1f5f9"/>
+${'<circle cx="32" cy="66" r="3.4" fill="#1f2937"/><circle cx="48" cy="66" r="3.4" fill="#1f2937"/><circle cx="33" cy="65" r="1.2" fill="#fff"/><circle cx="49" cy="65" r="1.2" fill="#fff"/>'}
+<ellipse cx="40" cy="74" rx="5" ry="3.5" fill="#475569"/><path d="M30 76 h-10 M30 79 h-9 M50 76 h10 M50 79 h9" stroke="#475569" stroke-width="1.2"/>
+<path d="M22 86 q-8 6 -4 12 q6 -2 10 -8z" fill="#94a3b8" stroke="${OL}" stroke-width="2"/></g>
+<g transform="translate(2 8)"><ellipse cx="82" cy="74" rx="20" ry="18" fill="#e2e8f0" stroke="${OL}" stroke-width="3"/><ellipse cx="82" cy="80" rx="12" ry="9" fill="#f8fafc"/>
+<circle cx="75" cy="68" r="3" fill="#1f2937"/><circle cx="89" cy="68" r="3" fill="#1f2937"/><circle cx="76" cy="67" r="1.1" fill="#fff"/><circle cx="90" cy="67" r="1.1" fill="#fff"/>
+<ellipse cx="82" cy="75" rx="4.2" ry="3" fill="#475569"/><path d="M98 84 q8 6 4 12 q-6 -2 -10 -8z" fill="#94a3b8" stroke="${OL}" stroke-width="2"/></g>
+<path d="M54 92 q8 -8 16 -2" stroke="${OL}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M54 92 q8 -8 16 -2" stroke="#94a3b8" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M22 54 q16 8 32 0" stroke="#0ea5e9" stroke-width="4" fill="none"/>
+<g transform="translate(38 62)"><rect x="-10" y="-4" width="20" height="12" rx="3" fill="#fde047" stroke="${OL}" stroke-width="2"/><text y="5.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="${OL}">ON</text></g>
+<path d="M60 30 c-4 -6 -12 -2 -8 4 l8 8 l8 -8 c4 -6 -4 -10 -8 -4z" fill="#f472b6" stroke="${OL}" stroke-width="2"/>`),
+
+  // 再帰ヘビ（★★・かっこいい寄り）：自分の中にもう一度とぐろを巻く、うずまきのヘビ
+  hebi: wrap2('hebi', '#bbf7d0', '#15803d', `
+<path d="M60 104 c-30 0 -40 -20 -40 -34 c0 -22 20 -32 38 -32 c16 0 28 10 28 24 c0 14 -10 22 -22 22 c-10 0 -16 -6 -16 -14 c0 -6 4 -10 10 -10" fill="none" stroke="${OL}" stroke-width="15" stroke-linecap="round"/>
+<path d="M60 104 c-30 0 -40 -20 -40 -34 c0 -22 20 -32 38 -32 c16 0 28 10 28 24 c0 14 -10 22 -22 22 c-10 0 -16 -6 -16 -14 c0 -6 4 -10 10 -10" fill="none" stroke="#22c55e" stroke-width="10" stroke-linecap="round"/>
+<path d="M60 104 c-30 0 -40 -20 -40 -34 c0 -22 20 -32 38 -32 c16 0 28 10 28 24 c0 14 -10 22 -22 22" fill="none" stroke="#bbf7d0" stroke-width="2.5" stroke-dasharray="3 7" stroke-linecap="round"/>
+<g transform="translate(62 60)"><path d="M-8 6 q-2 -14 10 -16 q14 -2 16 10 q2 10 -12 12 q-10 1 -14 -6z" fill="#22c55e" stroke="${OL}" stroke-width="3"/>
+<path d="M-2 -4 l6 2 M14 -4 l-6 3" stroke="${OL}" stroke-width="2.3" stroke-linecap="round"/><path d="M-1 0 q3 -3 6 0 q-3 3 -6 0z M8 0 q3 -3 6 0 q-3 3 -6 0z" fill="#facc15" stroke="${OL}" stroke-width="1"/>
+<path d="M18 4 l8 2 l-3 2 l4 3z" fill="#ef4444" stroke="#7f1d1d" stroke-width="1"/></g>
+<g font-family="monospace" font-weight="900" font-size="9" fill="#14532d"><text x="42" y="22">f(f(f(</text></g>`),
+
+  // デザインパターン鷹（★★★・かっこいい）：白い頭と金のくちばし。翼を広げ、設計図のひし形の紋章をつかむ
+  taka: wrap('taka', '#fef3c7', '#b45309', `
+<path d="M4 70 q20 -30 46 -22 l-6 10 l10 -2 l-4 10 l10 -2z" fill="#78350f" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M116 70 q-20 -30 -46 -22 l6 10 l-10 -2 l4 10 l-10 -2z" fill="#78350f" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<g stroke="#a16207" stroke-width="2" fill="none" opacity=".8"><path d="M12 64 q14 -12 28 -12 M108 64 q-14 -12 -28 -12"/></g>
+<path d="M36 116 q2 -34 24 -38 q22 4 24 38z" fill="#92400e" stroke="${OL}" stroke-width="3"/>
+<path d="M50 84 l4 8 l6 -6 l6 6 l4 -8" stroke="#b45309" stroke-width="2" fill="none"/>
+<path d="M38 56 q0 -26 22 -26 q22 0 22 26 q0 18 -22 22 q-22 -4 -22 -22z" fill="#f8fafc" stroke="${OL}" stroke-width="3"/>
+<path d="M40 46 l14 6 M80 46 l-14 6" stroke="${OL}" stroke-width="3.5" stroke-linecap="round"/>
+<path d="M44 54 q6 -4 11 1 q-6 4 -11 -1z M76 54 q-6 -4 -11 1 q6 4 11 -1z" fill="#f59e0b" stroke="${OL}" stroke-width="1.2"/><circle cx="50" cy="54" r="1.8" fill="${OL}"/><circle cx="70" cy="54" r="1.8" fill="${OL}"/>
+<path d="M52 60 q8 -4 16 0 q-2 12 -8 16 q-6 -4 -8 -16z" fill="url(#gd-taka)" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M56 64 q4 3 8 0" stroke="#92400e" stroke-width="1.5" fill="none"/>
+<g transform="translate(60 102)"><path d="M0 -12 l12 12 l-12 12 l-12 -12z" fill="#1e3a8a" stroke="url(#gd-taka)" stroke-width="3"/><path d="M0 -6 v12 M-6 0 h12" stroke="#93c5fd" stroke-width="2"/></g>
+<g stroke="url(#gd-taka)" stroke-width="4" stroke-linecap="round"><path d="M46 104 l-6 6 M74 104 l6 6"/></g>`),
+
+  // ハイウェイ・タイガー（★★★・かっこいい）：ゴーグルを上げたトラ。流れる光の線と高速道路のマーク
+  tora2: wrap('tora2', '#fed7aa', '#c2410c', `
+<g stroke="#fff7ed" stroke-width="3" stroke-linecap="round" opacity=".85"><path d="M2 44 h22 M0 58 h16 M4 92 h20 M98 44 h22 M104 58 h16 M96 92 h22"/></g>
+<path d="M30 116 q2 -30 30 -34 q28 4 30 34z" fill="#1f2937" stroke="${OL}" stroke-width="3"/>
+<path d="M46 84 l14 12 l14 -12" fill="none" stroke="#f97316" stroke-width="4"/>
+<path d="M32 40 l-4 -16 l16 8z M88 40 l4 -16 l-16 8z" fill="#f97316" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/><path d="M33 34 l-2 -6 l6 3z M87 34 l2 -6 l-6 3z" fill="#fde68a"/>
+<path d="M30 58 q0 -30 30 -30 q30 0 30 30 q0 22 -30 26 q-30 -4 -30 -26z" fill="#fb923c" stroke="${OL}" stroke-width="3"/>
+<path d="M44 64 q16 -6 32 0 q-2 16 -16 18 q-14 -2 -16 -18z" fill="#fff7ed"/>
+<g fill="${OL}"><path d="M60 30 l-4 10 l4 -2 l4 2z"/><path d="M31 54 l10 2 l-10 4z M89 54 l-10 2 l10 4z"/><path d="M34 70 l8 0 l-6 4z M86 70 l-8 0 l6 4z"/></g>
+${eyes(58, '#16a34a')}
+<path d="M56 68 h8 l-4 4z" fill="${OL}"/><path d="M60 72 v4 M60 76 q-5 4 -9 0 M60 76 q5 4 9 0" stroke="${OL}" stroke-width="2" fill="none" stroke-linecap="round"/>
+<g transform="translate(60 38)"><rect x="-26" y="-6" width="52" height="5" rx="2" fill="#111827"/><circle cx="-12" cy="-4" r="7" fill="#38bdf8" stroke="${OL}" stroke-width="2.5"/><circle cx="12" cy="-4" r="7" fill="#38bdf8" stroke="${OL}" stroke-width="2.5"/><path d="M-15 -7 l4 -2 M9 -7 l4 -2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g>
+<g transform="translate(88 98)"><path d="M-10 -12 h20 v12 q0 10 -10 13 q-10 -3 -10 -13z" fill="#16a34a" stroke="${OL}" stroke-width="2"/><text y="2" text-anchor="middle" font-size="9" font-weight="900" fill="#fff">E1</text></g>`),
+});
