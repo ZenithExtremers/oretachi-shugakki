@@ -276,11 +276,11 @@ const LAST = {
   ] },
   toeic: { title: '千ページの魔導書', art: 'tome', hpM: 1.2, atkM: 1.8, reward: 'tome', crown: 'TOEICリーディングの覇者', desc: '空中に浮かぶ分厚い本の魔物。ページの中に読む者を閉じこめる。', phases: [
     { name: '千ページの魔導書', lecs: [1, 2, 3], short: true, tip: 'Part 5 の連打。制限時間が短い' },
-    { name: '魔導書〔長文の章〕', lecs: [6], chain: true, tip: '4問続けて正解すると大ダメージ' },
+    { name: '魔導書〔長文の章〕', lecs: [6], chain: true, tip: '3問続けて正解すると大ダメージ' },
     { name: '魔導書〔最終章〕', lecs: [7], bookmark: true, final: true, tip: '正解で「しおり」。3つで本を閉じる' },
   ] },
   menkyo: { title: '暴走王ノーライセンス', art: 'biker', hpM: 1.1, atkM: 1.6, reward: 'police', crown: '免許の覇者', desc: 'ルールを無視して走り回る暴走バイクの王。', phases: [
-    { name: '暴走王〔仮免の試練〕', lecs: [1, 2, 3, 4], exam10: true, tip: '10問で9問以上正解しないと回復される' },
+    { name: '暴走王〔仮免の試練〕', lecs: [1, 2, 3, 4], exam10: true, tip: '5問で4問以上正解しないと回復される' },
     { name: '暴走王〔本免の試練〕', lecs: [5, 6], tip: '本免の範囲' },
     { name: '暴走王ノーライセンス', lecs: [7], double: true, final: true, tip: '危険予測。正解でダメージ2倍' },
   ] },
@@ -1337,7 +1337,7 @@ export function makeRPG(ctx) {
         // ラスボスの仕掛け（正解したとき）
         const tgt = () => (foes[st.fi].cur > 0 ? st.fi : st.active.find((i) => foes[i].cur > 0));
         st.cut = 1;
-        if (F.chain && ++st.chainN >= 4) { st.chainN = 0; const ti = tgt(); if (ti !== undefined) hitEnemy(partyAtk() * 3, '長文コンボ！', true, ti); }
+        if (F.chain && ++st.chainN >= 3) { st.chainN = 0; const ti = tgt(); if (ti !== undefined) hitEnemy(partyAtk() * 3, '長文コンボ！', true, ti); }
         if (F.bookmark) { st.marks++; pop(`📑 しおり ${st.marks}/3`, 'info'); if (st.marks >= 3) { st.marks = 0; const ti = tgt(); if (ti !== undefined) hitEnemy(partyAtk() * 4, '本を閉じた！', true, ti); } }
         hsay(st.combo >= 3 ? 'combo' : speed > 1.3 ? 'fast' : big ? 'big' : 'ok');
         t.forEach((x) => { st.gauge[x.id]++; });
@@ -1361,9 +1361,9 @@ export function makeRPG(ctx) {
           : `<div class="rp-after ng"><b>${i < 0 ? '時間切れ…' : 'ざんねん…'}</b><span>${st.q.exp}</span></div>`;
       }
       st.rootsQ = false;
-      if (F.exam10 && F.cur > 0) { // 暴走王〔仮免の試練〕：10問で9問以上正解しないと回復
+      if (F.exam10 && F.cur > 0) { // 暴走王〔仮免の試練〕：5問で4問以上正解しないと回復
         st.examN++; if (ok) st.examOk++;
-        if (st.examN >= 10) { if (st.examOk < 9) { F.cur = Math.min(F.hp, F.cur + F.hp * 0.3); pop('不合格！ ボスが回復', 'miss'); } else pop('合格！', 'info'); st.examN = st.examOk = 0; drawHp(); }
+        if (st.examN >= 5) { if (st.examOk < 4) { F.cur = Math.min(F.hp, F.cur + F.hp * 0.3); pop('不合格！ ボスが回復', 'miss'); } else pop('合格！', 'info'); st.examN = st.examOk = 0; drawHp(); }
       }
       await enemyTurn();
       if (st.over) return;
