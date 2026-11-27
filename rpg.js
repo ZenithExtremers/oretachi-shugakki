@@ -36,7 +36,7 @@ export const CHARS = {
   senchou: { name: 'ことばの船長', icon: '🧑‍✈️', rar: 3, subj: 'toeic', hp: 120, atk: 28, limited: 'toeic', skill: { kind: 'hint', pow: 2, cost: 3, name: '辞書の羅針盤' } },
   // 中間ボスを★3でクリアすると仲間になる（ガチャには出ない）
   liner: { name: 'グランドビルドライナー', icon: '🚂', rar: 3, subj: 'ccpp', hp: 150, atk: 34, limited: 'mid', skill: { kind: 'dmg', pow: 6, cost: 5, name: '合体ビルドバスター' } },
-  yankee: { name: '隣の部屋のヤンキー', icon: '😎', rar: 3, subj: 'db', hp: 160, atk: 26, limited: 'mid', skill: { kind: 'guard', pow: 4, cost: 3, name: 'ガン飛ばし' } },
+  yankee: { name: '隣の部屋のヤンキー', icon: '😎', rar: 3, subj: 'db', hp: 160, atk: 26, limited: 'mid', skill: { kind: 'guard', pow: 2, cost: 3, name: 'ガン飛ばし' } },
   spec: { name: '設計竜スペック', icon: '🐲', rar: 3, subj: 'sd', hp: 145, atk: 33, limited: 'mid', skill: { kind: 'dmg', pow: 5, cost: 4, name: '仕様書ブレス' } },
   // ★★★★（レジェンド）：勉強に出てくる用語がモチーフ。得意科目なし。ステータスは★★★（HP120・攻撃28）をもとに決める
   tachyon: { name: 'タキオン', icon: '⚡', rar: 4, subj: null, hp: 84, atk: 20, skill: { kind: 'charge', pow: 1, cost: 2, name: '超光速チャージ' }, prof: '光より速く動くといわれる仮想の粒子。仲間のスキルの時間を早める。' },
@@ -1065,7 +1065,7 @@ export function makeRPG(ctx) {
     // チャンス（次の攻撃2倍）／ピンチ（敵が力をためる：次に受けるダメージ2倍）
     function rollEvent() {
       st.event = null;
-      if (st.turns > 0) { const x = Math.random(); st.event = x < 0.16 ? 'chance' : x < 0.3 ? 'charge' : null; }
+      if (st.turns > 0) { const x = Math.random(); st.event = x < 0.08 ? 'chance' : x < 0.22 ? 'charge'  : null; /* チャンス 8%（v4.7.1 で 16%→8%）・力をためる 14% */ }
       const ev = document.getElementById('rp-event'); if (!ev) return;
       ev.hidden = !st.event;
       ev.className = 'rp-event ' + (st.event || '');
