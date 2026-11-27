@@ -446,7 +446,13 @@ async function sayGroup(g, btn) {
   }
   for (const [sp, t] of g.listen.lines) {
     if (tok !== SAY.tok) return;
-    await speakLine(t, sp);
+    const m = t.match(/^\(([A-D])\)\s*(.+)$/);
+    if (m) { // 「(A)」と本文のあいだに間を空ける
+      await speakLine(m[1], sp);
+      await new Promise((r) => setTimeout(r, 500));
+      if (tok !== SAY.tok) return;
+      await speakLine(m[2], sp);
+    } else await speakLine(t, sp);
     await new Promise((r) => setTimeout(r, /^\([A-D]\)/.test(t) ? 700 : 350));
   }
   if (tok === SAY.tok) { btn.textContent = '▶ もう一度'; SAY.btn = null; }
