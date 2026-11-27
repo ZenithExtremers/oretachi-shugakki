@@ -57,8 +57,32 @@ export function openMapAnime({ openOv, body, setCleanup }) {
     for (const c of cityEls) { c.setAttribute('transform', `translate(${c.dataset.x} ${c.dataset.y}) scale(${s})`); c.style.display = zoom >= 1.8 || c.classList.contains('major') ? '' : 'none'; }
     for (const ic of gIcons.children) ic.setAttribute('transform', `translate(${ic.dataset.x} ${ic.dataset.y}) scale(${s}) rotate(${ic.dataset.r || 0})`);
   }
-  function moveCam([lo, la, z], ms = 1100) {
-    const [x, y] = proj([lo, la]), from = { ...cam }, to = { x, y, w: MAP.w / z }, t0 = performance.now();
+  // 出来事のアイコンが上の年・出来事名の帯に重ならないよう、必要ならカメラを下げる（足りなければ少し引く）
+  function evPoints(ev) {
+    const pts = [];
+    for (const ic of ev?.ic || []) {
+      if (ic.a) pts.push(proj(ic.a)); if (ic.b) pts.push(proj(ic.b));
+      if (ic.at) (Array.isArray(ic.at[0]) ? ic.at : [ic.at]).forEach((q) => pts.push(proj(q)));
+    }
+    return pts;
+  }
+  function fitCam(to, ev) {
+    const pts = evPoints(ev); if (!pts.length) return to;
+    const W = svg.clientWidth || 1, H = svg.clientHeight || 1;
+    const topPx = (root.querySelector('.gm-top')?.getBoundingClientRect().bottom || 0) - svg.getBoundingClientRect().top + 26, padPx = 26;
+    for (let k = 0; k < 6; k++) {
+      const u = to.w / W, h = to.w * H / W, top = to.y - h * 0.4;
+      const minY = Math.min(...pts.map((q) => q[1])), maxY = Math.max(...pts.map((q) => q[1]));
+      const need = top + topPx * u - minY; // 上にはみ出している量
+      if (need <= 0) return to;
+      const room = top + h - padPx * u - maxY; // 下の余裕
+      if (room >= need) return { ...to, y: to.y - need };
+      to = { ...to, w: to.w * 1.15 };
+    }
+    return to;
+  }
+  function moveCam([lo, la, z], ms = 1100, ev) {
+    const [x, y] = proj([lo, la]), from = { ...cam }, to = fitCam({ x, y, w: MAP.w / z }, ev), t0 = performance.now();
     cancelAnimationFrame(anim);
     const step = (t) => {
       const k = ms ? Math.min(1, (t - t0) / ms) : 1, e = ease(k);
@@ -132,7 +156,7 @@ export function openMapAnime({ openOv, body, setCleanup }) {
     clearIcons(instant);
     paint(idx);
     front.classList.toggle('on', !!ev.front);
-    moveCam(ev.cam, instant ? 0 : 1100);
+    moveCam(ev.cam, instant ? 0 : 1100, ev);
     const band = root.querySelector('.gm-band'), year = root.querySelector('.gm-year');
     band.textContent = ev.t; band.className = `gm-band ${idx % 2 ? 'p' : 'g'} gm-in`;
     year.textContent = ev.y; year.classList.remove('gm-flip'); void year.offsetWidth; year.classList.add('gm-flip');

@@ -1646,3 +1646,10 @@ body.rp-night.rp-day {
 .rp-gtabs { margin-bottom: 10px; }
 .rp-gbanner.g-toeic { background: linear-gradient(135deg, #0369a1, #ea580c); }
 .rp-gbanner.g-menkyo { background: linear-gradient(135deg, #15803d, #facc15); }
+/* 主人公のひとこと（ステージ選択）・プロフィールの項目 */
+.rp-ssay { margin: 6px 0 10px; padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,.08); font-size: 12.5px; line-height: 1.5; color: #eef1ff; }
+.rp-day .rp-ssay { background: var(--card2, #f1f5f9); color: var(--ink, #111827); }
+.rp-prof2 { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: 8px 0 0; font-size: 12px; line-height: 1.5; }
+.rp-prof2 dt { font-weight: 800; color: #fbbf24; white-space: nowrap; }
+.rp-prof2 dd { margin: 0; color: inherit; opacity: .9; }
+.rp-day .rp-prof2 dt { color: #b45309; }
