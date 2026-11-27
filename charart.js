@@ -695,3 +695,182 @@ ${cute(58, 11, 4.4)}${blush(67, 20)}<path d="M55 70 q5 -4 10 0 q-5 5 -10 0z" fil
 <path d="M43 58 q5 -4 10 1 q-5 4 -10 -1z M77 58 q-5 -4 -10 1 q5 4 10 -1z" fill="#f8fafc" stroke="${OL}" stroke-width="1.5"/><circle cx="48" cy="58" r="1.8" fill="${OL}"/><circle cx="72" cy="58" r="1.8" fill="${OL}"/>
 <g transform="translate(48 104) scale(.85)"><rect x="-14" y="-6" width="28" height="16" rx="3" fill="url(#gd-zou)" stroke="${OL}" stroke-width="2"/><path d="M-7 -6 v-5 a7 7 0 0 1 14 0 v5" fill="none" stroke="${OL}" stroke-width="2.5"/><text y="5.5" text-anchor="middle" font-size="6" font-weight="900" fill="${OL}">COMMIT</text></g>`),
 });
+
+// ----- TOEIC（リスニング・リーディング）の仲間 -----
+Object.assign(CHAR_ART, {
+  // エコーコウモリ（★・リスニング）：こだまの音の輪を出すコウモリ
+  echo: wrap1('echo', '#ede9fe', '#c4b5fd', `
+<g fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" opacity=".7"><path d="M92 50 q6 10 0 20 M100 44 q10 16 0 32 M108 38 q14 22 0 44"/></g>
+<path d="M44 62 q-18 -16 -40 -8 q8 4 8 12 q8 -4 12 2 q6 -4 10 4 q6 -2 10 0z" fill="#6d28d9" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M76 62 q18 -16 36 -12 q-6 4 -6 12 q-8 -4 -10 2 q-6 -4 -10 4 q-6 -2 -10 0z" fill="#6d28d9" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M44 44 l-4 -16 l12 10z M76 44 l4 -16 l-12 10z" fill="#8b5cf6" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<ellipse cx="60" cy="64" rx="20" ry="22" fill="#8b5cf6" stroke="${OL}" stroke-width="3"/>
+${cute(58, 8, 3.8)}${blush(66, 13)}<path d="M55 70 q5 4 10 0" stroke="${OL}" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M56 70 l1.5 4 l1.5 -3.5 M61 70 l1.5 4 l1.5 -3.5" fill="#fff" stroke="${OL}" stroke-width=".8"/>`),
+
+  // ディクテーション猫（★・リスニング）：耳をそばだてて、えんぴつでノートに書き取るネコ
+  dictat: wrap1('dictat', '#fff7ed', '#fed7aa', `
+<path d="M34 44 l-4 -22 l18 12z M86 44 l4 -22 l-18 12z" fill="#fdba74" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M35 38 l-2 -10 l8 6z M85 38 l2 -10 l-8 6z" fill="#fda4af"/>
+<ellipse cx="60" cy="60" rx="32" ry="26" fill="#fdba74" stroke="${OL}" stroke-width="3"/>
+<path d="M44 40 l4 8 M60 36 v8 M76 40 l-4 8" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+${cute(58, 12, 4)}${blush(66, 20)}<path d="M57 64 l3 3 l3 -3z" fill="#f472b6"/><path d="M60 67 q-4 4 -8 1 M60 67 q4 4 8 1" stroke="${OL}" stroke-width="1.8" fill="none"/><path d="M30 62 h-12 M30 66 l-11 3 M90 62 h12 M90 66 l11 3" stroke="${OL}" stroke-width="1.3"/>
+<g transform="translate(60 98) rotate(-4)"><rect x="-26" y="-12" width="52" height="26" rx="3" fill="#fff" stroke="${OL}" stroke-width="2.5"/><path d="M-20 -4 h22 M-20 2 h30 M-20 8 h16" stroke="#94a3b8" stroke-width="2"/><path d="M-26 -12 v26" stroke="#ef4444" stroke-width="2"/></g>
+<g transform="translate(92 90) rotate(35)"><rect x="-3" y="-18" width="6" height="26" fill="#facc15" stroke="${OL}" stroke-width="2"/><path d="M-3 8 l3 7 l3 -7z" fill="#fde68a" stroke="${OL}" stroke-width="1.5"/></g>`),
+
+  // ナチュラルスピード・リス（★・リスニング）：ほおぶくろにコインをためこむリス
+  risu: wrap1('risu', '#fef3c7', '#fcd34d', `
+<path d="M86 104 q30 -10 24 -46 q-6 -24 -26 -18 q-12 6 -6 20 q10 0 10 14 q0 18 -14 22z" fill="#c2410c" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M98 60 q6 14 -2 30" stroke="#fdba74" stroke-width="3" fill="none"/>
+<path d="M38 40 l-2 -16 l12 10z M76 40 l2 -16 l-12 10z" fill="#ea580c" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<ellipse cx="56" cy="88" rx="22" ry="22" fill="#ea580c" stroke="${OL}" stroke-width="3"/><ellipse cx="56" cy="92" rx="12" ry="14" fill="#fed7aa"/>
+<ellipse cx="56" cy="56" rx="26" ry="22" fill="#ea580c" stroke="${OL}" stroke-width="3"/>
+<ellipse cx="38" cy="64" rx="10" ry="8" fill="#fed7aa" stroke="${OL}" stroke-width="2"/><ellipse cx="74" cy="64" rx="10" ry="8" fill="#fed7aa" stroke="${OL}" stroke-width="2"/>
+${cute(52, 9, 3.8)}<ellipse cx="56" cy="60" rx="3" ry="2.2" fill="${OL}"/><path d="M53 66 h6 v4 h-6z" fill="#fff" stroke="${OL}" stroke-width="1.2"/>
+<g transform="translate(56 96)"><circle r="9" fill="url(#gd-risu)" stroke="${OL}" stroke-width="2"/><text y="3.5" text-anchor="middle" font-size="9" font-weight="900" fill="#92400e">¢</text></g>
+<defs><linearGradient id="gd-risu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset="1" stop-color="#d97706"/></linearGradient></defs>`),
+
+  // イントネーション・イルカ（★★・リスニング）：上がり下がりの抑揚の波にのって跳ぶイルカ
+  iruka: wrap2('iruka', '#cffafe', '#0891b2', `
+<path d="M0 96 q20 -14 40 0 t40 0 t40 0 v24 h-120z" fill="#22d3ee" stroke="${OL}" stroke-width="2.5"/>
+<path d="M8 40 q12 -14 24 0 t24 0" stroke="#f0f9ff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/><path d="M50 40 l6 0 l-3 -5" stroke="#f0f9ff" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M18 92 q10 -48 60 -50 q18 0 26 10 q-10 0 -14 4 q8 10 4 24 q-6 -10 -16 -12 q-28 -2 -46 26z" fill="#38bdf8" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M58 44 l-4 -12 l14 8z" fill="#0ea5e9" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M30 86 q14 -20 40 -22 q-10 10 -40 22z" fill="#e0f2fe"/>
+<path d="M18 92 l-10 6 l4 -12z" fill="#0ea5e9" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="88" cy="52" r="3.6" fill="${OL}"/><circle cx="89" cy="51" r="1.3" fill="#fff"/><path d="M94 60 q4 2 8 -2" stroke="${OL}" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="86" cy="60" rx="4" ry="2.4" fill="#fb7185" opacity=".5"/>`),
+
+  // パラフレーズ・カメレオン（★★・リスニング）：体の色を変えて「同じ意味」を言いかえるカメレオン
+  chamele: wrap2('chamele', '#ecfccb', '#65a30d', `
+<path d="M8 82 h104" stroke="#78350f" stroke-width="7" stroke-linecap="round"/>
+<path d="M74 82 q22 2 26 16 q2 12 -10 12 q-8 0 -8 -8 q0 -6 6 -6" fill="none" stroke="${OL}" stroke-width="9" stroke-linecap="round"/><path d="M74 82 q22 2 26 16 q2 12 -10 12 q-8 0 -8 -8 q0 -6 6 -6" fill="none" stroke="#a855f7" stroke-width="5" stroke-linecap="round"/>
+<path d="M20 70 q8 -30 40 -30 q24 0 32 16 q4 14 -8 24 q-30 8 -64 -10z" fill="#4ade80" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M58 42 q14 4 22 14 q4 12 -4 22 q-14 4 -18 0z" fill="#38bdf8" opacity=".75"/><path d="M76 52 q8 6 8 16 q-4 8 -8 10z" fill="#a855f7" opacity=".75"/>
+<path d="M20 70 q-8 -10 -2 -22 q10 2 14 12" fill="#4ade80" stroke="${OL}" stroke-width="2.5"/>
+<circle cx="30" cy="58" r="8" fill="#bbf7d0" stroke="${OL}" stroke-width="2.5"/><circle cx="32" cy="58" r="3" fill="${OL}"/><path d="M14 66 q6 4 12 2" stroke="${OL}" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M40 76 l-2 8 M70 78 l2 6" stroke="${OL}" stroke-width="3" stroke-linecap="round"/>
+<g transform="translate(36 22)"><path d="M-20 -10 h40 v16 h-24 l-6 6 v-6 h-10z" fill="#fff" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/><text y="2" text-anchor="middle" font-size="9" font-weight="900" fill="#7c3aed">A ≒ B</text></g>`),
+
+  // サウンドウェーブ・クラゲ（★★・リスニング）：音の波の形の足をゆらすクラゲ
+  kurage: wrap2('kurage', '#e0e7ff', '#6366f1', `
+<g fill="#fff" opacity=".5"><circle cx="20" cy="30" r="3"/><circle cx="98" cy="20" r="2"/><circle cx="104" cy="96" r="3"/></g>
+<g fill="none" stroke-linecap="round"><path d="M40 62 q-6 10 0 20 t0 20 t0 20" stroke="${OL}" stroke-width="6"/><path d="M40 62 q-6 10 0 20 t0 20 t0 20" stroke="#c4b5fd" stroke-width="3"/>
+<path d="M54 64 q6 8 0 16 t0 16 t0 16" stroke="${OL}" stroke-width="6"/><path d="M54 64 q6 8 0 16 t0 16 t0 16" stroke="#f0abfc" stroke-width="3"/>
+<path d="M66 64 q-6 8 0 16 t0 16 t0 16" stroke="${OL}" stroke-width="6"/><path d="M66 64 q-6 8 0 16 t0 16 t0 16" stroke="#c4b5fd" stroke-width="3"/>
+<path d="M80 62 q6 10 0 20 t0 20 t0 20" stroke="${OL}" stroke-width="6"/><path d="M80 62 q6 10 0 20 t0 20 t0 20" stroke="#f0abfc" stroke-width="3"/></g>
+<path d="M26 62 q0 -40 34 -40 q34 0 34 40 q-8 6 -17 0 q-8 6 -17 0 q-8 6 -17 0 q-9 6 -17 0z" fill="#a78bfa" fill-opacity=".9" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M38 36 q10 -8 22 -8" stroke="#ede9fe" stroke-width="4" fill="none" stroke-linecap="round"/>
+${cute(48, 10, 3.8)}${blush(55, 17)}<path d="M56 54 q4 3 8 0" stroke="${OL}" stroke-width="1.8" fill="none" stroke-linecap="round"/>`),
+
+  // 同時通訳オオカミ（★★★・リスニング）：ヘッドセットをつけ、月に向かって遠吠えするオオカミ
+  ookami: wrap('ookami', '#e0e7ff', '#1e1b4b', `
+<circle cx="92" cy="26" r="14" fill="#fef9c3" stroke="#fde047" stroke-width="2"/><circle cx="88" cy="22" r="3" fill="#fde68a"/><circle cx="96" cy="30" r="2" fill="#fde68a"/>
+<path d="M20 116 l8 -26 l-10 4 l8 -16 l-10 2 l14 -14 h60 l14 14 l-10 -2 l8 16 l-10 -4 l8 26z" fill="#475569" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M32 44 l-4 -30 l20 18z M88 44 l4 -30 l-20 18z" fill="#64748b" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M33 36 l-2 -14 l10 9z M87 36 l2 -14 l-10 9z" fill="#cbd5e1"/>
+<path d="M26 56 q0 -26 34 -28 q34 2 34 28 q0 14 -8 22 l-12 14 q-14 8 -28 0 l-12 -14 q-8 -8 -8 -22z" fill="#94a3b8" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M44 66 q16 -6 32 0 l-4 18 q-12 8 -24 0z" fill="#e2e8f0"/>
+<path d="M30 64 l-8 6 l10 0 M90 64 l8 6 l-10 0" fill="#e2e8f0" stroke="${OL}" stroke-width="2"/>
+<path d="M60 32 l-6 14 l6 -3 l6 3z" fill="#64748b"/>
+${eyes(56, '#38bdf8')}
+<path d="M54 70 h12 l-6 6z" fill="${OL}"/><path d="M60 76 v4 M60 80 q-6 4 -10 0 M60 80 q6 4 10 0" stroke="${OL}" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M30 54 q0 -30 30 -32 q30 2 30 32" stroke="#0f172a" stroke-width="4.5" fill="none"/>
+<rect x="20" y="50" width="12" height="18" rx="5" fill="#38bdf8" stroke="${OL}" stroke-width="2.5"/><rect x="88" y="50" width="12" height="18" rx="5" fill="#38bdf8" stroke="${OL}" stroke-width="2.5"/>
+<path d="M26 68 q4 16 22 16" stroke="#0f172a" stroke-width="3" fill="none"/><circle cx="48" cy="84" r="3.5" fill="url(#gd-ookami)" stroke="${OL}" stroke-width="1.5"/>
+<g fill="none" stroke="#a5b4fc" stroke-width="2.5" stroke-linecap="round"><path d="M104 60 q4 4 0 8 M110 56 q8 8 0 16"/></g>`),
+
+  // 発音クジャク（★★★・リスニング）：羽を広げると目玉もようが発音記号になっているクジャク
+  kujaku: wrap('kujaku', '#ccfbf1', '#0f766e', `
+<g stroke="${OL}" stroke-width="2">${Array.from({ length: 9 }, (_, i) => { const a = (-160 + i * 17.5) * Math.PI / 180, x = 60 + Math.cos(a) * 46, y = 84 + Math.sin(a) * 46; return `<path d="M60 84 L${x.toFixed(1)} ${y.toFixed(1)}" stroke="#065f46" stroke-width="3"/><ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="9" ry="11" transform="rotate(${(a * 180 / Math.PI + 90).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})" fill="#14b8a6"/>`; }).join('')}</g>
+<g font-family="serif" font-size="9" font-weight="900" text-anchor="middle">${['θ', 'ð', 'æ', 'ʃ', 'ə', 'ŋ', 'ʒ', 'ɔ', 'r'].map((t, i) => { const a = (-160 + i * 17.5) * Math.PI / 180, x = 60 + Math.cos(a) * 46, y = 84 + Math.sin(a) * 46; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5" fill="url(#gd-kujaku)" stroke="#1e3a8a" stroke-width="1.5"/><text x="${x.toFixed(1)}" y="${(y + 3).toFixed(1)}" fill="#1e3a8a">${t}</text>`; }).join('')}</g>
+<path d="M48 116 q-4 -24 4 -40 q-6 -16 2 -30 q6 -8 12 -2 q6 8 0 20 q10 20 6 52z" fill="#1d4ed8" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M56 42 l-4 -12 M60 40 v-14 M64 42 l4 -12" stroke="${OL}" stroke-width="1.5"/><g fill="url(#gd-kujaku)" stroke="${OL}" stroke-width="1"><circle cx="52" cy="29" r="2.5"/><circle cx="60" cy="25" r="2.5"/><circle cx="68" cy="29" r="2.5"/></g>
+<path d="M54 50 l8 2 M56 55 q4 -3 8 1 q-4 3 -8 -1z" stroke="${OL}" stroke-width="2" fill="#fff" stroke-linecap="round"/><circle cx="60" cy="55" r="1.4" fill="${OL}"/>
+<path d="M66 54 l8 2 l-7 3z" fill="#f59e0b" stroke="${OL}" stroke-width="1.5" stroke-linejoin="round"/>
+<g fill="none" stroke="#5eead4" stroke-width="2" stroke-linecap="round"><path d="M80 56 q4 3 0 6 M86 52 q8 7 0 14"/></g>`),
+
+  // スキミング・ハチ（★・リーディング）：ページの上をすいすい飛んで、大事なところだけ拾うハチ
+  hachi: wrap1('hachi', '#fefce8', '#fde047', `
+<g transform="translate(60 100)"><path d="M-40 -6 q20 -6 40 0 q20 -6 40 0 v18 q-20 -6 -40 0 q-20 -6 -40 0z" fill="#fff" stroke="${OL}" stroke-width="2.5"/><path d="M0 -6 v18" stroke="${OL}" stroke-width="2"/><path d="M-34 0 h26 M-34 6 h20 M6 0 h28 M6 6 h18" stroke="#cbd5e1" stroke-width="2"/><path d="M-30 0 h12 M10 6 h14" stroke="#fde047" stroke-width="4" opacity=".8"/></g>
+<path d="M14 80 q20 -12 30 -28" stroke="#a16207" stroke-width="2" stroke-dasharray="3 5" fill="none"/>
+<ellipse cx="46" cy="38" rx="14" ry="9" fill="#e0f2fe" fill-opacity=".85" stroke="${OL}" stroke-width="2" transform="rotate(-25 46 38)"/><ellipse cx="72" cy="36" rx="14" ry="9" fill="#e0f2fe" fill-opacity=".85" stroke="${OL}" stroke-width="2" transform="rotate(25 72 36)"/>
+<ellipse cx="62" cy="60" rx="24" ry="18" fill="#facc15" stroke="${OL}" stroke-width="3"/>
+<path d="M56 43 q-4 8 -2 34 M70 44 q-4 10 -2 32" stroke="${OL}" stroke-width="5" fill="none"/>
+<path d="M86 60 l8 2 l-8 3z" fill="${OL}"/>
+<circle cx="44" cy="56" r="13" fill="#facc15" stroke="${OL}" stroke-width="3"/>
+${'<circle cx="39" cy="54" r="3" fill="#1f2937"/><circle cx="49" cy="54" r="3" fill="#1f2937"/><circle cx="40" cy="53" r="1" fill="#fff"/><circle cx="50" cy="53" r="1" fill="#fff"/>'}<path d="M41 61 q3 2 6 0" stroke="${OL}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+<path d="M40 44 q-4 -10 -10 -12 M48 44 q2 -10 8 -12" stroke="${OL}" stroke-width="2" fill="none"/><circle cx="30" cy="32" r="2.5" fill="${OL}"/><circle cx="56" cy="32" r="2.5" fill="${OL}"/>`),
+
+  // スキャニング・ハリネズミ（★・リーディング）：虫めがねで数字や名前をさがすハリネズミ
+  harine: wrap1('harine', '#fef3c7', '#fdba74', `
+<path d="M24 92 q-6 -18 2 -32 l-8 -4 l10 -4 l-6 -10 l12 2 l-2 -12 l10 6 l2 -12 l8 10 l6 -10 l4 12 l10 -6 l-2 12 l12 -2 l-6 10 l10 4 l-8 4 q8 14 2 32z" fill="#92400e" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M30 92 q-4 -14 4 -24 q12 -10 26 -10 q14 0 24 10 q8 10 4 24z" fill="#fde68a" stroke="${OL}" stroke-width="2.5"/>
+${cute(74, 11, 3.8)}${blush(82, 18)}<ellipse cx="60" cy="82" rx="4" ry="3" fill="${OL}"/><path d="M57 87 q3 2 6 0" stroke="${OL}" stroke-width="1.8" fill="none"/>
+<g transform="translate(92 96) rotate(-35)"><path d="M0 9 v14" stroke="#92400e" stroke-width="5" stroke-linecap="round"/><circle r="12" fill="#e0f2fe" fill-opacity=".85" stroke="${OL}" stroke-width="3"/><text y="4" text-anchor="middle" font-size="10" font-weight="900" fill="#1d4ed8">$5</text></g>
+<ellipse cx="44" cy="104" rx="7" ry="4" fill="#fde68a" stroke="${OL}" stroke-width="2"/><ellipse cx="72" cy="104" rx="7" ry="4" fill="#fde68a" stroke="${OL}" stroke-width="2"/>`),
+
+  // 単語帳ハムスター（★・リーディング）：単語カードの輪っかを抱え、ほおに単語をためこむハムスター
+  hamu: wrap1('hamu', '#fff7ed', '#fed7aa', `
+<circle cx="38" cy="38" r="9" fill="#fdba74" stroke="${OL}" stroke-width="2.5"/><circle cx="82" cy="38" r="9" fill="#fdba74" stroke="${OL}" stroke-width="2.5"/>
+<ellipse cx="60" cy="70" rx="36" ry="34" fill="#fdba74" stroke="${OL}" stroke-width="3"/>
+<ellipse cx="60" cy="80" rx="22" ry="22" fill="#fff7ed"/>
+<ellipse cx="32" cy="70" rx="12" ry="11" fill="#fff7ed" stroke="${OL}" stroke-width="2"/><ellipse cx="88" cy="70" rx="12" ry="11" fill="#fff7ed" stroke="${OL}" stroke-width="2"/>
+${cute(56, 11, 3.6)}<ellipse cx="60" cy="64" rx="2.6" ry="2" fill="#f472b6"/><path d="M57 67 q3 3 6 0" stroke="${OL}" stroke-width="1.6" fill="none"/>
+<g transform="translate(60 94)"><circle cx="-14" cy="-10" r="4" fill="none" stroke="#94a3b8" stroke-width="2.5"/><rect x="-20" y="-8" width="40" height="22" rx="3" fill="#fff" stroke="${OL}" stroke-width="2"/><rect x="-18" y="-5" width="40" height="20" rx="3" fill="#bfdbfe" stroke="${OL}" stroke-width="2"/><text x="2" y="8" text-anchor="middle" font-size="9" font-weight="900" fill="#1e3a8a">word</text></g>
+<ellipse cx="38" cy="96" rx="6" ry="5" fill="#fdba74" stroke="${OL}" stroke-width="2"/><ellipse cx="82" cy="96" rx="6" ry="5" fill="#fdba74" stroke="${OL}" stroke-width="2"/>`),
+
+  // 文法ゴリラ（★★・リーディング）：分厚い文法書を盾のように構えるゴリラ
+  gorira: wrap2('gorira', '#e2e8f0', '#475569', `
+<path d="M14 116 q-4 -30 18 -40 q10 -4 18 2 q10 -6 20 0 q8 -6 18 -2 q22 10 18 40z" fill="#334155" stroke="${OL}" stroke-width="3"/>
+<circle cx="30" cy="54" r="9" fill="#334155" stroke="${OL}" stroke-width="2.5"/><circle cx="90" cy="54" r="9" fill="#334155" stroke="${OL}" stroke-width="2.5"/>
+<path d="M32 52 q0 -32 28 -32 q28 0 28 32 q0 24 -28 26 q-28 -2 -28 -26z" fill="#334155" stroke="${OL}" stroke-width="3"/>
+<path d="M40 46 q20 -10 40 0 q2 10 -4 14 q8 6 4 14 q-16 8 -36 0 q-4 -8 4 -14 q-6 -4 -8 -14z" fill="#94a3b8" stroke="${OL}" stroke-width="2"/>
+<path d="M42 44 q8 -6 14 0 M78 44 q-8 -6 -14 0" stroke="${OL}" stroke-width="3" fill="none" stroke-linecap="round"/>${cute(50, 10, 3.4)}
+<ellipse cx="56" cy="60" rx="2.5" ry="2" fill="${OL}"/><ellipse cx="64" cy="60" rx="2.5" ry="2" fill="${OL}"/><path d="M52 68 q8 4 16 0" stroke="${OL}" stroke-width="2" fill="none" stroke-linecap="round"/>
+<g transform="translate(60 98)"><rect x="-22" y="-14" width="44" height="28" rx="3" fill="#b91c1c" stroke="${OL}" stroke-width="2.5"/><rect x="-18" y="-10" width="36" height="20" rx="2" fill="none" stroke="#fde68a" stroke-width="1.5"/><text y="3.5" text-anchor="middle" font-size="6.8" font-weight="900" fill="#fde68a">GRAMMAR</text></g>
+<ellipse cx="34" cy="98" rx="9" ry="8" fill="#475569" stroke="${OL}" stroke-width="2.5"/><ellipse cx="86" cy="98" rx="9" ry="8" fill="#475569" stroke="${OL}" stroke-width="2.5"/>`),
+
+  // 品詞ヒツジ（★★・リーディング）：ふわふわの毛に n. v. adj. adv. の札がついたヒツジ
+  hitsuji: wrap2('hitsuji', '#f0fdf4', '#86efac', `
+<g fill="#fff" stroke="${OL}" stroke-width="2.5">${[[32, 54], [48, 40], [66, 38], [84, 48], [92, 66], [86, 84], [68, 92], [48, 92], [30, 84], [24, 68]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="13"/>`).join('')}</g>
+<ellipse cx="58" cy="66" rx="32" ry="26" fill="#fff"/>
+<path d="M40 96 v14 M54 98 v14 M66 98 v14 M80 96 v14" stroke="${OL}" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="58" cy="66" rx="14" ry="16" fill="#334155" stroke="${OL}" stroke-width="2.5"/>
+<path d="M44 58 q-10 -2 -12 6 q6 4 12 0z M72 58 q10 -2 12 6 q-6 4 -12 0z" fill="#334155" stroke="${OL}" stroke-width="2"/>
+<circle cx="53" cy="64" r="3" fill="#fff"/><circle cx="63" cy="64" r="3" fill="#fff"/><circle cx="53.5" cy="64.5" r="1.6" fill="${OL}"/><circle cx="63.5" cy="64.5" r="1.6" fill="${OL}"/>
+<path d="M55 74 q3 2 6 0" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+<g font-size="7" font-weight="900" text-anchor="middle" stroke="${OL}" stroke-width="1.5">${[[30, 46, 'n.', '#fde047'], [88, 42, 'v.', '#93c5fd'], [96, 76, 'adj.', '#f9a8d4'], [22, 82, 'adv.', '#86efac']].map(([x, y, t, c]) => `<rect x="${x - 9}" y="${y - 6}" width="18" height="11" rx="2" fill="${c}"/><text x="${x}" y="${y + 2}" fill="${OL}" stroke="none">${t}</text>`).join('')}</g>`),
+
+  // 長文キリン（★★・リーディング）：長い首で、長い長い文章の巻物を上から読むキリン
+  kirin: wrap2('kirin', '#fef9c3', '#eab308', `
+<g transform="translate(28 40)"><rect x="-14" y="0" width="28" height="70" fill="#fff" stroke="${OL}" stroke-width="2.5"/><rect x="-16" y="-4" width="32" height="7" rx="3" fill="#a16207" stroke="${OL}" stroke-width="2"/><rect x="-16" y="68" width="32" height="7" rx="3" fill="#a16207" stroke="${OL}" stroke-width="2"/><path d="M-10 10 h20 M-10 16 h16 M-10 22 h20 M-10 28 h12 M-10 34 h20 M-10 40 h18 M-10 46 h20 M-10 52 h14 M-10 58 h20" stroke="#94a3b8" stroke-width="1.8"/></g>
+<path d="M66 116 v-60 q0 -10 8 -10 h6 q8 0 8 10 v60z" fill="#facc15" stroke="${OL}" stroke-width="3"/>
+<g fill="#b45309"><rect x="70" y="64" width="9" height="8" rx="2"/><rect x="78" y="82" width="8" height="9" rx="2"/><rect x="69" y="98" width="9" height="8" rx="2"/><rect x="80" y="104" width="6" height="8" rx="2"/></g>
+<path d="M60 28 l-4 -12 M76 28 l4 -12" stroke="${OL}" stroke-width="3"/><circle cx="56" cy="15" r="3.5" fill="#a16207" stroke="${OL}" stroke-width="2"/><circle cx="80" cy="15" r="3.5" fill="#a16207" stroke="${OL}" stroke-width="2"/>
+<path d="M50 30 q2 -8 18 -8 q16 0 18 8 q2 16 -4 22 q-8 6 -24 0 q-10 -6 -8 -22z" fill="#facc15" stroke="${OL}" stroke-width="3"/>
+<path d="M48 42 q-4 0 -6 4 q4 4 8 2" fill="#fde68a" stroke="${OL}" stroke-width="2"/>
+<circle cx="60" cy="36" r="3.2" fill="${OL}"/><circle cx="74" cy="36" r="3.2" fill="${OL}"/><circle cx="61" cy="35" r="1.1" fill="#fff"/><circle cx="75" cy="35" r="1.1" fill="#fff"/>
+<ellipse cx="68" cy="48" rx="9" ry="5" fill="#fde68a" stroke="${OL}" stroke-width="2"/><circle cx="65" cy="47" r="1.3" fill="${OL}"/><circle cx="71" cy="47" r="1.3" fill="${OL}"/>`),
+
+  // 速読チーター（★★★・リーディング）：本を背に、光の線を引いて全力で走るチーター
+  chita: wrap('chita', '#fef3c7', '#b45309', `
+<g stroke="#fff7ed" stroke-width="3.5" stroke-linecap="round" opacity=".9"><path d="M0 40 h24 M0 54 h16 M2 72 h20 M0 88 h26 M96 40 h24 M104 54 h16 M98 72 h22 M94 88 h26"/></g>
+<path d="M36 40 l-4 -14 l14 6z M84 40 l4 -14 l-14 6z" fill="#fbbf24" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/><path d="M37 34 l-1 -5 l5 2z M83 34 l1 -5 l-5 2z" fill="${OL}"/>
+<path d="M30 116 q2 -26 30 -30 q28 4 30 30z" fill="#fbbf24" stroke="${OL}" stroke-width="3"/>
+<g fill="${OL}"><circle cx="44" cy="102" r="2.5"/><circle cx="56" cy="108" r="2.5"/><circle cx="70" cy="100" r="2.5"/><circle cx="78" cy="110" r="2.5"/></g>
+<path d="M30 58 q0 -28 30 -28 q30 0 30 28 q0 22 -30 28 q-30 -6 -30 -28z" fill="#fbbf24" stroke="${OL}" stroke-width="3"/>
+<path d="M44 66 q16 -4 32 0 q-2 16 -16 18 q-14 -2 -16 -18z" fill="#fff7ed"/>
+<g fill="${OL}">${[[40, 42], [50, 38], [70, 38], [80, 42], [36, 52], [84, 52], [60, 40]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.2"/>`).join('')}</g>
+${eyes(56, '#d97706')}
+<path d="M48 60 q-4 8 -2 16 M72 60 q4 8 2 16" stroke="${OL}" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M55 68 h10 l-5 5z" fill="${OL}"/><path d="M60 73 v3 M60 76 q-5 4 -9 0 M60 76 q5 4 9 0" stroke="${OL}" stroke-width="2" fill="none" stroke-linecap="round"/>
+<g transform="translate(92 98) rotate(-14)"><path d="M-12 -8 h24 v16 h-24z" fill="#1d4ed8" stroke="${OL}" stroke-width="2"/><path d="M0 -8 v16" stroke="#bfdbfe" stroke-width="1.5"/><path d="M-9 -3 h7 M-9 1 h7 M3 -3 h7 M3 1 h7" stroke="#bfdbfe" stroke-width="1.2"/></g>`),
+
+  // 語彙ライオン（★★★・リーディング）：たてがみが単語の文字でできたライオン。大きく吠える
+  raion: wrap('raion', '#fef3c7', '#9a3412', `
+<g font-family="serif" font-weight="900" font-size="9" fill="#7c2d12" text-anchor="middle">${['abc', 'vow', 'lex', 'syn', 'ant', 'def', 'idm', 'pre', 'suf', 'etc'].map((t, i) => { const a = i / 10 * Math.PI * 2, x = 60 + Math.cos(a) * 42, y = 58 + Math.sin(a) * 40; return `<text x="${x.toFixed(1)}" y="${(y + 3).toFixed(1)}">${t}</text>`; }).join('')}</g>
+<path d="M60 14 l8 10 l12 -4 l2 12 l12 2 l-4 12 l10 8 l-10 8 l4 12 l-12 2 l-2 12 l-12 -4 l-8 10 l-8 -10 l-12 4 l-2 -12 l-12 -2 l4 -12 l-10 -8 l10 -8 l-4 -12 l12 -2 l2 -12 l12 4z" fill="#ea580c" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<circle cx="60" cy="58" r="24" fill="#fbbf24" stroke="${OL}" stroke-width="3"/>
+<circle cx="42" cy="38" r="6" fill="#fbbf24" stroke="${OL}" stroke-width="2.5"/><circle cx="78" cy="38" r="6" fill="#fbbf24" stroke="${OL}" stroke-width="2.5"/>
+${eyes(52, '#b45309')}
+<path d="M54 60 h12 l-6 6z" fill="${OL}"/>
+<path d="M48 68 q12 -4 24 0 q-2 12 -12 12 q-10 0 -12 -12z" fill="#7f1d1d" stroke="${OL}" stroke-width="2.5"/><path d="M50 68 l3 5 l3 -4 M64 68 l3 4 l3 -5" fill="#fff" stroke="${OL}" stroke-width="1"/>
+<g fill="none" stroke="url(#gd-raion)" stroke-width="3" stroke-linecap="round"><path d="M80 98 q8 4 14 -2 M76 106 q12 6 22 -4 M72 114 q16 6 30 -6"/></g>
+<path d="M40 116 q2 -16 20 -18 q18 2 20 18z" fill="#ea580c" stroke="${OL}" stroke-width="2.5"/>`),
+});
