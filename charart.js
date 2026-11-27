@@ -611,16 +611,21 @@ ${cute(48, 11, 4)}<ellipse cx="60" cy="57" rx="4.5" ry="3.2" fill="${OL}"/><path
 <g fill="#fff"><path d="M100 90 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2z"/><path d="M88 106 l1.5 3.5 l3.5 1.5 l-3.5 1.5 l-1.5 3.5 l-1.5 -3.5 l-3.5 -1.5 l3.5 -1.5z"/></g>`),
 
   // リュウ（★★★・全科目）：角とたてがみのドラゴンが、りゅうのいぶきを吐く
-  ryu: wrap('ryu', '#dcfce7', '#065f46', `
-<path d="M74 72 q24 -6 46 4 q-10 10 -30 10 q14 8 30 4 q-14 18 -48 0z" fill="#fb923c" stroke="#c2410c" stroke-width="2"/><path d="M76 76 q18 -2 32 4 q-14 4 -30 2z" fill="#fde047"/>
-<path d="M16 116 q-2 -30 18 -40 l20 10 q-14 12 -8 30z" fill="#059669" stroke="${OL}" stroke-width="3"/>
-<g fill="#fde68a" stroke="${OL}" stroke-width="1.5"><path d="M24 92 l6 -6 l4 8z M30 104 l6 -6 l4 8z"/></g>
-<path d="M28 34 l-10 -24 l20 14z M58 26 l6 -24 l6 22z" fill="url(#gd-ryu)" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
-<path d="M24 56 q0 -30 30 -32 q24 0 32 20 l-2 10 q8 4 6 14 q-4 10 -22 10 l-14 0 q-30 4 -30 -22z" fill="#10b981" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
-<path d="M60 66 q14 -2 26 0 q-2 10 -14 12 q-10 0 -12 -12z" fill="#7f1d1d" stroke="${OL}" stroke-width="2"/><path d="M64 66 l2 4 l2 -4 M72 66 l2 4 l2 -4" fill="#fff" stroke="${OL}" stroke-width="1"/>
-<path d="M22 40 q-14 6 -14 22 q8 -6 14 -6 q-8 10 -4 22 q6 -10 12 -12" fill="#065f46" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
-<path d="M50 40 l12 4 M52 47 q6 -4 11 0 q-6 4 -11 0z" stroke="${OL}" stroke-width="2.5" fill="#fde047" stroke-linecap="round"/><circle cx="57" cy="47" r="1.6" fill="${OL}"/>
-<circle cx="80" cy="50" r="2" fill="${OL}"/><g stroke="#6ee7b7" stroke-width="2" fill="none"><path d="M34 66 q6 4 12 2 M32 58 q6 4 12 2"/></g>`),
+  ryu: wrap('ryu', '#bbf7d0', '#022c22', `
+<g fill="#f97316" stroke="#c2410c" stroke-width="1.5" opacity=".9"><path d="M6 96 q6 -18 0 -32 q12 8 10 24 q6 -6 6 -16 q10 14 2 30z"/><path d="M114 96 q-6 -18 0 -32 q-12 8 -10 24 q-6 -6 -6 -16 q-10 14 -2 30z"/></g>
+<g fill="#fde047" opacity=".9"><path d="M10 88 q2 -8 0 -14 q6 6 4 14z"/><path d="M110 88 q-2 -8 0 -14 q-6 6 -4 14z"/></g>
+<path d="M40 40 q-12 -18 -6 -36 q4 14 16 24z M80 40 q12 -18 6 -36 q-4 14 -16 24z" fill="url(#gd-ryu)" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M36 42 l-14 -10 l6 14 l-12 0 l14 10 z M84 42 l14 -10 l-6 14 l12 0 l-14 10z" fill="#047857" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M22 116 q4 -26 20 -32 h36 q16 6 20 32z" fill="#065f46" stroke="${OL}" stroke-width="3"/>
+<g fill="#10b981" stroke="${OL}" stroke-width="1.5">${[[40, 98], [52, 94], [64, 94], [76, 98], [46, 108], [60, 106], [74, 108]].map(([x, y]) => `<path d="M${x - 5} ${y} q5 -6 10 0 q-5 5 -10 0z"/>`).join('')}</g>
+<path d="M30 54 q0 -24 30 -26 q30 2 30 26 q0 10 -6 16 l2 12 q-8 12 -26 14 q-18 -2 -26 -14 l2 -12 q-6 -6 -6 -16z" fill="#059669" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M60 30 l-5 10 l5 -2 l5 2z M48 32 l-3 8 l5 -3z M72 32 l3 8 l-5 -3z" fill="url(#gd-ryu)" stroke="${OL}" stroke-width="1.2"/>
+<path d="M38 46 l16 6 M82 46 l-16 6" stroke="${OL}" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="47" cy="54" r="7" fill="#fde047" opacity=".35"/><circle cx="73" cy="54" r="7" fill="#fde047" opacity=".35"/><path d="M40 55 q7 -6 14 0 q-7 4 -14 0z M80 55 q-7 -6 -14 0 q7 4 14 0z" fill="#fde047" stroke="${OL}" stroke-width="1.3"/><path d="M47 51 v7 M73 51 v7" stroke="${OL}" stroke-width="2"/>
+<path d="M50 62 q10 -3 20 0 l-1 14 q-9 5 -18 0z" fill="#34d399" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M54 70 l3 -2 M66 70 l-3 -2" stroke="${OL}" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M42 80 q18 8 36 0 q-4 14 -18 16 q-14 -2 -18 -16z" fill="#7f1d1d" stroke="${OL}" stroke-width="2.5"/><path d="M44 80 l3 7 l3 -5 M70 80 l3 5 l3 -7 M54 94 l2 -4 l2 4 M62 94 l2 -4 l2 4" fill="#fff" stroke="${OL}" stroke-width="1"/><path d="M50 88 q10 4 20 0" stroke="#f97316" stroke-width="2" fill="none"/>
+<path d="M44 74 q-16 2 -26 14 q-4 6 -10 4 M76 74 q16 2 26 14 q4 6 10 4" stroke="url(#gd-ryu)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`),
 });
 
 // ----- C/C++・DB・設計の追加の仲間 -----
