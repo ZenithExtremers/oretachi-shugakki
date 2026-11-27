@@ -987,3 +987,164 @@ ${evil(60, 9, '#f87171')}<path d="M52 76 q8 -4 16 0" stroke="#f87171" stroke-wid
 <path d="M14 92 q46 -80 92 0" fill="none" stroke="#f87171" stroke-width="6"/><path d="M22 92 q38 -66 76 0" fill="none" stroke="#fde047" stroke-width="6"/><path d="M30 92 q30 -52 60 0" fill="none" stroke="#4ade80" stroke-width="6"/><path d="M38 92 q22 -38 44 0" fill="none" stroke="#60a5fa" stroke-width="6"/>
 <circle cx="60" cy="78" r="14" fill="url(#eg-goldtrans)" stroke="${OL}" stroke-width="2.5"/>${smug(76, 5)}`),
 });
+
+// 吹き出し・音の波
+const bubble = (x, y, w, h, c = '#fff') => `<path d="M${x} ${y} h${w} q6 0 6 6 v${h - 12} q0 6 -6 6 h-${w * 0.6} l-8 8 v-8 h-${w * 0.4 - 8} q-6 0 -6 -6 v-${h - 12} q0 -6 6 -6z" fill="${c}" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>`;
+const waves = (x, y, c = '#fde047', dir = 1) => `<g fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round"><path d="M${x} ${y - 6} q${4 * dir} 6 0 12"/><path d="M${x + 8 * dir} ${y - 12} q${8 * dir} 12 0 24"/></g>`;
+
+Object.assign(ENEMY_ART, {
+  // ----- TOEIC リスニング：どの回にも出る雑魚 -----
+  'toeicL|聞きのがし': sprite('missear', `
+<path d="M76 30 q-36 -10 -40 26 q-2 16 10 22 q6 4 4 14 q-2 12 10 14 q14 0 14 -14 q2 -10 8 -14 q14 -10 10 -26 q-4 -16 -16 -22z" fill="#fda4af" stroke="${OL}" stroke-width="3"/><path d="M62 44 q-14 2 -12 16 q2 8 8 8" stroke="#be123c" stroke-width="3" fill="none"/>
+${evil(52, 0, '#fff').replace(/cx="60"/g, 'cx="72"')}<path d="M66 50 l5 1.5 M82 50 l-5 1.5" stroke="${OL}" stroke-width="0"/><g transform="translate(74 52)"><circle cx="-5" r="2" fill="${OL}"/><circle cx="5" r="2" fill="${OL}"/></g>
+<g stroke="#94a3b8" stroke-width="3" stroke-linecap="round"><path d="M14 40 l12 4 M14 56 h12 M16 72 l10 -4"/></g>`),
+  'toeicL|早口モンスター': sprite('fastmon', `
+<g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M6 50 h18 M2 64 h16 M6 78 h18"/></g>
+${blob('#38bdf8', 66, 30, 30)}${evil(62, 11, '#fff')}<path d="M48 76 q12 12 24 0 q-12 4 -24 0z" fill="#7f1d1d" stroke="${OL}" stroke-width="2"/>
+${bubble(70, 18, 36, 22, '#fef9c3')}<g stroke="${OL}" stroke-width="2"><path d="M76 26 h24 M76 32 h18"/></g>`),
+  'toeicL|似た音トラップ': sprite('similar', `
+<path d="M20 98 h80 l-10 -16 h-60z" fill="#78716c" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<g stroke="${OL}" stroke-width="2.5"><path d="M30 82 l6 -46 l18 0 l6 46z" fill="#a8a29e"/><path d="M60 82 l6 -46 l18 0 l6 46z" fill="#a8a29e"/></g>
+<path d="M36 50 q9 -8 18 0 M66 50 q9 -8 18 0" stroke="#fde047" stroke-width="2.5" fill="none"/>${waves(98, 52, '#fde047')}
+<g fill="${OL}"><circle cx="40" cy="62" r="2"/><circle cx="50" cy="62" r="2"/><circle cx="70" cy="62" r="2"/><circle cx="80" cy="62" r="2"/></g>`),
+  'toeicL|集中切れ': sprite('sleepy', `
+${blob('#a5b4fc', 66, 30, 28)}<path d="M42 62 q6 4 12 0 M66 62 q6 4 12 0" stroke="${OL}" stroke-width="2.6" fill="none" stroke-linecap="round"/><ellipse cx="60" cy="80" rx="6" ry="4" fill="#312e81"/>
+<path d="M84 74 q8 0 8 10 q-6 4 -8 -2z" fill="#bfdbfe" stroke="${OL}" stroke-width="1.5"/><g font-weight="900" fill="#e0e7ff"><text x="86" y="40" font-size="14">z</text><text x="98" y="28" font-size="10">z</text></g>`),
+  'toeicL|数字まちがい': sprite('numwrong', `
+<g stroke="${OL}" stroke-width="3" font-weight="900" font-size="26">${[[32, '1', '#fde047'], [62, '5', '#f472b6']].map(([x, t, c]) => `<rect x="${x - 16}" y="36" width="34" height="52" rx="8" fill="${c}"/><text x="${x + 1}" y="72" text-anchor="middle" fill="${OL}" stroke="none">${t}</text>`).join('')}<rect x="80" y="36" width="34" height="52" rx="8" fill="#cbd5e1" stroke-dasharray="5 3"/><text x="97" y="72" text-anchor="middle" fill="#64748b" stroke="none">0?</text></g>
+<g fill="${OL}"><circle cx="26" cy="46" r="1.8"/><circle cx="38" cy="46" r="1.8"/><circle cx="56" cy="46" r="1.8"/><circle cx="68" cy="46" r="1.8"/></g>`),
+  'toeicL|言いかえ忍者': sprite('ninjapara', `
+<path d="M26 112 q2 -32 34 -36 q32 4 34 36z" fill="#1e293b" stroke="${OL}" stroke-width="3"/>
+<circle cx="60" cy="54" r="28" fill="#1e293b" stroke="${OL}" stroke-width="3"/><rect x="34" y="46" width="52" height="16" fill="#f5d0b0" stroke="${OL}" stroke-width="2.5"/>${evil(54, 11, '#111827')}
+<path d="M84 44 q14 -6 20 4 q-10 0 -14 6" fill="#ef4444" stroke="${OL}" stroke-width="2"/>
+<g transform="translate(98 88) rotate(20)"><path d="M0 -10 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3z" fill="#cbd5e1" stroke="${OL}" stroke-width="1.5"/></g>`),
+  // ----- 回ごとの雑魚 -----
+  'toeicL|being 幽霊': sprite('beingghost', `
+<path d="M28 96 q-6 -58 32 -64 q38 6 32 64 l-8 -8 l-8 10 l-8 -10 l-8 10 l-8 -10 l-8 10 l-8 -10z" fill="#e0f2fe" fill-opacity=".8" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+${evil(54, 10, '#7dd3fc')}<ellipse cx="60" cy="72" rx="5" ry="7" fill="#0c4a6e"/>
+<rect x="82" y="84" width="22" height="18" rx="2" fill="#78350f" stroke="${OL}" stroke-width="2"/>`),
+  'toeicL|着ている状態の影': sprite('wearshadow', `
+<path d="M30 40 l14 -10 h32 l14 10 l14 20 l-12 8 l-8 -10 v52 h-48 v-52 l-8 10 l-12 -8z" fill="#475569" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M50 30 l10 12 l10 -12" fill="none" stroke="${OL}" stroke-width="2.5"/>${evil(64, 12, '#fde047')}<path d="M50 82 q10 -5 20 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'toeicL|Yes/No 小僧': sprite('yesno', `
+<circle cx="60" cy="64" r="32" fill="#fcd34d" stroke="${OL}" stroke-width="3"/><path d="M28 58 q0 -30 32 -30 q32 0 32 30 q-16 -10 -32 -10 q-16 0 -32 10z" fill="#1f2937" stroke="${OL}" stroke-width="3"/>
+${evil(66, 11, '#fff')}${grin(80, 10)}
+<g font-weight="900" font-size="13" stroke="${OL}" stroke-width=".6"><text x="6" y="40" fill="#4ade80">○</text><text x="100" y="40" fill="#f87171">×</text></g>`),
+  'toeicL|選択疑問ゴブリン': sprite('ororgoblin', `
+<path d="M26 40 l-14 -6 l12 18 M94 40 l14 -6 l-12 18" fill="#84cc16" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="60" cy="62" r="30" fill="#84cc16" stroke="${OL}" stroke-width="3"/>${evil(58, 11, '#fde047')}${grin(74, 10)}
+<g stroke="${OL}" stroke-width="2"><rect x="10" y="84" width="22" height="16" rx="3" fill="#f87171"/><rect x="88" y="84" width="22" height="16" rx="3" fill="#60a5fa"/></g>`),
+  'toeicL|3人目の声': sprite('third', `
+${[[26, 70, '#f472b6'], [60, 56, '#a78bfa'], [94, 70, '#38bdf8']].map(([x, y, c], i) => `<g><circle cx="${x}" cy="${y}" r="16" fill="${c}" stroke="${OL}" stroke-width="3"/><circle cx="${x - 5}" cy="${y - 2}" r="2" fill="${OL}"/><circle cx="${x + 5}" cy="${y - 2}" r="2" fill="${OL}"/><ellipse cx="${x}" cy="${y + 7}" rx="${i === 1 ? 5 : 3}" ry="${i === 1 ? 4 : 2}" fill="#7f1d1d"/></g>`).join('')}
+${waves(60, 30, '#fde047')}`),
+  'toeicL|次の行動ピクシー': sprite('pixie', `
+<path d="M48 54 q-26 -26 -32 -6 q10 6 30 12 M72 54 q26 -26 32 -6 q-10 6 -30 12" fill="#bae6fd" fill-opacity=".85" stroke="${OL}" stroke-width="2.5"/>
+<ellipse cx="60" cy="72" rx="14" ry="22" fill="#a3e635" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="46" r="14" fill="#a3e635" stroke="${OL}" stroke-width="3"/>${evil(46, 5, '#fff')}
+<path d="M84 96 h20 l-6 -6 M104 96 l-6 6" stroke="#fde047" stroke-width="3" fill="none" stroke-linecap="round"/>`),
+  'toeicL|アナウンス嵐': sprite('announce', `
+<path d="M20 52 h18 l36 -22 v68 l-36 -22 h-18z" fill="#f97316" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M38 52 v24" stroke="${OL}" stroke-width="2.5"/>
+${waves(84, 64, '#fde047')}<g transform="translate(18 20)"><path d="M10 0 l-6 12 h8 l-6 12" stroke="#fde047" stroke-width="3" fill="none"/></g>
+${evil(62, 0, '#fff').replace(/cx="60"/g, 'cx="52"')}<g transform="translate(52 64)"><circle cx="-6" r="2" fill="${OL}"/><circle cx="6" r="2" fill="${OL}"/></g>`),
+  'toeicL|留守電ミミック': sprite('phonemimic', `
+<rect x="22" y="40" width="76" height="58" rx="10" fill="#334155" stroke="${OL}" stroke-width="3"/><path d="M30 40 q30 -30 60 0" fill="#475569" stroke="${OL}" stroke-width="3"/>
+<path d="M30 70 q30 26 60 0 q-30 8 -60 0z" fill="#7f1d1d" stroke="${OL}" stroke-width="2.5"/><path d="M34 72 l4 6 l4 -5 l4 6 l4 -5 l4 6 l4 -5 l4 6 l4 -5 l4 6 l4 -5 l4 6 l4 -6" fill="none" stroke="#fff" stroke-width="1.6"/>
+${evil(58, 14, '#fde047')}<circle cx="88" cy="50" r="4" fill="#ef4444"/>`),
+  // ----- 回のボス -----
+  'toeicL|写真の番人': sprite('photoguard', `
+<rect x="14" y="34" width="92" height="66" rx="10" fill="#1f2937" stroke="${OL}" stroke-width="3"/><rect x="38" y="22" width="30" height="14" rx="3" fill="#374151" stroke="${OL}" stroke-width="2.5"/>
+<circle cx="60" cy="67" r="25" fill="#0ea5e9" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="67" r="15" fill="#082f49"/><circle cx="60" cy="67" r="6" fill="#ef4444"/><circle cx="66" cy="61" r="4" fill="#fff"/>
+<path d="M30 46 l14 6 M90 46 l-14 6" stroke="#fde047" stroke-width="3" stroke-linecap="round"/><path d="M96 40 l4 -12 l6 10" fill="url(#eg-photoguard)" stroke="${OL}" stroke-width="1.5"/>`, { aura: '#0ea5e9' }),
+  'toeicL|応答の門番': sprite('gatekeeper', `
+<path d="M14 110 v-60 q0 -34 46 -34 q46 0 46 34 v60z" fill="#78350f" stroke="${OL}" stroke-width="3"/><path d="M28 110 v-56 q0 -24 32 -24 q32 0 32 24 v56z" fill="#451a03" stroke="${OL}" stroke-width="2.5"/>
+<g stroke="#a16207" stroke-width="3"><path d="M44 34 v76 M60 30 v80 M76 34 v76"/></g>${evil(58, 14, '#fbbf24')}${grin(74, 13)}`, { aura: '#f59e0b' }),
+  'toeicL|会話のうず': sprite('convvortex', `
+<path d="M60 64 m-40 0 a40 40 0 1 1 40 40 a28 28 0 1 1 -24 -40 a16 16 0 1 1 20 12" fill="none" stroke="${OL}" stroke-width="10" stroke-linecap="round"/><path d="M60 64 m-40 0 a40 40 0 1 1 40 40 a28 28 0 1 1 -24 -40 a16 16 0 1 1 20 12" fill="none" stroke="#818cf8" stroke-width="6" stroke-linecap="round"/>
+${bubble(6, 10, 26, 18, '#fbcfe8')}${bubble(88, 14, 26, 18, '#bfdbfe')}${evil(62, 9, '#fde047')}`, { aura: '#818cf8' }),
+  'toeicL|ラジオの怪人': sprite('radiomon', `
+<path d="M42 32 l-12 -20 M78 32 l12 -20" stroke="${OL}" stroke-width="3"/><circle cx="30" cy="12" r="4" fill="#ef4444"/><circle cx="90" cy="12" r="4" fill="#ef4444"/>
+<rect x="16" y="32" width="88" height="68" rx="12" fill="#b45309" stroke="${OL}" stroke-width="3"/><rect x="24" y="40" width="44" height="52" rx="6" fill="#78350f" stroke="${OL}" stroke-width="2"/>
+<g fill="#451a03">${[0, 1, 2, 3, 4].map((i) => `<rect x="28" y="${46 + i * 9}" width="36" height="4" rx="2"/>`).join('')}</g>
+<circle cx="86" cy="54" r="9" fill="#fde047" stroke="${OL}" stroke-width="2"/><circle cx="86" cy="80" r="7" fill="#fbbf24" stroke="${OL}" stroke-width="2"/>
+<path d="M28 50 l14 5 M64 50 l-14 5" stroke="#fde047" stroke-width="3"/><circle cx="36" cy="60" r="3" fill="#fde047"/><circle cx="56" cy="60" r="3" fill="#fde047"/>`, { aura: '#f97316' }),
+  'toeicL|金のイヤホン': gold('goldbuds', `
+<path d="M38 74 q-4 20 22 30 q26 -10 22 -30" stroke="${OL}" stroke-width="2.5" fill="none"/>
+<g stroke="${OL}" stroke-width="3"><rect x="32" y="56" width="10" height="22" rx="5" fill="url(#eg-goldbuds)"/><rect x="78" y="56" width="10" height="22" rx="5" fill="url(#eg-goldbuds)"/><circle cx="37" cy="48" r="17" fill="url(#eg-goldbuds)"/><circle cx="83" cy="48" r="17" fill="url(#eg-goldbuds)"/></g>
+${smug(46, 0).replace(/60 - 6/g, '31').replace(/60 \+ 0 - 6/g, '77')}<g fill="none" stroke="${OL}" stroke-width="2.4" stroke-linecap="round"><path d="M31 46 q6 -4 12 0 M77 46 q6 -4 12 0"/></g>`),
+  // ----- ステージ専用 -----
+  'toeicL|ななめ写真': sprite('tiltphoto', `
+<g transform="rotate(-14 60 64)"><rect x="22" y="32" width="76" height="62" rx="3" fill="#fff" stroke="${OL}" stroke-width="3"/><rect x="28" y="38" width="64" height="44" fill="#bae6fd"/><path d="M28 82 l20 -20 l14 12 l12 -10 l18 18z" fill="#4ade80"/></g>
+${evil(54, 12, '#fff')}`),
+  'toeicL|物だけ写真': sprite('chairphoto', `
+<path d="M36 30 h48 v38 h-48z" fill="#b45309" stroke="${OL}" stroke-width="3"/><rect x="30" y="66" width="60" height="12" rx="3" fill="#d97706" stroke="${OL}" stroke-width="3"/><path d="M36 78 v28 M84 78 v28" stroke="${OL}" stroke-width="5" stroke-linecap="round"/>
+${evil(48, 11, '#fde047')}<path d="M52 60 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'toeicL|金のカメラ': gold('goldcam', `
+<rect x="18" y="40" width="84" height="58" rx="8" fill="url(#eg-goldcam)" stroke="${OL}" stroke-width="3"/><rect x="42" y="28" width="28" height="14" rx="3" fill="url(#eg-goldcam)" stroke="${OL}" stroke-width="2.5"/>
+<circle cx="60" cy="70" r="20" fill="#fef9c3" stroke="${OL}" stroke-width="3"/>${smug(68, 7)}`),
+  'toeicL|動作まちがい': sprite('actwrong', `
+<g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M6 60 h16 M10 74 h12"/></g>
+<path d="M44 104 l8 -22 l-16 -8 M76 104 l-6 -22 l16 -4" stroke="${OL}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="60" cy="62" rx="26" ry="28" fill="#fb923c" stroke="${OL}" stroke-width="3"/>${evil(56, 10, '#fff')}<path d="M52 72 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'toeicL|場所の言いかえ': sprite('placepara', `
+<path d="M60 104 q-26 -28 -26 -50 a26 26 0 0 1 52 0 q0 22 -26 50z" fill="#22c55e" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="52" r="14" fill="#fff" stroke="${OL}" stroke-width="2.5"/>${evil(52, 6, '#86efac')}
+<path d="M22 30 l12 8 M98 30 l-12 8" stroke="#fde047" stroke-width="3" stroke-linecap="round"/>`),
+  'toeicL|金のフィルム': gold('goldfilm', `
+<path d="M14 40 h92 v40 h-92z" fill="url(#eg-goldfilm)" stroke="${OL}" stroke-width="3"/><g fill="#78350f">${[0, 1, 2, 3, 4, 5, 6].map((i) => `<rect x="${18 + i * 13}" y="43" width="7" height="5" rx="1"/><rect x="${18 + i * 13}" y="72" width="7" height="5" rx="1"/>`).join('')}</g>
+<rect x="44" y="50" width="32" height="20" fill="#fef9c3" stroke="${OL}" stroke-width="2"/>${smug(58, 6)}`),
+  'toeicL|Who の影': sprite('whoshadow', `
+<path d="M30 112 q-4 -34 30 -40 q34 6 30 40z" fill="#1e293b" stroke="${OL}" stroke-width="3"/><path d="M26 52 q0 -30 34 -30 q34 0 34 30 l10 4 h-88z" fill="#1e293b" stroke="${OL}" stroke-width="3"/>
+<ellipse cx="60" cy="62" rx="22" ry="16" fill="#0f172a" stroke="${OL}" stroke-width="2"/>${evil(60, 8, '#fde047')}`),
+  'toeicL|How much 商人': sprite('merchant', `
+<path d="M30 104 q-4 -36 30 -40 q34 4 30 40z" fill="#a16207" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="46" r="22" fill="#fcd34d" stroke="${OL}" stroke-width="3"/>
+<path d="M36 30 q24 -18 48 0 l-4 6 h-40z" fill="#7c2d12" stroke="${OL}" stroke-width="2.5"/>${evil(46, 8, '#fff')}<path d="M52 56 q8 6 16 0" stroke="${OL}" stroke-width="2" fill="none"/>
+<g transform="translate(92 88)"><circle r="12" fill="#facc15" stroke="${OL}" stroke-width="2.5"/><text y="5" text-anchor="middle" font-size="13" font-weight="900" fill="#92400e">$</text></g>`),
+  'toeicL|金のマイク': gold('goldmic', `
+<path d="M60 76 v24 M44 104 h32" stroke="${OL}" stroke-width="5" stroke-linecap="round"/><path d="M40 56 q0 22 20 22 q20 0 20 -22" fill="none" stroke="${OL}" stroke-width="4"/>
+<rect x="44" y="20" width="32" height="52" rx="16" fill="url(#eg-goldmic)" stroke="${OL}" stroke-width="3"/>${smug(46, 6)}`),
+  'toeicL|提案スルー': sprite('ignoreprop', `
+${blob('#f87171', 68, 30, 30)}<path d="M42 62 l12 2 M66 64 l12 -2" stroke="${OL}" stroke-width="3" stroke-linecap="round"/><path d="M50 80 h20" stroke="${OL}" stroke-width="2.5"/>
+<path d="M20 36 l14 14 M34 36 l-14 14" stroke="${OL}" stroke-width="6" stroke-linecap="round"/><path d="M20 36 l14 14 M34 36 l-14 14" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>`),
+  'toeicL|わかりません回答': sprite('dunno', `
+<path d="M14 62 l18 -8 l6 10 M106 62 l-18 -8 l-6 10" stroke="${OL}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+${blob('#c4b5fd', 70, 28, 28)}<path d="M44 62 q5 -4 10 0 M66 62 q5 -4 10 0" stroke="${OL}" stroke-width="2.6" fill="none"/><path d="M52 80 q8 4 16 0" stroke="${OL}" stroke-width="2.2" fill="none"/>
+<text x="54" y="34" font-size="18" font-weight="900" fill="#fde047">?</text>`),
+  'toeicL|金の受話器': gold('goldphone', `
+<path d="M28 34 q-10 10 -4 24 l14 -6 q-4 -8 2 -12z M92 86 q10 -10 4 -24 l-14 6 q4 8 -2 12z" fill="url(#eg-goldphone)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M34 40 q26 -6 52 44" stroke="${OL}" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M34 40 q26 -6 52 44" stroke="url(#eg-goldphone)" stroke-width="8" fill="none" stroke-linecap="round"/>
+<circle cx="56" cy="58" r="13" fill="url(#eg-goldphone)" stroke="${OL}" stroke-width="2.5"/>${smug(56, 5).replace(/60 -/g, '56 -').replace(/60 \+/g, '56 +')}`),
+  'toeicL|予約の会話': sprite('reserve', `
+<rect x="22" y="30" width="76" height="74" rx="8" fill="#fff" stroke="${OL}" stroke-width="3"/><rect x="22" y="30" width="76" height="18" rx="8" fill="#38bdf8" stroke="${OL}" stroke-width="3"/>
+<circle cx="78" cy="78" r="9" fill="none" stroke="#ef4444" stroke-width="3"/>${evil(66, 12, '#fde047').replace(/60 -/g, '52 -').replace(/60 \+/g, '52 +')}`),
+  'toeicL|お店の会話': sprite('shopbag', `
+<path d="M28 44 h64 l6 62 h-76z" fill="#ec4899" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M44 44 v-10 q0 -12 16 -12 q16 0 16 12 v10" fill="none" stroke="${OL}" stroke-width="3"/>
+${evil(68, 12, '#fff')}${grin(82, 10)}`),
+  'toeicL|金の会話': gold('goldtalk', `${bubble(20, 28, 74, 56, 'url(#eg-goldtalk)')}${smug(52, 10).replace(/60 -/g, '57 -').replace(/60 \+/g, '57 +')}`),
+  'toeicL|出張の会話': sprite('tripcase', `
+<rect x="20" y="42" width="80" height="58" rx="8" fill="#0d9488" stroke="${OL}" stroke-width="3"/><path d="M46 42 v-10 h28 v10" fill="none" stroke="${OL}" stroke-width="3"/><path d="M20 70 h80" stroke="#134e4a" stroke-width="2.5"/>
+<g stroke="${OL}" stroke-width="1.5"><rect x="24" y="78" width="16" height="10" fill="#fde047" transform="rotate(-10 32 83)"/></g>${evil(58, 14, '#fff')}`),
+  'toeicL|職場の3人': sprite('office3', `
+${[[30, '#f87171'], [60, '#60a5fa'], [90, '#4ade80']].map(([x, c], i) => `<g><path d="M${x - 14} 110 q0 -24 14 -26 q14 2 14 26z" fill="${c}" stroke="${OL}" stroke-width="2.5"/><circle cx="${x}" cy="${i === 1 ? 62 : 70}" r="13" fill="${c}" stroke="${OL}" stroke-width="2.5"/><circle cx="${x - 4}" cy="${i === 1 ? 60 : 68}" r="1.8" fill="${OL}"/><circle cx="${x + 4}" cy="${i === 1 ? 60 : 68}" r="1.8" fill="${OL}"/></g>`).join('')}
+${bubble(42, 18, 36, 22, '#fff')}`),
+  'toeicL|金のヘッドセット': gold('goldheadset', `
+<path d="M28 66 q0 -40 32 -40 q32 0 32 40" fill="none" stroke="${OL}" stroke-width="9"/><path d="M28 66 q0 -40 32 -40 q32 0 32 40" fill="none" stroke="url(#eg-goldheadset)" stroke-width="5"/>
+<rect x="18" y="58" width="18" height="28" rx="7" fill="url(#eg-goldheadset)" stroke="${OL}" stroke-width="3"/><rect x="84" y="58" width="18" height="28" rx="7" fill="url(#eg-goldheadset)" stroke="${OL}" stroke-width="3"/>
+<path d="M28 86 q4 18 24 18" stroke="${OL}" stroke-width="3" fill="none"/><circle cx="54" cy="104" r="4" fill="url(#eg-goldheadset)" stroke="${OL}" stroke-width="1.5"/>${smug(62, 9)}`),
+  'toeicL|空港アナウンス': sprite('airport', `
+<path d="M10 66 l40 -6 l30 -30 h10 l-14 30 l26 -2 l8 -10 h6 l-4 18 l4 18 h-6 l-8 -10 l-26 -2 l14 30 h-10 l-30 -30 l-40 -6z" fill="#e2e8f0" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+${evil(62, 0, '#fff').replace(/cx="60"/g, 'cx="40"')}<g transform="translate(40 64)"><circle cx="-5" r="2" fill="${OL}"/><circle cx="5" r="2" fill="${OL}"/></g>`),
+  'toeicL|天気予報': sprite('weather', `
+<circle cx="40" cy="40" r="16" fill="#fde047" stroke="${OL}" stroke-width="3"/>
+<path d="M30 80 q0 -22 22 -22 q6 -14 22 -12 q18 2 18 18 q14 2 12 16 z" fill="#94a3b8" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<g stroke="#38bdf8" stroke-width="3" stroke-linecap="round"><path d="M44 90 l-4 10 M60 90 l-4 10 M76 90 l-4 10"/></g>${evil(70, 10, '#fff').replace(/60 -/g, '66 -').replace(/60 \+/g, '66 +')}`),
+  'toeicL|金のスピーカー': gold('goldspk', `
+<rect x="30" y="22" width="60" height="84" rx="8" fill="url(#eg-goldspk)" stroke="${OL}" stroke-width="3"/><circle cx="60" cy="76" r="18" fill="#78350f" stroke="${OL}" stroke-width="2.5"/><circle cx="60" cy="76" r="8" fill="#a16207"/>
+${smug(42, 9)}${waves(96, 70, '#fde68a')}`),
+  'toeicL|工場見学ガイド': sprite('factory', `
+<path d="M14 104 v-44 l22 -14 v14 l22 -14 v14 l22 -14 v58z" fill="#64748b" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><rect x="84" y="24" width="14" height="80" fill="#475569" stroke="${OL}" stroke-width="3"/>
+<path d="M90 20 q-6 -10 4 -14 q10 -2 10 6" fill="#e2e8f0" stroke="${OL}" stroke-width="2"/>${evil(78, 18, '#fde047').replace(/60 -/g, '46 -').replace(/60 \+/g, '46 +')}`),
+  'toeicL|社内連絡': sprite('memo', `
+<path d="M30 24 h52 l10 10 v74 h-62z" fill="#fef9c3" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><circle cx="60" cy="24" r="6" fill="#ef4444" stroke="${OL}" stroke-width="2"/>
+<g stroke="#cbd5e1" stroke-width="2.5"><path d="M38 86 h40 M38 94 h30"/></g>${evil(56, 10, '#a78bfa')}<path d="M52 70 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>`),
+  'toeicL|金のラジオ': gold('goldradio', `
+<path d="M38 36 l26 -14" stroke="${OL}" stroke-width="3"/><rect x="16" y="36" width="88" height="62" rx="12" fill="url(#eg-goldradio)" stroke="${OL}" stroke-width="3"/>
+<circle cx="40" cy="70" r="14" fill="#78350f" stroke="${OL}" stroke-width="2.5"/><rect x="62" y="56" width="32" height="12" rx="3" fill="#fef9c3" stroke="${OL}" stroke-width="2"/>${smug(80, 6).replace(/60 -/g, '78 -').replace(/60 \+/g, '78 +')}`),
+});
