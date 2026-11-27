@@ -34,6 +34,35 @@ export const CHARS = {
   gc: { name: 'ガベージコレクタ', icon: '🦝', rar: 3, subj: 'ccpp', hp: 125, atk: 26, skill: { kind: 'revive', pow: 0.3, cost: 5, name: 'メモリ回収' } },
   zou: { name: 'トランザクション象', icon: '🐘', rar: 3, subj: 'db', hp: 140, atk: 24, skill: { kind: 'rollback', pow: 1, cost: 4, name: 'ロールバック' } },
   taka: { name: 'デザインパターン鷹', icon: '🦅', rar: 3, subj: 'sd', hp: 105, atk: 30, skill: { kind: 'triple', pow: 3, cost: 4, name: 'シングルトン' } },
+  // v4.11.0：TOEIC ガチャ（リスニング・リーディング得意）と免許ガチャ。gacha でどのガチャから出るかを決める（なし＝秋学期ガチャ、'all'＝全部）
+  echo: { name: 'エコーコウモリ', icon: '🦇', rar: 1, subj: 'toeicL', gacha: 'toeic', hp: 48, atk: 11, skill: { kind: 'time', pow: 6, cost: 3, name: 'こだま' } },
+  dictat: { name: 'ディクテーション猫', icon: '🐱', rar: 1, subj: 'toeicL', gacha: 'toeic', hp: 50, atk: 10, skill: { kind: 'hint', pow: 2, cost: 3, name: '書き取り' } },
+  risu: { name: 'ナチュラルスピード・リス', icon: '🐿️', rar: 1, subj: 'toeicL', gacha: 'toeic', hp: 46, atk: 11, skill: { kind: 'coin', pow: 1.5, cost: 3, name: 'ためこみ' } },
+  iruka: { name: 'イントネーション・イルカ', icon: '🐬', rar: 2, subj: 'toeicL', gacha: 'toeic', hp: 80, atk: 15, skill: { kind: 'heal', pow: 0.3, cost: 4, name: 'なめらかな抑揚' } },
+  chamele: { name: 'パラフレーズ・カメレオン', icon: '🦎', rar: 2, subj: 'toeicL', gacha: 'toeic', hp: 64, atk: 15, skill: { kind: 'reflect', pow: 0.5, cost: 2, name: '言いかえ返し' } },
+  kurage: { name: 'サウンドウェーブ・クラゲ', icon: '🪼', rar: 2, subj: 'toeicL', gacha: 'toeic', hp: 70, atk: 18, skill: { kind: 'dot', pow: 1.5, cost: 4, name: '音の波' } },
+  ookami: { name: '同時通訳オオカミ', icon: '🐺', rar: 3, subj: 'toeicL', gacha: 'toeic', hp: 115, atk: 29, skill: { kind: 'dmg', pow: 5, cost: 5, name: '同時通訳' } },
+  kujaku: { name: '発音クジャク', icon: '🦚', rar: 3, subj: 'toeicL', gacha: 'toeic', hp: 120, atk: 27, skill: { kind: 'drain', pow: 3, cost: 4, name: '美しい発音' } },
+  hachi: { name: 'スキミング・ハチ', icon: '🐝', rar: 1, subj: 'toeic', gacha: 'toeic', hp: 46, atk: 12, skill: { kind: 'time', pow: 6, cost: 3, name: '飛ばし読み' } },
+  harine: { name: 'スキャニング・ハリネズミ', icon: '🦔', rar: 1, subj: 'toeic', gacha: 'toeic', hp: 52, atk: 10, skill: { kind: 'hint', pow: 2, cost: 3, name: '拾い読み' } },
+  hamu: { name: '単語帳ハムスター', icon: '🐹', rar: 1, subj: 'toeic', gacha: 'toeic', hp: 48, atk: 11, skill: { kind: 'expup', pow: 1.5, cost: 3, name: '単語の積み上げ' } },
+  gorira: { name: '文法ゴリラ', icon: '🦍', rar: 2, subj: 'toeic', gacha: 'toeic', hp: 90, atk: 14, skill: { kind: 'guard', pow: 3, cost: 3, name: '文法の守り' } },
+  hitsuji: { name: '品詞ヒツジ', icon: '🐑', rar: 2, subj: 'toeic', gacha: 'toeic', hp: 78, atk: 15, skill: { kind: 'heal', pow: 0.3, cost: 4, name: 'ふわふわ品詞' } },
+  kirin: { name: '長文キリン', icon: '🦒', rar: 2, subj: 'toeic', gacha: 'toeic', hp: 74, atk: 17, skill: { kind: 'triple', pow: 2, cost: 3, name: 'ロングリーチ' } },
+  chita: { name: '速読チーター', icon: '🐆', rar: 3, subj: 'toeic', gacha: 'toeic', hp: 110, atk: 30, skill: { kind: 'dmg', pow: 5, cost: 5, name: '速読ダッシュ' } },
+  raion: { name: '語彙ライオン', icon: '🦁', rar: 3, subj: 'toeic', gacha: 'toeic', hp: 122, atk: 27, skill: { kind: 'drain', pow: 3, cost: 4, name: 'ボキャブラ・ロア' } },
+  hiyoko: { name: 'ひよこドライバー', icon: '🐤', rar: 1, subj: 'menkyo', gacha: 'menkyo', hp: 52, atk: 10, skill: { kind: 'guard', pow: 2, cost: 3, name: '安全運転' } },
+  ebi: { name: 'シグナル・ロブスター', icon: '🦞', rar: 1, subj: 'menkyo', gacha: 'menkyo', hp: 48, atk: 11, skill: { kind: 'time', pow: 6, cost: 3, name: '赤信号ストップ' } },
+  kamo: { name: '合流カモ', icon: '🦆', rar: 1, subj: 'menkyo', gacha: 'menkyo', hp: 50, atk: 10, skill: { kind: 'heal', pow: 0.15, cost: 3, name: 'ゆずりあい' } },
+  hakusen: { name: '白線ドッグ', icon: '🐕', rar: 2, subj: 'menkyo', gacha: 'menkyo', hp: 80, atk: 15, skill: { kind: 'shield', pow: 1, cost: 3, name: '車線キープ' } },
+  shirokuma: { name: '雪道シロクマ', icon: '🐻‍❄️', rar: 2, subj: 'menkyo', gacha: 'menkyo', hp: 92, atk: 14, skill: { kind: 'weaken', pow: 3, cost: 3, name: 'スタッドレス' } },
+  uma: { name: '馬力ウマ', icon: '🐴', rar: 2, subj: 'menkyo', gacha: 'menkyo', hp: 70, atk: 19, skill: { kind: 'dmg', pow: 3, cost: 4, name: '馬力' } },
+  bison: { name: 'ブレーキ・バイソン', icon: '🦬', rar: 3, subj: 'menkyo', gacha: 'menkyo', hp: 135, atk: 25, skill: { kind: 'reflect', pow: 0.5, cost: 3, name: '急ブレーキ' } },
+  tora2: { name: 'ハイウェイ・タイガー', icon: '🐅', rar: 3, subj: 'menkyo', gacha: 'menkyo', hp: 108, atk: 30, skill: { kind: 'triple', pow: 3, cost: 4, name: '追い越し車線' } },
+  // ガチャ限定の★★★★（そのガチャだけから出る）
+  synapse: { name: 'シナプス', icon: '🧠', rar: 4, subj: null, gacha: 'aki', hp: 120, atk: 27, skill: { kind: 'memory', pow: 2, cost: 4, name: '長期記憶' }, prof: '神経と神経のつなぎ目。くり返すほど記憶が強くなる。秋学期ガチャ限定。' },
+  etymo: { name: 'エティモロジー', icon: '🌳', rar: 4, subj: null, gacha: 'toeic', hp: 120, atk: 30, skill: { kind: 'roots', pow: 4, cost: 4, name: 'ルーツをたどる' }, prof: '語源（単語の根っこ）を知る大樹。知らない単語も根っこからわかる。TOEIC ガチャ限定。' },
+  ditf: { name: 'ドア・イン・ザ・フェイス', icon: '🚪', rar: 4, subj: null, gacha: 'menkyo', hp: 120, atk: 30, skill: { kind: 'halfcharge', pow: 0.5, cost: 4, name: 'リジェクト・アンド・リバース' }, prof: '最初に無理なお願いをして断らせ、本当のお願いを通す交渉術。免許ガチャ限定。' },
   robo: { name: 'ロボ博士', icon: '🤖', rar: 3, subj: 'ccpp', hp: 100, atk: 28, skill: { kind: 'dmg', pow: 4, cost: 4, name: 'コンパイル砲' } },
   kujira: { name: 'クジラ', icon: '🐳', rar: 3, subj: 'db', hp: 130, atk: 22, skill: { kind: 'heal', pow: 0.6, cost: 4, name: 'しおふき' } },
   chou: { name: 'チョウ', icon: '🦋', rar: 3, subj: 'sd', hp: 90, atk: 26, skill: { kind: 'time', pow: 15, cost: 3, name: 'りんぷん' } },
@@ -50,10 +79,10 @@ export const CHARS = {
   yankee: { name: '隣の部屋のヤンキー', icon: '😎', rar: 3, subj: 'db', hp: 160, atk: 26, limited: 'mid', skill: { kind: 'guard', pow: 2, cost: 3, name: 'ガン飛ばし' } },
   spec: { name: '設計竜スペック', icon: '🐲', rar: 3, subj: 'sd', hp: 145, atk: 33, limited: 'mid', skill: { kind: 'dmg', pow: 5, cost: 4, name: '仕様書ブレス' } },
   // ★★★★（レジェンド）：勉強に出てくる用語がモチーフ。得意科目なし。ステータスは★★★（HP120・攻撃28）をもとに決める
-  tachyon: { name: 'タキオン', icon: '⚡', rar: 4, subj: null, hp: 84, atk: 20, skill: { kind: 'charge', pow: 1, cost: 2, name: '超光速チャージ' }, prof: '光より速く動くといわれる仮想の粒子。仲間のスキルの時間を早める。' },
-  nyukuri: { name: 'ニュクリ', icon: '☢️', rar: 4, subj: null, hp: 1, fixHp: true, atk: 36, skill: { kind: 'nuke', pow: 6, cost: 5, name: '核分裂インパクト' }, prof: '原子核（nucleus）の化身。とてつもない力を持つが、体はHP 1しかない。' },
-  homeo: { name: 'ホメオスタシス', icon: '💚', rar: 4, subj: null, hp: 144, atk: 22, skill: { kind: 'homeo', pow: 3, cost: 4, name: '恒常性の維持' }, prof: '体の中をいつも同じ状態に保つ番人。どんなに攻撃されても倒れない。' },
-  inertia: { name: 'イナーシャ', icon: '⚙️', rar: 4, subj: null, hp: 108, atk: 25, skill: { kind: 'inertia', pow: 3, cost: 4, name: '止まらない勢い' }, prof: '慣性の法則の鋼のよろい。一度ついた勢いは、ミスしても止まらない。' },
+  tachyon: { name: 'タキオン', icon: '⚡', rar: 4, gacha: 'all', subj: null, hp: 84, atk: 20, skill: { kind: 'charge', pow: 1, cost: 2, name: '超光速チャージ' }, prof: '光より速く動くといわれる仮想の粒子。仲間のスキルの時間を早める。' },
+  nyukuri: { name: 'ニュクリ', icon: '☢️', rar: 4, gacha: 'all', subj: null, hp: 1, fixHp: true, atk: 36, skill: { kind: 'nuke', pow: 6, cost: 5, name: '核分裂インパクト' }, prof: '原子核（nucleus）の化身。とてつもない力を持つが、体はHP 1しかない。' },
+  homeo: { name: 'ホメオスタシス', icon: '💚', rar: 4, gacha: 'all', subj: null, hp: 144, atk: 22, skill: { kind: 'homeo', pow: 3, cost: 4, name: '恒常性の維持' }, prof: '体の中をいつも同じ状態に保つ番人。どんなに攻撃されても倒れない。' },
+  inertia: { name: 'イナーシャ', icon: '⚙️', rar: 4, gacha: 'all', subj: null, hp: 108, atk: 25, skill: { kind: 'inertia', pow: 3, cost: 4, name: '止まらない勢い' }, prof: '慣性の法則の鋼のよろい。一度ついた勢いは、ミスしても止まらない。' },
   // ラスボスを★3で倒すと仲間になる★★★★（ガチャには出ない）。bonus：章ごとの攻撃の倍率（得意のかわり）
   noiseking: { name: '雑音王ノイズキング', icon: '🎧', rar: 4, subj: 'toeicL', hp: 120, atk: 30, limited: 'last', bonus: { toeicL: 1.5, toeic: 1.5, other: 0.8 }, skill: { kind: 'native', pow: 3, cost: 4, name: 'ネイティブスピード' }, prof: '大音量のスピーカーの王。英語の章では攻撃×1.5、ほかの章では×0.8の英語特化。' },
   tome: { name: '千ページの魔導書', icon: '📕', rar: 4, subj: 'toeic', hp: 110, atk: 32, limited: 'last', skill: { kind: 'speedread', pow: 0.8, cost: 3, name: '速読' }, prof: 'あらゆる文書を読みつくした魔導書。読むのがとにかく速い。' },
@@ -81,6 +110,12 @@ const SKILL_DESC = {
   hint: () => '不正解の選択肢を2つ消す（選択肢は2つ以上残す。○× の問題では制限時間+10秒）',
   healguard: () => 'パーティのHPを全回復し、次の2回受けるダメージ半分',
   charge: () => 'ほかの仲間全員のスキルのゲージを1たまった状態にする（正解1回ぶん）',
+  coin: (k) => `このバトルでもらえるコイン×${k.pow}`,
+  reflect: () => '次に受ける攻撃を半分にして、残りの半分を攻撃してきた敵に返す',
+  drain: (k) => `攻撃力×${k.pow} のダメージ（2体以上なら割り振り）、与えたダメージの30%回復`,
+  memory: () => 'このバトルのあいだ、コンボの上限が2倍（最大×2.0）になり、まちがえてもコンボが半分残る',
+  roots: (k) => `次の${k.pow}問、不正解の選択肢を1つずつ消し、正解すると攻撃1.8倍`,
+  halfcharge: () => 'ほかの仲間全員のスキルのゲージが、半分（必要な数の半分）たまる',
   weaken: (k) => `${k.pow}ターンのあいだ、敵全員の攻撃力−20%`,
   dot: (k) => `3ターンのあいだ、毎ターン敵全員に攻撃力×${k.pow} のダメージ`,
   revive: (k) => `その戦いで1回だけ、HPが0になってもHP${Math.round(k.pow * 100)}%で復活`,
@@ -302,7 +337,7 @@ export function makeRPG(ctx) {
     return ups;
   }
   // 戦闘力：HP÷2 ＋ 攻撃×5（今の科目が得意なら×1.5、全科目なら×1.2）＋ スキルの強さ
-  const SKW = { dmg: 25, heal: 120, time: 5, guard: 18, hint: 50, healguard: 160, charge: 90, nuke: 32, stardust: 30, native: 45, speedread: 40, traffic: 45, weaken: 12, dot: 30, revive: 55, expup: 8, shield: 30, rollback: 50, copy: 40, poly: 35, triple: 30, homeo: 45, inertia: 40 };
+  const SKW = { dmg: 25, heal: 120, time: 5, guard: 18, hint: 50, healguard: 160, charge: 90, nuke: 32, stardust: 30, native: 45, speedread: 40, traffic: 45, coin: 6, reflect: 40, drain: 32, memory: 45, roots: 40, halfcharge: 75, weaken: 12, dot: 30, revive: 55, expup: 8, shield: 30, rollback: 50, copy: 40, poly: 35, triple: 30, homeo: 45, inertia: 40 };
   function power(id, subj = R().subj) {
     const m = member(id), k = m.skill;
     const bonus = m.bonus ? m.bonus[subj] ?? m.bonus.other : m.subj === subj ? 1.3 : m.subj === 'all' ? 1.2 : 1;
@@ -636,10 +671,11 @@ export function makeRPG(ctx) {
   const allyList = () => Object.keys(CHARS).map((id) => ({ id, key: id, ...CHARS[id] }));
   function howToGet(id) {
     const c = CHARS[id];
+    if (!c.limited && c.gacha && c.gacha !== 'all') return `${c.gacha === 'toeic' ? 'TOEIC ガチャ' : c.gacha === 'menkyo' ? '免許ガチャ' : '秋学期ガチャ'}（${RAR[c.rar]}${c.rar === 4 ? '・限定' : ''}）`;
     if (c.limited === 'last') { const sj = Object.keys(LAST).find((k) => LAST[k].reward === id); return `ラスボス「${LAST[sj].title}」を★3でクリア`; }
     if (c.limited === 'mid') { const sj = Object.keys(MID).find((k) => MID[k].reward === id); return `中間ボス「${MID[sj].title}」を★3でクリア`; }
     if (c.limited) return `${CHAPTERS.find((x) => x.id === c.limited)?.name || ''} の章の★集め（50%）`;
-    return c.rar === 4 ? 'ガチャでまれに出る（★★★★ 2%）' : `ガチャ（${RAR[c.rar]}）`;
+    return c.rar === 4 ? 'どのガチャでもまれに出る（★★★★）' : `秋学期ガチャ（${RAR[c.rar]}）`;
   }
   function renderZukan(m) {
     const r = R(); zsubj = zsubj || r.subj; r.zrew = r.zrew || {};
@@ -868,14 +904,22 @@ export function makeRPG(ctx) {
   /* ---------- ガチャ ---------- */
   // 確率：★★★★ 2% ・ ★★★ 4% ・ ★★ 26% ・ ★ 68%。天井：★★★が出ないまま50回目は★★★確定。10連は★★以上1体確定
   const PITY = 50;
-  const poolOf = (rar) => Object.keys(CHARS).filter((id) => CHARS[id].rar === rar && !CHARS[id].limited);
+  // ガチャは3種類。キャラの gacha（なし＝秋学期、'all'＝全部）でどのガチャから出るかが決まる。天井はガチャごとに数える
+  const GACHAS = [
+    { id: 'aki', name: '秋学期ガチャ', sub: 'C/C++・DB・設計の仲間' },
+    { id: 'toeic', name: 'TOEIC ガチャ', sub: 'リスニング・リーディングが得意な仲間' },
+    { id: 'menkyo', name: '免許ガチャ', sub: '免許が得意な仲間' },
+  ];
+  let gk = 'aki';
+  const poolOf = (rar, g = gk) => Object.keys(CHARS).filter((id) => { const c = CHARS[id]; return c.rar === rar && !c.limited && (c.gacha === 'all' || (c.gacha || 'aki') === g); });
+  const pityOf = () => { const r = R(); if (!r.pityBy) r.pityBy = { aki: r.pity || 0 }; return r.pityBy[gk] || 0; };
   function pullOne(minRar = 1) {
-    const r = R();
+    const r = R(); pityOf(); r.pity = r.pityBy[gk] || 0;
     // ★★★★ 2%・★★★ 4%（あわせて6%）。天井の★★★確定でも 1/3 で★★★★
     let x = Math.random(), rar = x < 0.02 ? 4 : x < 0.06 ? 3 : x < 0.32 ? 2 : 1;
     if ((r.pity || 0) + 1 >= PITY && rar < 3) rar = Math.random() < 1 / 3 ? 4 : 3;
     rar = Math.max(rar, minRar);
-    r.pity = rar >= 3 ? 0 : (r.pity || 0) + 1;
+    r.pity = rar >= 3 ? 0 : (r.pity || 0) + 1; r.pityBy[gk] = r.pity;
     const pool = poolOf(rar);
     return pool[rnd(pool.length)];
   }
@@ -922,22 +966,23 @@ export function makeRPG(ctx) {
   }
   function openGacha(B) {
     let showRates = false;
-    const feat = poolOf(3).slice(0, 3);
     const draw = (res) => {
-      const r = R(), left = PITY - (r.pity || 0);
+      const r = R(), left = PITY - pityOf(), G = GACHAS.find((x) => x.id === gk), feat = poolOf(3).slice(0, 3);
       B.innerHTML = `
-        <div class="rp-gbanner"><div class="rp-gbt"><b>秋学期ガチャ</b><small>★★★★ 2%・★★★ 4%　10連は★★以上1体確定</small></div>
+        <div class="seg rp-seg rp-gtabs" role="group">${GACHAS.map((x) => `<button data-gk="${x.id}" aria-pressed="${gk === x.id}">${x.name.replace(' ガチャ', '').replace('ガチャ', '')}</button>`).join('')}</div>
+        <div class="rp-gbanner g-${gk}"><div class="rp-gbt"><b>${G.name}</b><small>${G.sub} ・ ★★★★ 2%・★★★ 4%　10連は★★以上1体確定</small></div>
           <div class="rp-gfeat">${feat.map((id) => `<span>${iconHTML(id)}<small>${esc(CHARS[id].name)}</small></span>`).join('')}</div></div>
         <div class="rp-pity"><span>★★★以上確定まで あと <b>${left}</b> 回</span><span class="rp-pbar"><i style="width:${((PITY - left) / PITY) * 100}%"></i></span></div>
         ${r.tickets ? `<button class="rp-btn gold big wide rp-ticket" data-g="t">🎟️ チケットで1回<small>のこり ${r.tickets}枚</small></button>` : ''}
         <div class="row rp-gbtns"><button class="rp-btn gold big" data-g="1" ${r.coins < 100 ? 'disabled' : ''}>1回<small>🪙100</small></button><button class="rp-btn gold big rp-g10" data-g="10" ${r.coins < 900 ? 'disabled' : ''}>10連<small>🪙900・★★以上確定</small></button></div>
         <p class="rp-have">持っている 🪙 <b>${r.coins}</b>　<button class="rp-link" data-rates>${showRates ? '閉じる' : '提供割合・キャラ一覧'}</button></p>
-        ${showRates ? `<div class="rp-rates2">${[4, 3, 2, 1].map((k) => `<div class="rr${k}"><b>${RAR[k]}　${['', '68%', '26%', '4%', '2%'][k]}</b><span>${k === 4 ? '？？？（出るまでひみつ）' : poolOf(k).map((id) => esc(CHARS[id].name)).join('・')}</span></div>`).join('')}<p class="muted small">かぶったら限界突破（レベル上限+1）。章限定の仲間はガチャには出ない。</p></div>` : ''}
+        ${showRates ? `<div class="rp-rates2">${[4, 3, 2, 1].map((k) => `<div class="rr${k}"><b>${RAR[k]}　${['', '68%', '26%', '4%', '2%'][k]}</b><span>${k === 4 ? `？？？（出るまでひみつ・${poolOf(4).length}体）` : poolOf(k).map((id) => esc(CHARS[id].name)).join('・')}</span></div>`).join('')}<p class="muted small">かぶったら限界突破（レベル上限+1）。章限定の仲間はガチャには出ない。天井はガチャごとに数える。</p></div>` : ''}
         ${res ? `<div class="rp-gres">${res.map(([id, isNew], i) => `<span class="rp-gitem r${CHARS[id].rar}" style="animation-delay:${i * 0.05}s">${iconHTML(id)}<span class="rp-rar">${RAR[CHARS[id].rar]}</span><small>${esc(CHARS[id].name)}</small><em>${isNew ? 'NEW!' : '上限+1'}</em></span>`).join('')}</div>` : ''}`;
     };
     draw();
     B.onclick = (e) => {
       if (e.target.closest('[data-rates]')) { showRates = !showRates; draw(); return; }
+      const tb = e.target.closest('[data-gk]'); if (tb) { gk = tb.dataset.gk; bgm.sfx('tap'); draw(); return; }
       const b = e.target.closest('[data-g]'); if (!b || b.disabled) return;
       const r = R(), tk = b.dataset.g === 't', n = tk ? 1 : +b.dataset.g, cost = tk ? 0 : n === 10 ? 900 : 100;
       if (tk ? !r.tickets : r.coins < cost) return;
@@ -998,7 +1043,7 @@ export function makeRPG(ctx) {
     const maxHp = t.reduce((a, x) => a + x.hp, 0);
     // ウェーブ：雑魚ステージは3ウェーブ、ボス戦は1ウェーブ、中間ボスは1体ずつ
     const waves = isMid || isRev || isLast ? foes.map((_, i) => [i]) : boss ? [foes.map((_, i) => i)] : [0, 1, 2].map((w) => Array.from({ length: slots }, (_, k) => w * slots + k));
-    const st = { foes, waves, wave: 0, active: [...waves[0]], fi: 0, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: isRev ? 60 : Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0, cdMax: 3, cut: 1, chainN: 0, marks: 0, examN: 0, examOk: 0, native: 0, speedCap: 0.4, nullify: 0, weaken: 0, dot: [], revive: 0, expMul: 1, lastDmg: 0, triple: 0 };
+    const st = { foes, waves, wave: 0, active: [...waves[0]], fi: 0, hp: maxHp, maxHp, gauge: Object.fromEntries(t.map((x) => [x.id, 0])), guard: 0, bonusT: 0, q: null, timer: null, left: 0, total: 1, limit: isRev ? 60 : Math.round((boss ? 90 : 12) * D.time), busy: false, combo: 0, correct: 0, miss: 0, over: false, turns: 0, event: null, rares: 0, cdMax: 3, cut: 1, chainN: 0, marks: 0, examN: 0, examOk: 0, native: 0, speedCap: 0.4, nullify: 0, weaken: 0, dot: [], revive: 0, expMul: 1, lastDmg: 0, triple: 0, coinMul: 1, reflect: 0, memory: false, roots: 0 };
     const deckObj = DECKS.find((d) => d.id === subj) || DECKS.find((d) => d.id === subj + lec) || (subj === 'toeic' && DECKS.find((d) => d.id === 'toeic3')) || DECKS[0]; // TOEIC リーディングはレベルごとの単語帳（Part 6・7 は Lv.3）
     const deck = deckObj.words, deckId = deckObj.id;
     // 雑魚戦の単語はその回のものだけ（単語に回の番号が付いている科目）。選択肢のハズレは科目全体から
@@ -1106,6 +1151,7 @@ export function makeRPG(ctx) {
       if (st.guard) { d /= 2; st.guard--; }
       if (st.inertia) d /= 2; // イナーシャ：受けるダメージ半分
       if (st.weaken) d *= 0.8; // デバッグてんとう「バグ報告」
+      if (st.reflect) { d *= 1 - st.reflect; const back = d; st.reflect = 0; const ti = live.find((i) => foes[i].cur > 0); if (ti !== undefined) setTimeout(() => { if (!st.over) hitEnemy(back, '↩ 返し', true, ti); }, 250); drawBuffs(); } // カメレオン・バイソン：半分にして残りを返す
       const before = st.hp;
       st.hp -= Math.round(d); st.lastDmg = Math.round(d);
       if (st.homeo) st.hp = Math.max(st.hp, Math.min(before, Math.ceil(st.maxHp * 0.3))); // ホメオスタシス：30%より下がらない
@@ -1125,7 +1171,7 @@ export function makeRPG(ctx) {
     const cdShort = (f) => (f.cd === 1 ? '⚠️ 次で攻撃' : `⏳ あと${f.cd}ターン`); // 敵が2体以上のときは短く
     const cdHTML = (i) => (turnAtk && foes[i].cd ? `<i class="rp-cd${foes[i].cd === 1 ? ' soon' : ''}" data-cd="${i}">${st.active.length > 1 ? cdShort(foes[i]) : cdTxt(foes[i])}</i>` : '');
     function drawCd() { document.querySelectorAll('[data-cd]').forEach((el) => { const f = foes[+el.dataset.cd]; el.textContent = st.active.length > 1 ? cdShort(f) : cdTxt(f); el.classList.toggle('soon', f.cd === 1); }); }
-    function buffHTML() { return `${st.weaken ? `<span>🐞 敵の攻撃−20% あと${st.weaken}</span>` : ''}${st.dot.length ? `<span>🐍 再帰 あと${Math.max(...st.dot.map((x) => x.n))}</span>` : ''}${st.revive ? '<span>🦝 復活まち</span>' : ''}${st.triple ? `<span>🦅 次の正解×${st.triple}</span>` : ''}${st.expMul > 1 ? `<span>🦜 経験値×${st.expMul}</span>` : ''}${st.native ? `<span>🎧 ネイティブ あと${st.native}</span>` : ''}${st.nullify ? `<span>🛡️ 次のダメージ0${st.nullify > 1 ? `×${st.nullify}` : ''}</span>` : ''}${st.speedCap > 0.4 ? '<span>📕 速読</span>' : ''}${st.homeo ? `<span>💚 恒常性 あと${st.homeo}</span>` : ''}${st.inertia ? `<span class="in">⚙️ 慣性 あと${st.inertia}</span>` : ''}`; }
+    function buffHTML() { return `${st.memory ? '<span>🧠 長期記憶</span>' : ''}${st.roots ? `<span>🌳 ルーツ あと${st.roots}問</span>` : ''}${st.reflect ? '<span>↩ 返しの構え</span>' : ''}${st.coinMul > 1 ? `<span>🐿️ コイン×${st.coinMul}</span>` : ''}${st.weaken ? `<span>🐞 敵の攻撃−20% あと${st.weaken}</span>` : ''}${st.dot.length ? `<span>🐍 再帰 あと${Math.max(...st.dot.map((x) => x.n))}</span>` : ''}${st.revive ? '<span>🦝 復活まち</span>' : ''}${st.triple ? `<span>🦅 次の正解×${st.triple}</span>` : ''}${st.expMul > 1 ? `<span>🦜 経験値×${st.expMul}</span>` : ''}${st.native ? `<span>🎧 ネイティブ あと${st.native}</span>` : ''}${st.nullify ? `<span>🛡️ 次のダメージ0${st.nullify > 1 ? `×${st.nullify}` : ''}</span>` : ''}${st.speedCap > 0.4 ? '<span>📕 速読</span>' : ''}${st.homeo ? `<span>💚 恒常性 あと${st.homeo}</span>` : ''}${st.inertia ? `<span class="in">⚙️ 慣性 あと${st.inertia}</span>` : ''}`; }
     function drawBuffs() { const el = document.getElementById('rp-buffs'); if (el) el.innerHTML = buffHTML(); }
     async function enemyTurn() {
       if (!turnAtk) return;
@@ -1189,6 +1235,7 @@ export function makeRPG(ctx) {
         if (listenW) { const sw = document.getElementById('rp-sayw'); sw.onclick = () => api.say?.(sayText); st.q.sayText = sayText; }
       }
       document.querySelector('#hk-obody')?.scrollTo({ top: 0 });
+      if (st.roots > 0) applyRoots();
       st.busy = false;
       st.left = Math.round((st.q.real ? 90 * D.time : st.limit) * (F.short ? 0.6 : 1) * st.cut) + st.bonusT; // 魔導書は短く、ノイズキングはまちがえると減る
       st.total = st.left;
@@ -1240,6 +1287,7 @@ export function makeRPG(ctx) {
     async function answer(i, btn) {
       if (st.busy || st.over) return;
       st.busy = true; clearInterval(st.timer); st.turns++; st.ans = (st.ans || 0) + 1;
+      if (st.rootsQ) { st.roots = Math.max(0, st.roots - 1); setTimeout(drawBuffs, 0); } // エティモロジー：1問ぶん使った
       const ok = i === st.q.answer;
       const F = foes[st.fi];
       if (isRev) {
@@ -1272,7 +1320,7 @@ export function makeRPG(ctx) {
           line = `<div class="rp-after ok"><b>復讐成功！${F.nemesis ? '（宿敵撃破）' : ''}</b></div>` + await revDetail(i, true);
         } else {
         // 仲間が1人ずつ攻撃。狙った敵が倒れたら、残りの攻撃は自動で次の敵へ
-        const bonus = speed * mult * (1 + Math.min(st.combo - 1, 5) * 0.1) * (F.double ? 2 : 1) * (st.native && /^toeic/.test(subj) ? 2 : 1) * (st.triple ? st.triple : 1);
+        const bonus = speed * mult * (1 + Math.min(st.combo - 1, st.memory ? 10 : 5) * 0.1) * (st.rootsQ ? 1.8 : 1) * (F.double ? 2 : 1) * (st.native && /^toeic/.test(subj) ? 2 : 1) * (st.triple ? st.triple : 1);
         const lbl = mult > 1 ? 'チャンス！' : st.combo > 1 ? `${st.combo}コンボ` : speed > 1.3 ? 'はやい！' : '';
         for (const [k, x] of t.entries()) {
           if (st.over) return;
@@ -1293,7 +1341,7 @@ export function makeRPG(ctx) {
         line = st.q.boss ? `<div class="exp ok"><span class="verdict">正解</span>${st.q.exp}</div>` : `<div class="rp-after ok"><b>正解！</b><span>${st.q.exp}</span></div>`;
         }
       } else {
-        if (!st.inertia) st.combo = 0; st.miss++;
+        if (!st.inertia) st.combo = st.memory ? Math.floor(st.combo / 2) : 0; st.miss++; // シナプス：まちがえてもコンボが半分残る
         if (F.chain) st.chainN = 0;
         if (F.timeCut) { st.cut = Math.max(0.5, st.cut * 0.8); pop('ノイズ！ 時間が減る', 'miss'); }
         if (isLast && subj === 'menkyo' && d === 2) st.cdMax = Math.max(1, st.cdMax - 1); // 暴走王：まちがえるたびに攻撃の間隔が短く
@@ -1308,6 +1356,7 @@ export function makeRPG(ctx) {
           ? `<div class="exp ng"><span class="verdict">${i < 0 ? '時間切れ' : '不正解'}</span>${st.q.exp}</div>`
           : `<div class="rp-after ng"><b>${i < 0 ? '時間切れ…' : 'ざんねん…'}</b><span>${st.q.exp}</span></div>`;
       }
+      st.rootsQ = false;
       if (F.exam10 && F.cur > 0) { // 暴走王〔仮免の試練〕：10問で9問以上正解しないと回復
         st.examN++; if (ok) st.examOk++;
         if (st.examN >= 10) { if (st.examOk < 9) { F.cur = Math.min(F.hp, F.cur + F.hp * 0.3); pop('不合格！ ボスが回復', 'miss'); } else pop('合格！', 'info'); st.examN = st.examOk = 0; drawHp(); }
@@ -1458,6 +1507,13 @@ export function makeRPG(ctx) {
       nextQuestion();
     }
 
+    // エティモロジー「ルーツをたどる」：今の問題の不正解を1つ消す（選択肢は2つ以上残す）。この問題で正解すると攻撃1.8倍
+    function applyRoots() {
+      const all = [...document.querySelectorAll('#rp-q [data-c]')].filter((b) => !b.disabled);
+      const wrong = all.filter((b) => +b.dataset.c !== st.q.answer);
+      if (all.length > 2 && wrong.length) { const b = wrong[rnd(wrong.length)]; b.disabled = true; b.classList.add('rp-gone'); }
+      st.rootsQ = true;
+    }
     // ★★★★のスキル：虹色のカットイン
     function cutIn(x) {
       const el = document.createElement('div'); el.className = 'rp-cutin';
@@ -1474,13 +1530,24 @@ export function makeRPG(ctx) {
         if (src) { x = src; k = src.skill; pop(`🦘 継承：${src.skill.name}`, 'info'); }
       }
       if (k.kind === 'poly') k = st.hp <= st.maxHp / 2 ? { ...k, kind: 'heal', pow: 0.3 } : { ...k, kind: 'dmg' }; // タコ「多態性」
-      if (k.kind === 'weaken') { st.weaken = k.pow; pop('🐞 バグ報告！', 'info'); bgm.sfx('skill'); drawBuffs(); }
-      else if (k.kind === 'dot') { st.dot.push({ n: 3, dmg: atkOf(x) * k.pow }); pop('🐍 再帰呼び出し！', 'info'); bgm.sfx('skill'); drawBuffs(); }
-      else if (k.kind === 'revive') { st.revive = Math.max(st.revive, k.pow); pop('🦝 メモリ回収！', 'heal'); bgm.sfx('heal'); drawBuffs(); }
-      else if (k.kind === 'expup') { st.expMul = Math.max(st.expMul, k.pow); pop('🦜 経験値UP！', 'info'); bgm.sfx('skill'); drawBuffs(); }
-      else if (k.kind === 'shield') { st.nullify += k.pow; pop('🦭 LEFT JOIN！', 'info'); bgm.sfx('skill'); drawBuffs(); }
+      if (k.kind === 'coin') { st.coinMul = Math.max(st.coinMul, k.pow); pop(`${(CHARS[x.id] || x).icon || "✨"} ${k.name}！`, 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'reflect') { st.reflect = k.pow; pop(`${(CHARS[x.id] || x).icon || "✨"} ${k.name}！`, 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'drain') {
+        bgm.sfx('skill'); const L = st.active.filter((i) => foes[i].cur > 0); let dealt = 0;
+        L.forEach((i, j) => { const d0 = (atkOf(x) * k.pow) / (L.length > 1 ? L.length : 1); dealt += d0; hitEnemy(d0, j ? '' : k.name, true, i); });
+        st.hp = Math.min(st.maxHp, st.hp + dealt * 0.3); pop(`+${Math.round(dealt * 0.3)}`, 'heal'); drawHp();
+        if (st.active.some((i) => foes[i].cur <= 0) && !st.busy) { st.busy = true; clearInterval(st.timer); document.querySelectorAll('#rp-q [data-c]').forEach((b) => { b.disabled = true; }); setTimeout(afterTurn, 600); }
+      }
+      else if (k.kind === 'memory') { st.memory = true; pop('🧠 長期記憶！', 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'roots') { st.roots = k.pow; applyRoots(); pop('🌳 ルーツをたどる！', 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'halfcharge') { t.forEach((m) => { if (m.id !== self.id) st.gauge[m.id] = (st.gauge[m.id] || 0) + Math.ceil(m.skill.cost / 2); }); pop('🚪 リジェクト・アンド・リバース！', 'info'); bgm.sfx('skill'); }
+      else if (k.kind === 'weaken') { st.weaken = k.pow; pop(`${(CHARS[x.id] || x).icon || "✨"} ${k.name}！`, 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'dot') { st.dot.push({ n: 3, dmg: atkOf(x) * k.pow }); pop(`${(CHARS[x.id] || x).icon || "✨"} ${k.name}！`, 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'revive') { st.revive = Math.max(st.revive, k.pow); pop(`${(CHARS[x.id] || x).icon || "✨"} ${k.name}！`, 'heal'); bgm.sfx('heal'); drawBuffs(); }
+      else if (k.kind === 'expup') { st.expMul = Math.max(st.expMul, k.pow); pop(`${(CHARS[x.id] || x).icon || "✨"} ${k.name}！`, 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'shield') { st.nullify += k.pow; pop(`${(CHARS[x.id] || x).icon || "✨"} ${k.name}！`, 'info'); bgm.sfx('skill'); drawBuffs(); }
       else if (k.kind === 'rollback') { const back = st.lastDmg || 0; st.hp = Math.min(st.maxHp, st.hp + back); st.lastDmg = 0; pop(back ? `🐘 ロールバック +${back}` : '🐘 ロールバック', 'heal'); bgm.sfx('heal'); drawHp(); }
-      else if (k.kind === 'triple') { st.triple = k.pow; pop('🦅 シングルトン！', 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'triple') { st.triple = k.pow; pop(`${(CHARS[x.id] || x).icon || "✨"} ${k.name}！`, 'info'); bgm.sfx('skill'); drawBuffs(); }
       else if (k.kind === 'heal') { st.hp = Math.min(st.maxHp, st.hp + st.maxHp * k.pow); pop('回復！', 'heal'); bgm.sfx('heal'); drawHp(); }
       else if (k.kind === 'dmg') {
         bgm.sfx('skill');
@@ -1545,7 +1612,7 @@ export function makeRPG(ctx) {
       if (win) {
         stars = 1 + (st.hp / st.maxHp >= 0.5 ? 1 : 0) + (st.miss === 0 ? 1 : 0);
         newBest = stars > (r.stars[dk] || 0);
-        coins = Math.round((boss ? 120 : 40) * (1 + lvIdx * 0.15) * D.rew) * (first ? 2 : 1) + st.rares * 150;
+        coins = Math.round((boss ? 120 : 40) * (1 + lvIdx * 0.15) * D.rew * st.coinMul) * (first ? 2 : 1) + st.rares * 150; // リスのスキルで×1.5
         exp = Math.round((boss ? 80 : 30) * D.rew * (1 + lvIdx * 0.1) * st.expMul); // 強い章ほど経験値も多め（インコのスキルで×1.5）
         food = first ? 2 : 1;
         r.coins += coins; r.clear[id] = 1; if (newBest) r.stars[dk] = stars;

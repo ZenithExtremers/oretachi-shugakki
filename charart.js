@@ -241,6 +241,36 @@ ${eyes(57, '#0ea5e9')}
 <text x="64" y="92" text-anchor="middle" font-size="9" font-weight="900" fill="#1e293b" font-family="serif">F=ma</text>`),
 });
 
+// ===== ガチャ限定の★★★★（v4.11.0）：シナプス（秋学期）・エティモロジー（TOEIC）・ドア・イン・ザ・フェイス（免許） =====
+Object.assign(CHAR_ART, {
+  // シナプス：2つの神経細胞がつながる場所。光の粒（神経伝達物質）がとびかう
+  synapse: wrap4('synapse', '#fbcfe8', '#7e22ce', `
+<g stroke="#f0abfc" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"><path d="M10 30 Q30 40 34 52 M8 70 Q24 66 34 60 M20 100 Q30 84 38 72"/><path d="M110 36 Q92 44 86 56 M112 82 Q96 76 86 68 M100 108 Q90 92 82 76"/></g>
+<circle cx="38" cy="62" r="16" fill="#c084fc" stroke="${OL}" stroke-width="2.5"/><circle cx="38" cy="62" r="7" fill="#7e22ce"/>
+<path d="M52 60 Q60 56 64 60" stroke="#e9d5ff" stroke-width="6" fill="none" stroke-linecap="round"/>
+<path d="M70 50 q12 -4 14 10 q2 14 -14 12 z" fill="#f0abfc" stroke="${OL}" stroke-width="2.5"/>
+<g fill="#fde047">${[[60, 50], [64, 66], [58, 58], [66, 56], [62, 72]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6"/>`).join('')}</g>
+<g fill="#fff" opacity=".9"><circle cx="24" cy="40" r="2"/><circle cx="96" cy="94" r="2"/><circle cx="92" cy="30" r="1.6"/></g>`),
+
+  // エティモロジー：語源の大樹。根っこがアルファベットになっている
+  etymo: wrap4('etymo', '#d9f99d', '#166534', `
+<circle cx="60" cy="44" r="30" fill="#22c55e" stroke="${OL}" stroke-width="2.5"/><circle cx="40" cy="52" r="16" fill="#16a34a" stroke="${OL}" stroke-width="2"/><circle cx="82" cy="50" r="17" fill="#16a34a" stroke="${OL}" stroke-width="2"/>
+<g fill="#facc15"><circle cx="52" cy="34" r="3"/><circle cx="72" cy="40" r="3"/><circle cx="60" cy="54" r="3"/></g>
+<path d="M54 70 h12 l2 26 h-16 z" fill="#92400e" stroke="${OL}" stroke-width="2.5"/>
+<path d="M54 94 Q40 100 26 112 M60 96 V116 M66 94 Q80 100 94 112" stroke="#92400e" stroke-width="5" fill="none" stroke-linecap="round"/>
+<g font-family="serif" font-weight="900" font-size="12" fill="#fef3c7" stroke="${OL}" stroke-width=".6"><text x="18" y="112">re</text><text x="54" y="112">port</text><text x="88" y="112">er</text></g>`),
+
+  // ドア・イン・ザ・フェイス：目の前でバタンと閉まる大きな扉と、すき間からさしこむ光
+  ditf: wrap4('ditf', '#fde68a', '#92400e', `
+<rect x="24" y="16" width="72" height="100" fill="#451a03" stroke="${OL}" stroke-width="3"/>
+<rect x="30" y="22" width="60" height="94" fill="#b45309" stroke="${OL}" stroke-width="2.5"/>
+<rect x="36" y="30" width="48" height="34" rx="3" fill="#d97706" stroke="${OL}" stroke-width="2"/><rect x="36" y="72" width="48" height="36" rx="3" fill="#d97706" stroke="${OL}" stroke-width="2"/>
+<circle cx="80" cy="68" r="4.5" fill="url(#gd-ditf)" stroke="${OL}" stroke-width="1.5"/>
+<path d="M90 22 L112 6 L112 120 L90 116 Z" fill="#fef08a" opacity=".55"/>
+<g stroke="#f43f5e" stroke-width="4" stroke-linecap="round"><path d="M10 40 l10 6 M8 60 h12 M10 80 l10 -6"/></g>
+<text x="60" y="54" text-anchor="middle" font-size="15" font-weight="900" fill="#fef3c7" stroke="${OL}" stroke-width=".8">NO!</text>`),
+});
+
 // ===== ラスボス（TOEIC リスニング・リーディング・免許）と、改心した白バイ隊長。すべてオリジナル =====
 const LK = '#0f172a';
 const lframe = (id, c1, c2, body) => `<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" class="rp-art lb">

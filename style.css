@@ -1643,3 +1643,6 @@ body.rp-night.rp-day {
 @keyframes fla { to { opacity: 0; } }
 .reveal .ms-plan { opacity: .35; }
 .top .ms-tower { opacity: .25; transition: opacity .6s; }
+.rp-gtabs { margin-bottom: 10px; }
+.rp-gbanner.g-toeic { background: linear-gradient(135deg, #0369a1, #ea580c); }
+.rp-gbanner.g-menkyo { background: linear-gradient(135deg, #15803d, #facc15); }
