@@ -1156,16 +1156,19 @@ export function makeRPG(ctx) {
         let c = F.word;
         if (!c) { let rest = qDeck.filter((x) => !usedW.has(x[0])); if (!rest.length) { usedW.clear(); rest = qDeck; } c = rest[rnd(rest.length)]; usedW.add(c[0]); }
         const others = shuffle(wd.filter((x) => x[0] !== c[0])); others.sort((x, y) => (String(y[2]) === String(c[2])) - (String(x[2]) === String(c[2]))); // ハズレもなるべく同じ回から
-        const pool = [c, ...shuffle(others.slice(0, 6))]; const flip = F.word ? false : rnd(2) === 1;
+        const listenW = (F.deck || deckId) === 'toeicL'; // リスニングの章：英語を聞いて意味を選ぶ
+        const pool = [c, ...shuffle(others.slice(0, 6))]; const flip = F.word || listenW ? false : rnd(2) === 1;
         const q = flip ? c[1] : c[0], a = flip ? c[0] : c[1];
         const opts = shuffle([a, ...pool.slice(1, 4).map((x) => (flip ? x[0] : x[1]))]);
-        st.q = { answer: opts.indexOf(a), exp: `<b>${esc(c[0])}</b>：${esc(c[1])}`, n: 4, word: c, deck: F.deck || deckId, choices: opts.map(esc) };
-        qEl.innerHTML = `<div class="rp-zq${q.length > 14 ? ' long' : ''}">${esc(q)}</div>
+        st.q = { answer: opts.indexOf(a), exp: `<b>${esc(c[0])}</b>：${esc(c[1])}`, n: 4, word: c, deck: F.deck || deckId, choices: opts.map(esc), listen: listenW };
+        const sayText = c[3] || c[0];
+        qEl.innerHTML = `${listenW ? `<div class="rp-zq rp-zlisten"><button class="rp-btn" id="rp-sayw">🔊 もう一度きく</button><small>音声を聞いて、意味を選ぶ</small></div>` : `<div class="rp-zq${q.length > 14 ? ' long' : ''}">${esc(q)}</div>`}
           <div class="hk-choices word rp-zc">${opts.map((o, i) => `<button data-c="${i}">${esc(o)}</button>`).join('')}</div>`;
+        if (listenW) { const sw = document.getElementById('rp-sayw'); sw.onclick = () => api.say?.(sayText); api.say?.(sayText); }
       }
       document.querySelector('#hk-obody')?.scrollTo({ top: 0 });
       st.busy = false;
-      st.left = Math.round((st.q.real ? 90 * D.time : st.limit) * (F.short ? 0.6 : 1) * st.cut) + st.bonusT; // 魔導書は短く、ノイズキングはまちがえると減る
+      st.left = Math.round((st.q.real ? 90 * D.time : st.limit) * (F.short ? 0.6 : 1) * st.cut) + st.bonusT + (st.q.listen ? 4 : 0); // 聞きとりは読み上げのぶん+4秒 // 魔導書は短く、ノイズキングはまちがえると減る
       st.total = st.left;
       clearInterval(st.timer);
       const tick = () => {

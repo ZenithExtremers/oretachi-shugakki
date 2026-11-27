@@ -1,6 +1,6 @@
 import { L1, L2, L3 } from './toeic/words.js';
 // ヒマコロシの単語帳（秋学期の科目の用語と意味）。講義資料の言い回しに合わせる。
-// [用語, 意味, 回]。回は冒険の雑魚戦でその回の単語だけを出すため。同じ単語帳の中で用語・意味が重ならないようにする（4択の選択肢になるため）
+// [用語, 意味, 回, 読み上げる文（リスニングの章で「～」をふくむ用語だけ）]。回は冒険の雑魚戦でその回の単語だけを出すため。同じ単語帳の中で用語・意味が重ならないようにする（4択の選択肢になるため）
 export default [
   {
     id: 'ccpp', name: 'C/C++用語', mark: 'C++', color: '#2563eb',
@@ -248,16 +248,16 @@ export default [
   {
     id: 'toeicL', name: 'TOEIC リスニングの表現', mark: 'L', color: '#0284c7',
     words: [
-      ['be stacked', '積み重ねられている', 1], ['be lined up', '一列に並んでいる', 1], ['be leaning against', '～に立てかけてある', 1],
+      ['be stacked', '積み重ねられている', 1], ['be lined up', '一列に並んでいる', 1], ['be leaning against', '～に立てかけてある', 1, 'The ladder is leaning against the wall.'],
       ['be wearing', '身につけている（状態）', 1], ['be putting on', '身につけようとしている（動作）', 1], ['be being repaired', '修理されているところ', 1],
       ['pour', '注ぐ', 1], ['sweep', '掃く', 1], ['board', '（乗り物に）乗りこむ', 1], ['row', '列', 1],
-      ['Why don\'t you ～?', '～したらどう？（提案）', 2], ['Why don\'t we ～?', '（いっしょに）～しませんか', 2], ['Would you mind ～ing?', '～していただけますか', 2],
-      ['I\'m afraid ～', '残念ながら～', 2], ['Let me check.', '確認します', 2], ['It\'s up to you.', 'あなたしだいです', 2],
+      ['Why don\'t you ～?', '～したらどう？（提案）', 2, 'Why don\'t you ask Kevin?'], ['Why don\'t we ～?', '（いっしょに）～しませんか', 2, 'Why don\'t we take a break?'], ['Would you mind ～ing?', '～していただけますか', 2, 'Would you mind closing the window?'],
+      ['I\'m afraid ～', '残念ながら～', 2, 'I\'m afraid I can\'t come.'], ['Let me check.', '確認します', 2], ['It\'s up to you.', 'あなたしだいです', 2],
       ['I\'d be happy to.', '喜んで（引き受ける）', 2], ['Not that I know of.', '私の知る限りではない', 2], ['either is fine', 'どちらでもよい', 2], ['sold out', '売り切れ', 2],
-      ['out of stock', '在庫切れ', 3], ['make a reservation', '予約する', 3], ['be in charge of', '～を担当している', 3], ['run late', '遅れている', 3],
-      ['fill in for', '～の代わりを務める', 3], ['place an order', '注文する', 3], ['trade show', '展示会', 3], ['budget', '予算', 3],
+      ['out of stock', '在庫切れ', 3], ['make a reservation', '予約する', 3], ['be in charge of', '～を担当している', 3, 'She is in charge of the project.'], ['run late', '遅れている', 3],
+      ['fill in for', '～の代わりを務める', 3, 'Can you fill in for me tomorrow?'], ['place an order', '注文する', 3], ['trade show', '展示会', 3], ['budget', '予算', 3],
       ['deadline', '締め切り', 3], ['supplier', '仕入れ先', 3],
-      ['Attention, passengers.', '乗客のみなさまにお知らせします', 4], ['due to', '～のために（原因）', 4], ['in the meantime', 'その間に', 4],
+      ['Attention, passengers.', '乗客のみなさまにお知らせします', 4], ['due to', '～のために（原因）', 4, 'The flight was delayed due to bad weather.'], ['in the meantime', 'その間に', 4],
       ['remind', '思い出させる・念を押す', 4], ['voucher', '引換券・クーポン', 4], ['stay tuned', 'チャンネルはそのまま（ラジオ）', 4],
       ['extension', '内線（電話）', 4], ['leave a message', 'メッセージを残す', 4], ['be relocated', '移転する', 4], ['refreshments', '軽食・飲み物', 4],
     ],

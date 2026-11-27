@@ -1585,3 +1585,4 @@ body.rp-night.rp-day {
 .ls-biker .ls-fire { display: block; position: absolute; left: 50%; top: calc(42% + 60px); width: 300px; height: 90px; transform: translateX(-50%); opacity: 0; background: radial-gradient(ellipse at 50% 100%, #f97316, #dc2626 40%, transparent 70%); filter: blur(4px); }
 .ls-biker.reveal .ls-fire { opacity: 1; animation: lsFl .25s infinite alternate; }
 @keyframes lsFl { to { transform: translateX(-50%) scaleY(1.2); } }
+.rp-zlisten { display: flex; flex-direction: column; align-items: center; gap: 6px; } .rp-zlisten small { opacity: .75; font-size: 12px; font-weight: 700; }

@@ -759,6 +759,8 @@ const HIMA_API = {
     if (used) used.add(q.id);
     return HIMA_API.renderQ(s, q);
   },
+  // 冒険のリスニングの雑魚戦：英語を読み上げる
+  say(text, sp = 'W') { if (!window.speechSynthesis) return; stopSay(); speakLine(text, sp); },
   // 冒険から「復讐に送る」
   sendRevenge(qid) { if (qid) sendRevenge(qid); },
   async lessonDigest(sid, lec) { return lessonDigest(await getSubject(sid), lec); },
