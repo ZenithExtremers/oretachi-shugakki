@@ -1653,3 +1653,11 @@ body.rp-night.rp-day {
 .rp-prof2 dt { font-weight: 800; color: #fbbf24; white-space: nowrap; }
 .rp-prof2 dd { margin: 0; color: inherit; opacity: .9; }
 .rp-day .rp-prof2 dt { color: #b45309; }
+/* 敵のオリジナルイラスト（enemyart.js） */
+.rp-enemy svg.en { width: 78px; height: 78px; display: block; }
+.rp-field.boss .rp-enemy svg.en { width: 92px; height: 92px; }
+.rp-foe .rp-enemy svg.en { width: 54px; height: 54px; }
+.rp-foe.boss .rp-enemy svg.en { width: 66px; height: 66px; }
+.rp-sfoes span svg.en { width: 36px; height: 36px; }
+.rp-revic svg.en { width: 28px; height: 28px; display: block; }
+.rp-nemi svg.en { width: 52px; height: 52px; display: block; }

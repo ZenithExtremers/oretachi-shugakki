@@ -6,6 +6,13 @@ import { bgm } from './bgm.js';
 import { ENEMIES } from './enemies.js';
 import { STAGE } from './enemies-stage.js';
 import { CHAR_ART, MID_ART, LAST_ART } from './charart.js';
+import { ENEMY_ART } from './enemyart.js';
+// 敵のオリジナルイラスト：絵がある敵は、絵文字のかわりに SVG を使う（キーは「科目|名前」）
+for (const [sj, E] of Object.entries(ENEMIES)) {
+  const fix = (a) => { const k = `${sj}|${a[0]}`; if (ENEMY_ART[k]) a[1] = ENEMY_ART[k]; };
+  E.common.forEach(fix); Object.values(E.lec).forEach((l) => l.forEach(fix)); Object.values(E.boss).forEach(fix); fix(E.rare);
+  for (const tris of Object.values(STAGE[sj] || {})) tris.forEach((tri) => tri.forEach(fix));
+}
 
 /* ---------- データ ---------- */
 // 仲間。subj が一致するステージでは攻撃力×1.5（'all' はどこでも×1.2）
