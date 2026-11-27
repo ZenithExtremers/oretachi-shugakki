@@ -375,3 +375,92 @@ ${evil(58, 11, '#fff')}<path d="M50 78 q10 -5 20 0" stroke="${OL}" stroke-width=
 <rect x="30" y="40" width="60" height="60" fill="none" stroke="${OL}" stroke-width="3"/><g fill="#78350f" font-size="9" font-weight="900" font-family="monospace">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n, i) => `<text x="${36 + (i % 3) * 20}" y="${54 + Math.floor(i / 3) * 20}">${n}</text>`).join('')}</g>
 ${smug(28, 9)}`),
 });
+
+Object.assign(ENEMY_ART, {
+  // ----- C/C++：ステージ専用（第5回） -----
+  'ccpp|引数迷子': sprite('argslost', `
+<path d="M22 50 h76 v46 h-76z" fill="#fef3c7" stroke="${OL}" stroke-width="3"/><path d="M22 50 l38 28 l38 -28" fill="none" stroke="${OL}" stroke-width="2.5"/>
+${evil(70, 14, '#fde047').replace(/y="70"/g, 'y="70"')}<path d="M50 88 q10 -4 20 0" stroke="${OL}" stroke-width="2" fill="none"/>
+<g font-family="monospace" font-size="8" font-weight="900"><text x="10" y="36" fill="#fde68a">f(x)</text><text x="76" y="36" fill="#93c5fd">f(int a)</text></g><path d="M34 40 q24 -10 40 -4" stroke="#94a3b8" stroke-width="2" fill="none" stroke-dasharray="3 3"/>`),
+  'ccpp|プロトタイプ忘れ': sprite('noproto', `
+<path d="M30 30 h50 l12 12 v66 h-62z" fill="#f8fafc" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M80 30 v12 h12" fill="#e2e8f0" stroke="${OL}" stroke-width="2.5"/>
+<rect x="36" y="38" width="38" height="10" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="3 2"/><text x="38" y="46" font-size="6" font-weight="900" fill="#ef4444" font-family="monospace">int f();?</text>
+${evil(72, 10, '#93c5fd')}<path d="M52 88 q8 -4 16 0" stroke="${OL}" stroke-width="2" fill="none"/>
+<g stroke="#cbd5e1" stroke-width="2"><path d="M38 98 h40 M38 104 h30"/></g>`),
+  'ccpp|金の関数': gold('goldfunc', `
+<path d="M26 44 h22 q0 -12 12 -12 q12 0 12 12 h22 v22 q12 0 12 12 q0 12 -12 12 v18 h-68z" fill="url(#eg-goldfunc)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+${smug(64, 10)}<text x="40" y="100" font-size="9" font-weight="900" fill="#78350f" font-family="monospace">f(x)</text>`),
+  'ccpp|ビットこぼし': sprite('bitspill', `
+<path d="M30 40 h60 l-6 56 q-24 10 -48 0z" fill="#334155" stroke="${OL}" stroke-width="3"/><ellipse cx="60" cy="40" rx="30" ry="8" fill="#475569" stroke="${OL}" stroke-width="3"/>
+${evil(64, 12, '#22d3ee')}${grin(78, 9)}
+<g font-family="monospace" font-size="11" font-weight="900" fill="#22d3ee"><text x="20" y="28">1</text><text x="36" y="18">0</text><text x="84" y="24">1</text><text x="96" y="40">0</text><text x="98" y="104">1</text><text x="12" y="104">0</text></g>
+<g font-family="monospace" font-size="8" font-weight="900" fill="#fde047"><text x="52" y="112">&amp; | ^</text></g>`),
+  'ccpp|シフト暴走': sprite('shift', `
+<g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M8 46 h14 M4 60 h16 M8 74 h14"/></g>
+<path d="M26 40 h56 l20 24 l-20 24 h-56z" fill="#f97316" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+${evil(62, 12, '#fff').replace(/60 -/g, '54 -').replace(/60 \+/g, '54 +')}<path d="M44 76 q10 4 20 0" stroke="${OL}" stroke-width="2" fill="none"/>
+<g font-family="monospace" font-size="10" font-weight="900" fill="#fde047"><text x="36" y="30">&lt;&lt;</text><text x="72" y="30">&gt;&gt;</text><text x="34" y="106" fill="#fed7aa">x2 ÷2</text></g>`),
+  'ccpp|金のビット': gold('goldbit', `
+<path d="M50 96 h20 v8 h-20z" fill="#78350f" stroke="${OL}" stroke-width="2"/><path d="M44 86 h32 v10 h-32z" fill="#a16207" stroke="${OL}" stroke-width="2"/>
+<path d="M60 22 q26 0 26 26 q0 16 -12 26 v12 h-28 v-12 q-12 -10 -12 -26 q0 -26 26 -26z" fill="url(#eg-goldbit)" stroke="${OL}" stroke-width="3"/>
+${smug(50, 8)}<text x="45" y="81" font-size="5.5" font-weight="900" fill="#78350f" font-family="monospace">10110101</text>`),
+  // ----- 第6回 -----
+  'ccpp|ヌル参照': sprite('nullref', `
+<ellipse cx="60" cy="98" rx="36" ry="10" fill="#020617" stroke="${OL}" stroke-width="3"/>
+<path d="M60 86 v-30" stroke="#94a3b8" stroke-width="3" stroke-dasharray="4 3"/>
+<path d="M36 52 q-2 -26 24 -28 q26 2 24 28 q-2 16 -24 18 q-22 -2 -24 -18z" fill="#64748b" stroke="${OL}" stroke-width="3"/>
+${evil(46, 10, '#f87171')}<path d="M50 60 q10 -4 20 0" stroke="${OL}" stroke-width="2" fill="none"/>
+<text x="66" y="112" font-size="9" font-weight="900" fill="#f87171" font-family="monospace">nullptr</text>`),
+  'ccpp|アスタリスク酔い': sprite('asterisk', `
+<g stroke="${OL}" stroke-width="12" stroke-linecap="round"><path d="M60 24 v76 M28 42 l64 40 M92 42 l-64 40"/></g>
+<g stroke="#facc15" stroke-width="8" stroke-linecap="round"><path d="M60 24 v76 M28 42 l64 40 M92 42 l-64 40"/></g>
+<circle cx="60" cy="62" r="16" fill="#facc15" stroke="${OL}" stroke-width="3"/>
+<g fill="none" stroke="${OL}" stroke-width="2"><path d="M50 58 m-3 0 a3 3 0 1 1 3 3"/><path d="M70 58 m-3 0 a3 3 0 1 1 3 3"/></g><path d="M54 68 q6 3 12 -1" stroke="${OL}" stroke-width="2" fill="none"/>
+<g font-family="monospace" font-size="9" font-weight="900" fill="#fde68a"><text x="6" y="110">int* p</text><text x="84" y="110">*p</text></g>`),
+  'ccpp|金のアドレス': gold('goldaddr', `
+<path d="M60 104 q-26 -28 -26 -50 a26 26 0 0 1 52 0 q0 22 -26 50z" fill="url(#eg-goldaddr)" stroke="${OL}" stroke-width="3"/>
+<circle cx="60" cy="54" r="15" fill="#fff7ed" stroke="${OL}" stroke-width="2.5"/>${smug(52, 6)}
+<text x="76" y="104" font-size="8" font-weight="900" fill="#fde047" font-family="monospace">0x1000</text>`),
+  'ccpp|new出しっぱなし': sprite('newleak', `
+<path d="M60 84 q4 12 -2 26" stroke="#94a3b8" stroke-width="2" fill="none"/>
+<ellipse cx="60" cy="52" rx="30" ry="34" fill="#f472b6" stroke="${OL}" stroke-width="3"/><path d="M56 86 h8 l-4 6z" fill="#f472b6" stroke="${OL}" stroke-width="2"/>${hl(42, 42, 12)}
+${evil(52, 11, '#fff')}${grin(66, 11)}
+<text x="44" y="24" font-size="10" font-weight="900" fill="#fbcfe8" font-family="monospace">new</text><text x="82" y="104" font-size="8" font-weight="900" fill="#94a3b8" font-family="monospace">delete?</text>`),
+  'ccpp|delete[]忘れ': sprite('nodelarr', `
+<path d="M32 46 h56 l-6 58 h-44z" fill="#64748b" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M26 38 h68 v8 h-68z" fill="#94a3b8" stroke="${OL}" stroke-width="3"/><path d="M52 38 v-6 h16 v6" fill="none" stroke="${OL}" stroke-width="3"/>
+${evil(66, 11, '#fde047')}<path d="M50 82 q10 -4 20 0" stroke="${OL}" stroke-width="2" fill="none"/>
+<g stroke="${OL}" stroke-width="1.5"><rect x="76" y="22" width="10" height="10" fill="#38bdf8"/><rect x="88" y="22" width="10" height="10" fill="#38bdf8"/><rect x="100" y="22" width="10" height="10" fill="#38bdf8"/></g>
+<text x="6" y="30" font-size="8" font-weight="900" fill="#ef4444" font-family="monospace">[ ]?</text>`),
+  'ccpp|金のヒープ': gold('goldheap', `
+<path d="M10 104 l30 -50 l14 18 l16 -36 l40 68z" fill="url(#eg-goldheap)" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M64 46 l6 -10 l6 10 l-6 4z" fill="#fff" stroke="${OL}" stroke-width="1.5"/>
+${smug(78, 9)}<text x="18" y="30" font-size="8" font-weight="900" fill="#fde047" font-family="monospace">free!</text>`),
+  // ----- 第8回 -----
+  'ccpp|sizeofちがい': sprite('sizeof', `
+<rect x="18" y="56" width="84" height="26" rx="3" fill="#fde047" stroke="${OL}" stroke-width="3"/><g stroke="${OL}" stroke-width="2"><path d="M39 56 v26 M60 56 v26 M81 56 v26"/></g>
+<g font-family="monospace" font-size="10" font-weight="900" fill="${OL}"><text x="24" y="74">A</text><text x="45" y="74">B</text><text x="66" y="74">C</text><text x="84" y="74" fill="#ef4444">\\0</text></g>
+<path d="M30 56 q0 -26 30 -26 q30 0 30 26" fill="#f59e0b" stroke="${OL}" stroke-width="3"/>${evil(44, 10, '#fff')}
+<g font-family="monospace" font-size="8" font-weight="900"><text x="12" y="100" fill="#22c55e">sizeof=4</text><text x="68" y="100" fill="#93c5fd">strlen=3</text></g>`),
+  'ccpp|一文字ちがい': sprite('onechar', `
+<g transform="translate(36 64)"><circle r="20" fill="#38bdf8" stroke="${OL}" stroke-width="3"/><text y="7" text-anchor="middle" font-size="18" font-weight="900" fill="#fff" font-family="monospace">'A'</text></g>
+<g transform="translate(86 64)"><rect x="-22" y="-20" width="44" height="40" rx="8" fill="#f472b6" stroke="${OL}" stroke-width="3"/><text y="6" text-anchor="middle" font-size="16" font-weight="900" fill="#fff" font-family="monospace">"A"</text></g>
+<path d="M28 38 l6 2 M44 38 l-6 2 M78 38 l6 2 M94 38 l-6 2" stroke="${OL}" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M56 64 h8" stroke="#ef4444" stroke-width="3"/><text x="60" y="100" text-anchor="middle" font-size="9" font-weight="900" fill="#fde047">≠</text>`),
+  'ccpp|金の文字列': gold('goldstr', `
+<path d="M12 70 q12 -20 24 0 t24 0 t24 0 t24 0" fill="none" stroke="url(#eg-goldstr)" stroke-width="8" stroke-linecap="round"/>
+<g font-family="monospace" font-size="9" font-weight="900" fill="#78350f">${['H', 'i', '!', '\\0'].map((t, i) => `<circle cx="${24 + i * 24}" cy="${i % 2 ? 76 : 64}" r="9" fill="url(#eg-goldstr)" stroke="${OL}" stroke-width="2"/><text x="${24 + i * 24}" y="${(i % 2 ? 76 : 64) + 3}" text-anchor="middle">${t}</text>`).join('')}</g>
+<circle cx="60" cy="38" r="14" fill="url(#eg-goldstr)" stroke="${OL}" stroke-width="2.5"/>${smug(36, 5)}`),
+  'ccpp|strncpyのこし': sprite('strncpy', `
+<path d="M30 84 l40 -40 M40 30 l40 40" stroke="#cbd5e1" stroke-width="10" stroke-linecap="round"/><path d="M30 84 l40 -40 M40 30 l40 40" stroke="${OL}" stroke-width="2" stroke-linecap="round" fill="none"/>
+<circle cx="28" cy="88" r="12" fill="none" stroke="#ef4444" stroke-width="6"/><circle cx="84" cy="74" r="12" fill="none" stroke="#ef4444" stroke-width="6"/>
+<circle cx="56" cy="56" r="8" fill="#94a3b8" stroke="${OL}" stroke-width="2"/>${evil(40, 10, '#fde047')}
+<g font-family="monospace" font-size="8" font-weight="900"><text x="74" y="22" fill="#fde68a">"ABC|</text><text x="74" y="104" fill="#ef4444">\\0?</text></g>`),
+  'ccpp|連結しすぎ': sprite('strcat', `
+<g fill="none" stroke-width="8">${[[20, 66], [36, 58], [52, 66], [68, 58], [84, 66], [100, 58]].map(([x, y], i) => `<ellipse cx="${x}" cy="${y}" rx="10" ry="7" stroke="${OL}" transform="rotate(${i % 2 ? 20 : -20} ${x} ${y})"/>`).join('')}</g>
+<g fill="none" stroke-width="4.5">${[[20, 66], [36, 58], [52, 66], [68, 58], [84, 66], [100, 58]].map(([x, y], i) => `<ellipse cx="${x}" cy="${y}" rx="10" ry="7" stroke="#a78bfa" transform="rotate(${i % 2 ? 20 : -20} ${x} ${y})"/>`).join('')}</g>
+<circle cx="60" cy="88" r="14" fill="#8b5cf6" stroke="${OL}" stroke-width="3"/>${evil(88, 5, '#fde047')}
+<text x="16" y="34" font-size="8" font-weight="900" fill="#c4b5fd" font-family="monospace">strcat(a,b)</text>`),
+  'ccpp|金のcstring': gold('goldcstr', `
+<g stroke="${OL}" stroke-width="2.5"><rect x="22" y="56" width="18" height="50" fill="url(#eg-goldcstr)"/><rect x="42" y="46" width="18" height="60" fill="#f59e0b"/><rect x="62" y="52" width="18" height="54" fill="url(#eg-goldcstr)"/><rect x="82" y="62" width="16" height="44" fill="#d97706"/></g>
+<g font-family="monospace" font-size="5" font-weight="900" fill="#78350f"><text x="24" y="82" transform="rotate(-90 31 82)">strlen</text><text x="44" y="80" transform="rotate(-90 51 80)">strcpy</text><text x="64" y="82" transform="rotate(-90 71 82)">strcat</text><text x="84" y="88" transform="rotate(-90 90 88)">strcmp</text></g>
+<circle cx="60" cy="30" r="14" fill="url(#eg-goldcstr)" stroke="${OL}" stroke-width="2.5"/>${smug(28, 5)}`),
+});
