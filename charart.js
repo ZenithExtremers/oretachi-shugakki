@@ -823,7 +823,7 @@ ${cute(56, 11, 3.6)}<ellipse cx="60" cy="64" rx="2.6" ry="2" fill="#f472b6"/><pa
 <path d="M40 46 q20 -10 40 0 q2 10 -4 14 q8 6 4 14 q-16 8 -36 0 q-4 -8 4 -14 q-6 -4 -8 -14z" fill="#94a3b8" stroke="${OL}" stroke-width="2"/>
 <path d="M42 44 q8 -6 14 0 M78 44 q-8 -6 -14 0" stroke="${OL}" stroke-width="3" fill="none" stroke-linecap="round"/>${cute(50, 10, 3.4)}
 <ellipse cx="56" cy="60" rx="2.5" ry="2" fill="${OL}"/><ellipse cx="64" cy="60" rx="2.5" ry="2" fill="${OL}"/><path d="M52 68 q8 4 16 0" stroke="${OL}" stroke-width="2" fill="none" stroke-linecap="round"/>
-<g transform="translate(60 98)"><rect x="-22" y="-14" width="44" height="28" rx="3" fill="#b91c1c" stroke="${OL}" stroke-width="2.5"/><rect x="-18" y="-10" width="36" height="20" rx="2" fill="none" stroke="#fde68a" stroke-width="1.5"/><text y="3.5" text-anchor="middle" font-size="6.8" font-weight="900" fill="#fde68a">GRAMMAR</text></g>
+<g transform="translate(60 98)"><rect x="-26" y="-14" width="52" height="28" rx="3" fill="#b91c1c" stroke="${OL}" stroke-width="2.5"/><rect x="-22" y="-10" width="44" height="20" rx="2" fill="none" stroke="#fde68a" stroke-width="1.5"/><text y="4.5" text-anchor="middle" font-size="12" font-weight="900" fill="#fde68a">文法</text></g>
 <ellipse cx="34" cy="98" rx="9" ry="8" fill="#475569" stroke="${OL}" stroke-width="2.5"/><ellipse cx="86" cy="98" rx="9" ry="8" fill="#475569" stroke="${OL}" stroke-width="2.5"/>`),
 
   // 品詞ヒツジ（★★・リーディング）：ふわふわの毛に n. v. adj. adv. の札がついたヒツジ
@@ -873,4 +873,94 @@ ${eyes(52, '#b45309')}
 <path d="M48 68 q12 -4 24 0 q-2 12 -12 12 q-10 0 -12 -12z" fill="#7f1d1d" stroke="${OL}" stroke-width="2.5"/><path d="M50 68 l3 5 l3 -4 M64 68 l3 4 l3 -5" fill="#fff" stroke="${OL}" stroke-width="1"/>
 <g fill="none" stroke="url(#gd-raion)" stroke-width="3" stroke-linecap="round"><path d="M80 98 q8 4 14 -2 M76 106 q12 6 22 -4 M72 114 q16 6 30 -6"/></g>
 <path d="M40 116 q2 -16 20 -18 q18 2 20 18z" fill="#ea580c" stroke="${OL}" stroke-width="2.5"/>`),
+});
+
+// ----- 免許の仲間 -----
+Object.assign(CHAR_ART, {
+  // ひよこドライバー（★・免許）：若葉マークをつけた小さな車にのるひよこ
+  hiyoko: wrap1('hiyoko', '#f0f9ff', '#bae6fd', `
+<path d="M0 104 h120 v16 h-120z" fill="#94a3b8"/><path d="M8 110 h14 M36 110 h14 M64 110 h14 M92 110 h14" stroke="#fff" stroke-width="2.5"/>
+<ellipse cx="60" cy="48" rx="20" ry="18" fill="#fde047" stroke="${OL}" stroke-width="3"/>
+<path d="M58 30 q-2 -8 4 -10 q-1 5 3 6" fill="#fde047" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+${cute(46, 8, 3.4)}${blush(52, 14)}<path d="M56 52 l4 4 l4 -4z" fill="#fb923c" stroke="${OL}" stroke-width="1.6" stroke-linejoin="round"/>
+<path d="M18 92 q0 -20 18 -24 h48 q18 4 18 24 v8 h-84z" fill="#f43f5e" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M36 68 q4 -6 12 -6 h24 q8 0 12 6z" fill="#bae6fd" stroke="${OL}" stroke-width="2.5"/>
+<circle cx="36" cy="100" r="9" fill="#1f2937" stroke="${OL}" stroke-width="2"/><circle cx="36" cy="100" r="3.5" fill="#cbd5e1"/><circle cx="84" cy="100" r="9" fill="#1f2937" stroke="${OL}" stroke-width="2"/><circle cx="84" cy="100" r="3.5" fill="#cbd5e1"/>
+<circle cx="98" cy="84" r="3" fill="#fde047" stroke="${OL}" stroke-width="1.5"/>
+<g transform="translate(56 84)"><path d="M0 -8 l-8 4 v10 l8 -4z" fill="#facc15" stroke="${OL}" stroke-width="1.5"/><path d="M0 -8 l8 4 v10 l-8 -4z" fill="#22c55e" stroke="${OL}" stroke-width="1.5"/></g>`),
+
+  // シグナル・ロブスター（★・免許）：赤信号でストップ！のハサミをかかげるロブスター
+  ebi: wrap1('ebi', '#fff1f2', '#fecaca', `
+<g transform="translate(86 34)"><rect x="-9" y="-22" width="18" height="44" rx="5" fill="#1f2937" stroke="${OL}" stroke-width="2"/><circle cy="-12" r="5.5" fill="#ef4444"/><circle cy="-12" r="8" fill="#ef4444" opacity=".25"/><circle cy="0" r="5" fill="#57534e"/><circle cy="12" r="5" fill="#57534e"/><path d="M0 22 v24" stroke="#64748b" stroke-width="4"/></g>
+<path d="M24 54 q-10 -16 0 -30 q10 2 10 14 l-4 2 q4 6 2 14z" fill="#f87171" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 24 l-6 -8 M30 26 l2 -10" stroke="${OL}" stroke-width="2" fill="none"/>
+<path d="M66 56 q8 -14 0 -26 q-10 2 -10 12 l4 2 q-4 6 -2 12z" fill="#f87171" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M30 62 q30 -10 40 0 q6 22 -4 40 q-6 10 -14 10 q-8 0 -12 -6 q-14 -20 -10 -44z" fill="#ef4444" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M38 80 q12 4 24 0 M40 92 q10 4 20 0" stroke="#b91c1c" stroke-width="2" fill="none"/>
+<path d="M44 112 l-6 6 h24 l-6 -6" fill="#ef4444" stroke="${OL}" stroke-width="2.5"/>
+<path d="M42 62 l-6 -14 M58 62 l6 -14" stroke="${OL}" stroke-width="2"/><circle cx="36" cy="46" r="4" fill="#fff" stroke="${OL}" stroke-width="2"/><circle cx="64" cy="46" r="4" fill="#fff" stroke="${OL}" stroke-width="2"/><circle cx="36" cy="46" r="2" fill="${OL}"/><circle cx="64" cy="46" r="2" fill="${OL}"/>
+<path d="M44 70 q6 4 12 0" stroke="${OL}" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M36 64 q-14 -2 -20 6 M64 64 q14 -2 20 6" stroke="${OL}" stroke-width="1.5" fill="none"/>`),
+
+  // 合流カモ（★・免許）：子ガモを連れて、ゆずりあいながら合流するカモ
+  kamo: wrap1('kamo', '#ecfeff', '#a5f3fc', `
+<path d="M0 98 h120 v22 h-120z" fill="#94a3b8"/><path d="M0 98 l60 -20 h60" stroke="#fff" stroke-width="3" fill="none" stroke-dasharray="8 6"/>
+<path d="M96 44 l10 6 l-10 6 v-4 h-12 v-4 h12z" fill="#22c55e" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+<path d="M30 80 l-12 -10 l14 2z" fill="#78350f" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/><path d="M28 84 q0 -16 20 -18 h20 q18 2 18 18 q-2 12 -20 12 h-28 q-10 0 -10 -12z" fill="#a16207" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><path d="M40 80 q12 -8 26 0 q-12 6 -26 0z" fill="#78350f" stroke="${OL}" stroke-width="2"/><path d="M44 96 v6 M62 96 v6" stroke="#f97316" stroke-width="3" stroke-linecap="round"/>
+<path d="M48 54 q10 -10 22 -4 q6 4 4 12 q-4 6 -14 6 q-10 -2 -12 -14z" fill="#16a34a" stroke="${OL}" stroke-width="2.5"/>
+<path d="M50 66 q10 4 22 0" stroke="#fff" stroke-width="3"/>
+<path d="M74 56 l10 2 l-10 4z" fill="#facc15" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="64" cy="55" r="3" fill="${OL}"/><circle cx="65" cy="54" r="1" fill="#fff"/>
+
+<g transform="translate(96 88)"><ellipse rx="9" ry="7" fill="#fde047" stroke="${OL}" stroke-width="2"/><circle cx="2" cy="-8" r="5.5" fill="#fde047" stroke="${OL}" stroke-width="2"/><circle cx="3" cy="-9" r="1.4" fill="${OL}"/><path d="M7 -8 l4 1 l-4 2z" fill="#fb923c"/></g>
+<g transform="translate(14 88)"><ellipse rx="8" ry="6" fill="#fde047" stroke="${OL}" stroke-width="2"/><circle cx="2" cy="-7" r="5" fill="#fde047" stroke="${OL}" stroke-width="2"/><circle cx="3" cy="-8" r="1.3" fill="${OL}"/><path d="M7 -7 l4 1 l-4 2z" fill="#fb923c"/></g>`),
+
+  // 白線ドッグ（★★・免許）：白い線の上をまっすぐ走る、白黒もようのイヌ
+  hakusen: wrap2('hakusen', '#e0f2fe', '#475569', `
+<path d="M0 82 l120 -10 v48 h-120z" fill="#64748b"/><path d="M0 100 l120 -10" stroke="#fff" stroke-width="5"/><path d="M0 116 l120 -10" stroke="#fde047" stroke-width="3" stroke-dasharray="12 8"/>
+<g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M4 40 h18 M2 52 h14"/></g>
+<path d="M28 64 q-14 -4 -16 -16" stroke="${OL}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M28 64 q-14 -4 -16 -16" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M32 76 l-10 16 l6 2 l12 -14 M72 76 l12 14 l-5 4 l-14 -12" fill="#fff" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M26 66 q4 -16 26 -16 h24 q8 0 10 8 l-6 18 h-48 q-8 -2 -6 -10z" fill="#fff" stroke="${OL}" stroke-width="3"/>
+<path d="M40 54 q8 -2 10 6 q-4 8 -12 4z" fill="${OL}"/><circle cx="62" cy="68" r="5" fill="${OL}"/>
+<path d="M44 76 l-6 18 l6 2 l8 -18 M62 76 l6 18 l-6 2 l-6 -18" fill="#fff" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M76 46 q2 -16 18 -16 q14 0 16 14 q0 12 -12 14 h-10 q-12 0 -12 -12z" fill="#fff" stroke="${OL}" stroke-width="3"/>
+<path d="M84 30 q-10 -2 -12 10 q6 6 10 2z" fill="${OL}"/><path d="M102 32 q8 4 6 14 q-6 0 -8 -6z" fill="${OL}"/>
+<circle cx="92" cy="42" r="3" fill="${OL}"/><circle cx="93" cy="41" r="1" fill="#fff"/><ellipse cx="108" cy="50" rx="3.5" ry="2.6" fill="${OL}"/><path d="M98 56 q4 4 8 0" stroke="${OL}" stroke-width="1.8" fill="none"/>
+<path d="M84 56 q8 6 16 4" stroke="#ef4444" stroke-width="4" fill="none" stroke-linecap="round"/>`),
+
+  // 雪道シロクマ（★★・免許）：スタッドレスタイヤを抱えて雪道を歩くシロクマ
+  shirokuma: wrap2('shirokuma', '#f0f9ff', '#7dd3fc', `
+<g fill="#fff"><circle cx="20" cy="30" r="2.5"/><circle cx="98" cy="22" r="2"/><circle cx="104" cy="56" r="2.6"/><circle cx="14" cy="66" r="1.8"/><circle cx="34" cy="16" r="1.8"/></g>
+<path d="M0 104 q30 -8 60 0 t60 0 v16 h-120z" fill="#fff" stroke="${OL}" stroke-width="2"/>
+<circle cx="36" cy="34" r="9" fill="#f8fafc" stroke="${OL}" stroke-width="2.5"/><circle cx="84" cy="34" r="9" fill="#f8fafc" stroke="${OL}" stroke-width="2.5"/>
+<path d="M24 116 q-2 -30 36 -34 q38 4 36 34z" fill="#f8fafc" stroke="${OL}" stroke-width="3"/>
+<circle cx="60" cy="54" r="26" fill="#f8fafc" stroke="${OL}" stroke-width="3"/>
+<ellipse cx="60" cy="64" rx="12" ry="9" fill="#e2e8f0" stroke="${OL}" stroke-width="1.5"/>
+${cute(50, 10, 3.6)}<ellipse cx="60" cy="60" rx="4" ry="3" fill="${OL}"/><path d="M56 66 q4 3 8 0" stroke="${OL}" stroke-width="1.8" fill="none"/>
+<g transform="translate(60 98)"><circle r="16" fill="#1f2937" stroke="${OL}" stroke-width="2.5"/><circle r="7" fill="#94a3b8" stroke="${OL}" stroke-width="2"/><g fill="#cbd5e1">${Array.from({ length: 10 }, (_, i) => { const a = i / 10 * Math.PI * 2; return `<circle cx="${(Math.cos(a) * 12).toFixed(1)}" cy="${(Math.sin(a) * 12).toFixed(1)}" r="1.4"/>`; }).join('')}</g></g>
+<ellipse cx="40" cy="96" rx="8" ry="7" fill="#f8fafc" stroke="${OL}" stroke-width="2.5"/><ellipse cx="80" cy="96" rx="8" ry="7" fill="#f8fafc" stroke="${OL}" stroke-width="2.5"/>`),
+
+  // 馬力ウマ（★★・免許）：エンジンの力を表すメーターをつけた、たてがみのなびくウマ
+  uma: wrap2('uma', '#fef3c7', '#b45309', `
+<g transform="translate(88 92)"><path d="M-18 6 a18 18 0 0 1 36 0" fill="#1f2937" stroke="${OL}" stroke-width="2.5"/><path d="M-13 4 a13 13 0 0 1 26 0" fill="none" stroke="#f59e0b" stroke-width="3" stroke-dasharray="4 2"/><path d="M0 6 l10 -10" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/><circle cy="6" r="2.5" fill="#fff"/><text y="16" text-anchor="middle" font-size="7" font-weight="900" fill="#78350f">HP</text></g>
+<path d="M30 116 q-6 -30 6 -50 l20 6 q-10 20 -4 44z" fill="#92400e" stroke="${OL}" stroke-width="3"/>
+<path d="M36 70 q-4 -30 18 -44 q22 -10 34 6 q8 12 10 28 q2 10 -8 12 q-8 2 -14 -4 q-10 4 -16 -2 q-8 10 -24 4z" fill="#b45309" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M54 24 l-2 -12 l10 8z" fill="#b45309" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M50 26 q-24 2 -28 26 q-2 16 4 36 q6 -10 8 -22 q6 4 8 -10 q4 6 8 -2 q2 -14 0 -28z" fill="#1f2937" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<ellipse cx="92" cy="60" rx="8" ry="6" fill="#d97706" stroke="${OL}" stroke-width="2"/><ellipse cx="94" cy="58" rx="2" ry="1.5" fill="${OL}"/>
+<path d="M64 38 l10 3 M66 44 q4 -3 8 0 q-4 3 -8 0z" stroke="${OL}" stroke-width="2.3" fill="#fff" stroke-linecap="round"/><circle cx="70" cy="44" r="1.6" fill="${OL}"/>
+<path d="M60 52 q8 6 14 4" stroke="#78350f" stroke-width="2" fill="none"/>`),
+
+  // ブレーキ・バイソン（★★★・免許）：角を前に向けて踏んばるバイソン。後ろにブレーキの火花
+  bison: wrap('bison', '#fee2e2', '#7f1d1d', `
+<g stroke="#fde047" stroke-width="2.5" stroke-linecap="round"><path d="M14 104 l-8 -6 M18 110 l-10 0 M100 104 l8 -6 M102 110 l10 0"/></g>
+<path d="M0 112 h120 v8 h-120z" fill="#334155"/>
+<path d="M20 112 q-4 -22 10 -30 h60 q14 8 10 30z" fill="#451a03" stroke="${OL}" stroke-width="3"/>
+<path d="M22 52 q-14 -4 -16 -18 q8 6 18 4 M98 52 q14 -4 16 -18 q-8 6 -18 4" fill="#f5f5f4" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M18 52 q0 -30 42 -32 q42 2 42 32 q-4 14 -12 18 l-6 18 q-24 12 -48 0 l-6 -18 q-8 -4 -12 -18z" fill="#78350f" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M28 40 q8 -16 32 -18 q24 2 32 18 q-10 -6 -16 -4 l-6 -6 l-4 6 l-6 -8 l-6 8 l-4 -6 l-6 6 q-6 -2 -16 4z" fill="#451a03" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+${eyes(52, '#ef4444')}
+<path d="M44 70 q16 -6 32 0 q2 12 -16 16 q-18 -4 -16 -16z" fill="#57534e" stroke="${OL}" stroke-width="2.5"/>
+<ellipse cx="53" cy="74" rx="3" ry="2.4" fill="${OL}"/><ellipse cx="67" cy="74" rx="3" ry="2.4" fill="${OL}"/>
+<circle cx="60" cy="84" r="4" fill="none" stroke="url(#gd-bison)" stroke-width="2.5"/>
+<path d="M48 88 q12 8 24 0 q-4 14 -12 16 q-8 -2 -12 -16z" fill="#451a03" stroke="${OL}" stroke-width="2"/>`),
 });
