@@ -424,32 +424,34 @@ ${'<circle cx="32" cy="66" r="3.4" fill="#1f2937"/><circle cx="48" cy="66" r="3.
 <path d="M18 4 l8 2 l-3 2 l4 3z" fill="#ef4444" stroke="#7f1d1d" stroke-width="1"/></g>
 <g font-family="monospace" font-weight="900" font-size="9" fill="#14532d"><text x="42" y="22">f(f(f(</text></g>`),
 
-  // デザインパターン鷹（★★★・かっこいい）：白い頭と金のくちばし。翼を広げ、設計図のひし形の紋章をつかむ
+  // デザインパターン鷹（★★★・かっこいい）：翼を大きく広げて急降下する鷹。足のつめで設計図のひし形の紋章をつかむ
   taka: wrap('taka', '#fef3c7', '#b45309', `
-<path d="M4 70 q20 -30 46 -22 l-6 10 l10 -2 l-4 10 l10 -2z" fill="#78350f" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
-<path d="M116 70 q-20 -30 -46 -22 l6 10 l-10 -2 l4 10 l-10 -2z" fill="#78350f" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
-<g stroke="#a16207" stroke-width="2" fill="none" opacity=".8"><path d="M12 64 q14 -12 28 -12 M108 64 q-14 -12 -28 -12"/></g>
-<path d="M36 116 q2 -34 24 -38 q22 4 24 38z" fill="#92400e" stroke="${OL}" stroke-width="3"/>
-<path d="M50 84 l4 8 l6 -6 l6 6 l4 -8" stroke="#b45309" stroke-width="2" fill="none"/>
-<path d="M38 56 q0 -26 22 -26 q22 0 22 26 q0 18 -22 22 q-22 -4 -22 -22z" fill="#f8fafc" stroke="${OL}" stroke-width="3"/>
-<path d="M40 46 l14 6 M80 46 l-14 6" stroke="${OL}" stroke-width="3.5" stroke-linecap="round"/>
-<path d="M44 54 q6 -4 11 1 q-6 4 -11 -1z M76 54 q-6 -4 -11 1 q6 4 11 -1z" fill="#f59e0b" stroke="${OL}" stroke-width="1.2"/><circle cx="50" cy="54" r="1.8" fill="${OL}"/><circle cx="70" cy="54" r="1.8" fill="${OL}"/>
-<path d="M52 60 q8 -4 16 0 q-2 12 -8 16 q-6 -4 -8 -16z" fill="url(#gd-taka)" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
-<path d="M56 64 q4 3 8 0" stroke="#92400e" stroke-width="1.5" fill="none"/>
-<g transform="translate(60 102)"><path d="M0 -12 l12 12 l-12 12 l-12 -12z" fill="#1e3a8a" stroke="url(#gd-taka)" stroke-width="3"/><path d="M0 -6 v12 M-6 0 h12" stroke="#93c5fd" stroke-width="2"/></g>
-<g stroke="url(#gd-taka)" stroke-width="4" stroke-linecap="round"><path d="M46 104 l-6 6 M74 104 l6 6"/></g>`),
+<g stroke="#fde68a" stroke-width="2" stroke-linecap="round" opacity=".6"><path d="M60 2 v18 M40 6 l6 14 M80 6 l-6 14"/></g>
+<path d="M56 50 q-20 -18 -50 -14 q8 6 10 10 q-8 0 -12 4 q10 4 14 8 q-8 2 -10 6 q14 2 22 4 q-4 4 -4 8 q14 -2 26 -10z" fill="#78350f" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M64 50 q20 -18 50 -14 q-8 6 -10 10 q8 0 12 4 q-10 4 -14 8 q8 2 10 6 q-14 2 -22 4 q4 4 4 8 q-14 -2 -26 -10z" fill="#78350f" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<g stroke="#b45309" stroke-width="1.8" fill="none" opacity=".9"><path d="M14 42 q20 0 38 12 M10 54 q20 2 40 6 M112 42 q-20 0 -38 12 M110 54 q-20 2 -40 6"/></g>
+<path d="M46 60 q0 -10 14 -10 q14 0 14 10 q0 22 -14 30 q-14 -8 -14 -30z" fill="#92400e" stroke="${OL}" stroke-width="2.5"/>
+<path d="M52 66 q8 4 16 0 M52 74 q8 4 16 0" stroke="#b45309" stroke-width="1.8" fill="none"/>
+<path d="M52 88 l-6 10 h28 l-6 -10" fill="#78350f" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M44 40 q0 -20 16 -20 q16 0 16 20 q0 12 -16 14 q-16 -2 -16 -14z" fill="#f8fafc" stroke="${OL}" stroke-width="3"/>
+<path d="M46 34 l10 4 M74 34 l-10 4" stroke="${OL}" stroke-width="3" stroke-linecap="round"/>
+<path d="M48 39 q4 -3 8 1 q-4 3 -8 -1z M72 39 q-4 -3 -8 1 q4 3 8 -1z" fill="#f59e0b" stroke="${OL}" stroke-width="1.1"/><circle cx="52" cy="39" r="1.5" fill="${OL}"/><circle cx="68" cy="39" r="1.5" fill="${OL}"/>
+<path d="M54 44 q6 -3 12 0 q-1 9 -6 12 q-5 -3 -6 -12z" fill="url(#gd-taka)" stroke="${OL}" stroke-width="2.2" stroke-linejoin="round"/>
+<g transform="translate(60 106)"><path d="M0 -10 l10 10 l-10 10 l-10 -10z" fill="#1e3a8a" stroke="url(#gd-taka)" stroke-width="3"/><path d="M0 -5 v10 M-5 0 h10" stroke="#93c5fd" stroke-width="2"/></g>
+<g fill="none" stroke="url(#gd-taka)" stroke-width="3.5" stroke-linecap="round"><path d="M50 98 q-4 4 -2 9 M56 98 q-2 5 0 8 M64 98 q2 5 0 8 M70 98 q4 4 2 9"/></g>`),
 
-  // ハイウェイ・タイガー（★★★・かっこいい）：ゴーグルを上げたトラ。流れる光の線と高速道路のマーク
+  // ハイウェイ・タイガー（★★★・かっこいい）：道路に前足をついて身がまえるトラ。額にゴーグル、後ろに流れる光の線
   tora2: wrap('tora2', '#fed7aa', '#c2410c', `
-<g stroke="#fff7ed" stroke-width="3" stroke-linecap="round" opacity=".85"><path d="M2 44 h22 M0 58 h16 M4 92 h20 M98 44 h22 M104 58 h16 M96 92 h22"/></g>
-<path d="M30 116 q2 -30 30 -34 q28 4 30 34z" fill="#1f2937" stroke="${OL}" stroke-width="3"/>
-<path d="M46 84 l14 12 l14 -12" fill="none" stroke="#f97316" stroke-width="4"/>
-<path d="M32 40 l-4 -16 l16 8z M88 40 l4 -16 l-16 8z" fill="#f97316" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/><path d="M33 34 l-2 -6 l6 3z M87 34 l2 -6 l-6 3z" fill="#fde68a"/>
-<path d="M30 58 q0 -30 30 -30 q30 0 30 30 q0 22 -30 26 q-30 -4 -30 -26z" fill="#fb923c" stroke="${OL}" stroke-width="3"/>
-<path d="M44 64 q16 -6 32 0 q-2 16 -16 18 q-14 -2 -16 -18z" fill="#fff7ed"/>
-<g fill="${OL}"><path d="M60 30 l-4 10 l4 -2 l4 2z"/><path d="M31 54 l10 2 l-10 4z M89 54 l-10 2 l10 4z"/><path d="M34 70 l8 0 l-6 4z M86 70 l-8 0 l6 4z"/></g>
-${eyes(58, '#16a34a')}
-<path d="M56 68 h8 l-4 4z" fill="${OL}"/><path d="M60 72 v4 M60 76 q-5 4 -9 0 M60 76 q5 4 9 0" stroke="${OL}" stroke-width="2" fill="none" stroke-linecap="round"/>
-<g transform="translate(60 38)"><rect x="-26" y="-6" width="52" height="5" rx="2" fill="#111827"/><circle cx="-12" cy="-4" r="7" fill="#38bdf8" stroke="${OL}" stroke-width="2.5"/><circle cx="12" cy="-4" r="7" fill="#38bdf8" stroke="${OL}" stroke-width="2.5"/><path d="M-15 -7 l4 -2 M9 -7 l4 -2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g>
-<g transform="translate(88 98)"><path d="M-10 -12 h20 v12 q0 10 -10 13 q-10 -3 -10 -13z" fill="#16a34a" stroke="${OL}" stroke-width="2"/><text y="2" text-anchor="middle" font-size="9" font-weight="900" fill="#fff">E1</text></g>`),
+<g stroke="#fff7ed" stroke-width="3" stroke-linecap="round" opacity=".85"><path d="M2 40 h22 M0 54 h14 M98 40 h22 M106 54 h14"/></g>
+<path d="M0 100 h120 v20 h-120z" fill="#334155"/><path d="M6 108 h16 M34 108 h16 M62 108 h16 M90 108 h16" stroke="#fde047" stroke-width="3"/>
+<path d="M30 40 l-6 -18 l18 8z M90 40 l6 -18 l-18 8z" fill="#f97316" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/><path d="M31 33 l-2 -7 l7 3z M89 33 l2 -7 l-7 3z" fill="#fde68a"/>
+<path d="M26 60 q-4 -10 2 -18 q8 -16 32 -16 q24 0 32 16 q6 8 2 18 q6 6 2 14 q-8 18 -36 20 q-28 -2 -36 -20 q-4 -8 2 -14z" fill="#fb923c" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+<path d="M40 70 q20 -8 40 0 q-2 20 -20 22 q-18 -2 -20 -22z" fill="#fff7ed"/>
+<g fill="${OL}"><path d="M60 28 l-5 12 l5 -3 l5 3z"/><path d="M27 52 l12 3 l-12 4z M93 52 l-12 3 l12 4z"/><path d="M26 66 l10 1 l-9 4z M94 66 l-10 1 l9 4z"/><path d="M44 30 l4 8 l-6 -2z M76 30 l-4 8 l6 -2z"/></g>
+${eyes(56, '#16a34a')}
+<path d="M55 68 h10 l-5 5z" fill="${OL}"/><path d="M60 73 v4 M60 77 q-6 5 -11 0 M60 77 q6 5 11 0" stroke="${OL}" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M52 80 l2 5 l2 -5 M64 80 l2 5 l2 -5" fill="#fff" stroke="${OL}" stroke-width="1"/>
+<g transform="translate(60 36)"><rect x="-26" y="-6" width="52" height="5" rx="2" fill="#111827"/><circle cx="-12" cy="-4" r="7" fill="#38bdf8" stroke="${OL}" stroke-width="2.5"/><circle cx="12" cy="-4" r="7" fill="#38bdf8" stroke="${OL}" stroke-width="2.5"/><path d="M-15 -7 l4 -2 M9 -7 l4 -2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g>
+<g stroke="${OL}" stroke-width="2.5"><path d="M30 104 q-2 -14 10 -14 q12 0 10 14z" fill="#fb923c"/><path d="M70 104 q-2 -14 10 -14 q12 0 10 14z" fill="#fb923c"/></g>
+<g stroke="${OL}" stroke-width="1.6"><path d="M36 104 v-5 M42 104 v-5 M76 104 v-5 M82 104 v-5"/><path d="M34 94 l6 2 M80 94 l6 2" stroke-width="2.4"/></g>`),
 });
