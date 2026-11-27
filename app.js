@@ -420,7 +420,7 @@ function pickVoice(sp) {
 }
 function speakLine(t, sp) {
   return new Promise((res) => {
-    const u = new SpeechSynthesisUtterance(t); u.lang = 'en-US'; u.rate = 0.95;
+    const u = new SpeechSynthesisUtterance(t); u.lang = 'en-US'; u.rate = window.__sayRate || 0.95; // ラスボス「雑音モード」では速く
     const v = pickVoice(sp); if (v) u.voice = v;
     if (!v || !(sp[0] === 'M' ? MALE : FEMALE).test(v.name)) u.pitch = sp[0] === 'M' ? 0.8 : 1.2; // 男女の声がないときは高さで分ける
     u.onend = u.onerror = () => res();
@@ -431,6 +431,7 @@ function stopSay() { SAY.tok++; try { speechSynthesis.cancel(); } catch {} if (S
 async function sayGroup(g, btn) {
   if (SAY.btn === btn) return stopSay(); // 再生中にもう一度押すと止める
   stopSay();
+  if (window.__sayLimit) { const k = (+btn.dataset.plays || 0) + 1; if (k > window.__sayLimit) { btn.textContent = '再生は2回まで'; btn.disabled = true; return; } btn.dataset.plays = k; } // ラスボス：再生回数の制限
   if (!window.speechSynthesis) { alert('この端末は読み上げに対応していません。スクリプトを読んでください。'); return; }
   const tok = SAY.tok; SAY.btn = btn; btn.textContent = '■ 止める';
   try { speechSynthesis.speak(new SpeechSynthesisUtterance('')); } catch {} // iPhone は最初の読み上げをタップの中で始める必要がある

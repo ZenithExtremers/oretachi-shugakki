@@ -240,3 +240,66 @@ ${eyes(57, '#0ea5e9')}
 <g transform="translate(100 96)"><path d="M-12 0 h12 v-6 l10 6 l-10 6 v-6" fill="#fbbf24" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/></g>
 <text x="64" y="92" text-anchor="middle" font-size="9" font-weight="900" fill="#1e293b" font-family="serif">F=ma</text>`),
 });
+
+// ===== ラスボス（TOEIC リスニング・リーディング・免許）と、改心した白バイ隊長。すべてオリジナル =====
+const LK = '#0f172a';
+const lframe = (id, c1, c2, body) => `<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" class="rp-art lb">
+<defs><radialGradient id="a${id}" cx="50%" cy="45%" r="55%"><stop offset="0" stop-color="${c1}"/><stop offset=".7" stop-color="${c2}"/><stop offset="1" stop-color="#05020f"/></radialGradient>
+<linearGradient id="g${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".5" stop-color="#f5c542"/><stop offset="1" stop-color="#b7791f"/></linearGradient>
+<clipPath id="c${id}"><circle cx="80" cy="80" r="74"/></clipPath></defs>
+<circle cx="80" cy="80" r="76" fill="url(#a${id})"/>
+<g clip-path="url(#c${id})">${body}</g>
+<circle cx="80" cy="80" r="76" fill="none" stroke="url(#g${id})" stroke-width="5"/>
+<circle cx="80" cy="80" r="70" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="6 5"/></svg>`;
+const lcrown = (x, y, s = 1, id = 'x') => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-22 10 L-26 -14 L-12 0 L0 -18 L12 0 L26 -14 L22 10 Z" fill="url(#g${id})" stroke="${LK}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="0" cy="-2" r="3.5" fill="#dc2626" stroke="${LK}" stroke-width="1"/></g>`;
+
+// ① 雑音王ノイズキング：大きなスピーカーの体、2つのウーファーが目、王冠、音の波
+const noise = lframe('n', '#a5f3fc', '#155e75', `
+<g stroke="#22d3ee" stroke-width="3" fill="none" opacity=".8"><path d="M22 60 q-10 20 0 40 M12 52 q-16 28 0 56 M138 60 q10 20 0 40 M148 52 q16 28 0 56"/></g>
+<rect x="38" y="38" width="84" height="108" rx="10" fill="#1e1b4b" stroke="${LK}" stroke-width="3"/>
+<rect x="44" y="44" width="72" height="96" rx="6" fill="#312e81"/>
+<circle cx="62" cy="72" r="15" fill="#0f172a" stroke="#64748b" stroke-width="3"/><circle cx="62" cy="72" r="6" fill="#f43f5e"/>
+<circle cx="98" cy="72" r="15" fill="#0f172a" stroke="#64748b" stroke-width="3"/><circle cx="98" cy="72" r="6" fill="#f43f5e"/>
+<path d="M50 60 l20 6 M110 60 l-20 6" stroke="#f43f5e" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="80" cy="118" r="20" fill="#0f172a" stroke="#64748b" stroke-width="3"/><circle cx="80" cy="118" r="11" fill="#1e293b" stroke="#475569" stroke-width="2"/><circle cx="80" cy="118" r="4" fill="#22d3ee"/>
+<g fill="#22d3ee">${[0,1,2,3,4,5,6].map(i => `<rect x="${52 + i * 8}" y="${96 - [4,8,12,6,10,5,9][i]}" width="5" height="${[4,8,12,6,10,5,9][i]}" rx="1"/>`).join('')}</g>
+${lcrown(80, 30, 1.1, 'n')}`);
+
+// ② 千ページの魔導書：開いた分厚い本、ページの文字、まわりを回る文字、留め金の目
+const tome = lframe('t', '#e9d5ff', '#4c1d95', `
+<g font-family="serif" font-weight="900" fill="#c4b5fd" font-size="13" opacity=".85"><text x="20" y="40">A</text><text x="132" y="44">B</text><text x="18" y="122">C</text><text x="134" y="120">D</text><text x="74" y="24">Ω</text></g>
+<path d="M80 54 Q52 42 26 50 L26 120 Q52 112 80 124 Z" fill="#fef9c3" stroke="${LK}" stroke-width="2.5"/>
+<path d="M80 54 Q108 42 134 50 L134 120 Q108 112 80 124 Z" fill="#fef3c7" stroke="${LK}" stroke-width="2.5"/>
+<g stroke="#a8a29e" stroke-width="2.2">${[0,1,2,3,4].map(i => `<path d="M36 ${62 + i * 11} q20 -4 36 2 M88 ${64 + i * 11} q20 -6 38 -2"/>`).join('')}</g>
+<path d="M26 120 Q52 112 80 124 Q108 112 134 120 L136 130 Q108 122 80 134 Q52 122 24 130 Z" fill="#7c2d12" stroke="${LK}" stroke-width="2.5"/>
+<circle cx="80" cy="90" r="13" fill="url(#gt)" stroke="${LK}" stroke-width="2.5"/><ellipse cx="80" cy="90" rx="8" ry="5" fill="#fff"/><circle cx="80" cy="90" r="3.5" fill="#7e22ce"/>
+<path d="M30 46 l-8 -10 M130 46 l8 -10 M24 70 l-12 -2 M136 70 l12 -2" stroke="#e9d5ff" stroke-width="3" stroke-linecap="round"/>
+${lcrown(80, 36, 0.9, 't')}`);
+
+// ③ 暴走王ノーライセンス：炎を出すバイク、黒いバイザーのヘルメットに王冠
+const biker = lframe('b', '#fecaca', '#7f1d1d', `
+<path d="M10 140 q20 -30 10 -50 q16 14 14 30 q8 -26 26 -34 q-8 22 6 38 q4 -18 16 -24 q-2 22 10 40 z" fill="#f97316" opacity=".85"/>
+<circle cx="44" cy="124" r="20" fill="#111827" stroke="#9ca3af" stroke-width="4"/><circle cx="44" cy="124" r="6" fill="#9ca3af"/>
+<circle cx="120" cy="124" r="20" fill="#111827" stroke="#9ca3af" stroke-width="4"/><circle cx="120" cy="124" r="6" fill="#9ca3af"/>
+<path d="M44 124 L70 96 L104 96 L120 124 M70 96 L84 112 L104 96" stroke="#dc2626" stroke-width="7" fill="none" stroke-linejoin="round"/>
+<path d="M66 94 q20 -12 44 0 l-4 8 h-36z" fill="#b91c1c" stroke="${LK}" stroke-width="2"/>
+<path d="M108 90 l14 -6 l2 6" stroke="#9ca3af" stroke-width="4" fill="none"/><circle cx="128" cy="88" r="5" fill="#fef08a" stroke="${LK}"/>
+<path d="M76 92 L82 70 L96 66" stroke="#111827" stroke-width="10" stroke-linecap="round" fill="none"/>
+<circle cx="86" cy="54" r="16" fill="#111827" stroke="${LK}" stroke-width="2"/><path d="M76 52 q12 -8 22 2 v6 h-22z" fill="#334155"/><path d="M78 54 h18" stroke="#f43f5e" stroke-width="2.5"/>
+${lcrown(86, 34, 0.75, 'b')}`);
+
+// ③' 改心した白バイ隊長（仲間になった姿）
+const police = lframe('p', '#e0f2fe', '#1d4ed8', `
+<circle cx="44" cy="124" r="20" fill="#111827" stroke="#cbd5e1" stroke-width="4"/><circle cx="44" cy="124" r="6" fill="#cbd5e1"/>
+<circle cx="120" cy="124" r="20" fill="#111827" stroke="#cbd5e1" stroke-width="4"/><circle cx="120" cy="124" r="6" fill="#cbd5e1"/>
+<path d="M44 124 L70 96 L104 96 L120 124 M70 96 L84 112 L104 96" stroke="#f8fafc" stroke-width="7" fill="none" stroke-linejoin="round"/>
+<path d="M66 94 q20 -12 44 0 l-4 8 h-36z" fill="#f8fafc" stroke="${LK}" stroke-width="2"/>
+<rect x="104" y="80" width="10" height="6" rx="2" fill="#ef4444"/><rect x="114" y="80" width="10" height="6" rx="2" fill="#3b82f6"/>
+<path d="M76 92 L82 70 L96 66" stroke="#1e3a8a" stroke-width="10" stroke-linecap="round" fill="none"/>
+<circle cx="86" cy="54" r="16" fill="#f8fafc" stroke="${LK}" stroke-width="2"/><path d="M76 52 q12 -8 22 2 v6 h-22z" fill="#93c5fd"/>
+<path d="M80 40 l6 -6 l6 6 l-6 4z" fill="url(#gp)" stroke="${LK}" stroke-width="1.2"/>
+<path d="M30 40 l8 8 M130 40 l-8 8" stroke="#fef08a" stroke-width="3" stroke-linecap="round"/>`);
+
+
+export const LAST_ART = { noise, tome, biker, police };
+Object.assign(CHAR_ART, { noiseking: noise, tome, police });

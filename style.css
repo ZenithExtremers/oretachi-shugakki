@@ -1524,3 +1524,64 @@ body.rp-night.rp-day {
 .script b { display: inline-block; min-width: 3.5em; margin-right: 6px; font-size: 12px; color: var(--brand); }
 .rp-bq .listen-play { width: 100%; }
 .passage.pre { white-space: pre-line; }
+
+/* ---------- ラスボス ---------- */
+.rp-noscript #rp-q [data-act=script] { display: none; }
+.rp-lastspot { border-color: #f43f5e !important; box-shadow: 0 0 22px rgba(244, 63, 94, .55); }
+.rp-lastspot .c { width: 92px; height: 92px; }
+.rp-lastspot .c svg { width: 100%; height: 100%; }
+.rp-lastface { width: 130px; margin: 4px auto; }
+.rp-lastface svg { width: 100%; height: auto; display: block; }
+.rp-phases { margin: 6px 0; padding-left: 1.4em; font-size: 13px; line-height: 1.5; text-align: left; }
+.rp-phases li { margin: 4px 0; }
+.rp-phases b { display: block; }
+.rp-phases small { color: #c7cdea; }
+.rp-day .rp-phases small { color: var(--muted); }
+.rp-art.lb { display: block; }
+.rp-lastshow { position: fixed; inset: 0; z-index: 200; overflow: hidden; background: #050505; cursor: pointer; animation: gtIn .3s; }
+.rp-lastshow.out { animation: gtOut .3s forwards; }
+.ls-tome.rp-lastshow { background: radial-gradient(circle at 50% 44%, #2e1065, #05020f 70%); }
+.ls-biker.rp-lastshow { background: #020617; }
+.rp-lastshow > div { pointer-events: none; }
+.ls-boss { position: absolute; left: 50%; top: 42%; width: 220px; transform: translate(-50%, -50%) scale(0); }
+.ls-boss svg { width: 100%; height: auto; display: block; }
+.ls-nm { position: absolute; left: 0; right: 0; top: calc(42% + 130px); text-align: center; opacity: 0; color: #fff; }
+.ls-nm small { display: block; font-size: 13px; letter-spacing: .3em; color: #fde68a; }
+.ls-nm b { display: inline-block; margin-top: 4px; padding: 6px 18px; font-size: 24px; font-weight: 900; background: linear-gradient(90deg, transparent, #7f1d1d 15%, #7f1d1d 85%, transparent); }
+.ls-warn { position: absolute; left: 0; right: 0; top: 14%; text-align: center; font-size: 30px; font-weight: 900; letter-spacing: .2em; color: #f43f5e; opacity: 0; text-shadow: 0 0 18px #f43f5e; }
+.rp-lastshow.warn .ls-warn { opacity: 1; animation: lsB .5s steps(2) 4; }
+@keyframes lsB { 50% { opacity: .2; } }
+.rp-lastshow.reveal .ls-boss { animation: lsIn .8s cubic-bezier(.2, 1.5, .4, 1) forwards; }
+.rp-lastshow.reveal .ls-nm { animation: lsNm .5s .4s ease-out forwards; }
+@keyframes lsIn { from { transform: translate(-50%, -50%) scale(0) rotate(-12deg); } to { transform: translate(-50%, -50%) scale(1); } }
+@keyframes lsNm { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.ls-static, .ls-bars, .ls-pg, .ls-beam, .ls-light, .ls-skid, .ls-fire { display: none; }
+/* ノイズキング */
+.ls-noise .ls-static { display: block; position: absolute; inset: 0; opacity: 0; background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.18) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 2px, transparent 2px 5px); }
+.ls-noise.s1 .ls-static { opacity: 1; animation: lsStat .08s steps(2) infinite; }
+.ls-noise.reveal .ls-static { opacity: .25; }
+@keyframes lsStat { 50% { transform: translate(3px, -2px); filter: brightness(1.6); } }
+.ls-noise .ls-bars { display: flex; position: absolute; left: 0; right: 0; bottom: 3%; height: 140px; gap: 5px; justify-content: center; align-items: flex-end; opacity: 0; }
+.ls-noise.s2 .ls-bars { opacity: 1; }
+.ls-noise.reveal .ls-bars { opacity: .3; }
+.ls-bars i { width: 9px; background: linear-gradient(#22d3ee, #a855f7); border-radius: 4px; animation: lsEq .35s ease-in-out infinite alternate; }
+@keyframes lsEq { from { height: 10%; } to { height: 100%; } }
+/* 魔導書 */
+.ls-tome .ls-pg { display: block; position: absolute; width: 40px; height: 54px; background: #fef9c3; border: 1px solid #a16207; opacity: 0; }
+.ls-tome.s1 .ls-pg { animation: lsPg 1.6s ease-in forwards; }
+@keyframes lsPg { 0% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)); } }
+.ls-tome .ls-beam { display: block; position: absolute; left: 50%; top: 0; bottom: 0; width: 140px; transform: translateX(-50%) scaleX(0); background: linear-gradient(transparent, #e9d5ff, transparent); filter: blur(8px); }
+.ls-tome.s2 .ls-beam { animation: lsBeam .8s ease-out forwards; }
+@keyframes lsBeam { 60% { transform: translateX(-50%) scaleX(1); opacity: 1; } 100% { transform: translateX(-50%) scaleX(1.4); opacity: .25; } }
+/* 暴走王 */
+.ls-biker .ls-light { display: block; position: absolute; left: 50%; top: 42%; width: 30px; height: 30px; border-radius: 50%; background: #fff; box-shadow: 0 0 60px 30px #fef08a; transform: translate(-50%, -50%) scale(0); }
+.ls-biker.s1 .ls-light { animation: lsHl 1.2s ease-in forwards; }
+.ls-biker.reveal .ls-light { animation: lsHlOut .7s forwards; }
+@keyframes lsHl { from { transform: translate(-50%, -50%) scale(.1); } to { transform: translate(-50%, -50%) scale(14); opacity: .9; } }
+@keyframes lsHlOut { from { transform: translate(-50%, -50%) scale(14); opacity: .9; } to { transform: translate(-50%, -50%) scale(14); opacity: 0; } }
+.ls-biker.s2 { animation: gtQuake .5s 2; }
+.ls-biker .ls-skid { display: block; position: absolute; left: 0; right: 0; bottom: 14%; height: 40px; opacity: 0; background: repeating-linear-gradient(90deg, #111 0 30px, transparent 30px 44px); }
+.ls-biker.reveal .ls-skid { opacity: .8; }
+.ls-biker .ls-fire { display: block; position: absolute; left: 50%; top: calc(42% + 60px); width: 300px; height: 90px; transform: translateX(-50%); opacity: 0; background: radial-gradient(ellipse at 50% 100%, #f97316, #dc2626 40%, transparent 70%); filter: blur(4px); }
+.ls-biker.reveal .ls-fire { opacity: 1; animation: lsFl .25s infinite alternate; }
+@keyframes lsFl { to { transform: translateX(-50%) scaleY(1.2); } }
