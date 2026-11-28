@@ -79,6 +79,7 @@ export const CHARS = {
   kenja: { name: 'テーブル賢者', icon: '🧙', rar: 3, subj: 'db', hp: 140, atk: 24, limited: 'db', skill: { kind: 'heal', pow: 0.7, cost: 4, name: '正規化の祈り' } },
   kenchiku: { name: 'UML建築士', icon: '👷', rar: 3, subj: 'sd', hp: 125, atk: 27, limited: 'sd', skill: { kind: 'time', pow: 18, cost: 3, name: '設計図ひろげ' } },
   kyokan: { name: 'ドライブ教官', icon: '🧑‍🏫', rar: 3, subj: 'menkyo', hp: 125, atk: 27, limited: 'menkyo', skill: { kind: 'guard', pow: 3, cost: 3, name: '補助ブレーキ' } },
+  tenmon: { name: '天文博士', icon: '🔭', rar: 3, subj: 'uchu', hp: 118, atk: 29, limited: 'uchu', skill: { kind: 'time', pow: 18, cost: 3, name: '星図をひろげる' } },
   kikimimi: { name: 'ききみみウサギ', icon: '🐰', rar: 3, subj: 'toeicL', hp: 115, atk: 27, limited: 'toeicL', skill: { kind: 'time', pow: 18, cost: 3, name: 'もう一回きく' } },
   senchou: { name: 'ことばの船長', icon: '🧑‍✈️', rar: 3, subj: 'toeic', hp: 120, atk: 28, limited: 'toeic', skill: { kind: 'hint', pow: 2, cost: 3, name: '辞書の羅針盤' } },
   // 中間ボスを★3でクリアすると仲間になる（ガチャには出ない）
@@ -93,6 +94,7 @@ export const CHARS = {
   // ラスボスを★3で倒すと仲間になる★★★★（ガチャには出ない）。bonus：章ごとの攻撃の倍率（得意のかわり）
   noiseking: { name: '雑音王ノイズキング', icon: '🎧', rar: 4, subj: 'toeicL', hp: 120, atk: 30, limited: 'last', bonus: { toeicL: 1.5, toeic: 1.5, other: 0.8 }, skill: { kind: 'native', pow: 3, cost: 4, name: 'ネイティブスピード' }, prof: '大音量のスピーカーの王。英語の章では攻撃×1.5、ほかの章では×0.8の英語特化。' },
   tome: { name: '千ページの魔導書', icon: '📕', rar: 4, subj: 'toeic', hp: 110, atk: 32, limited: 'last', skill: { kind: 'speedread', pow: 0.8, cost: 3, name: '速読' }, prof: 'あらゆる文書を読みつくした魔導書。読むのがとにかく速い。' },
+  horizon: { name: '事象の地平線王ホライズン', icon: '🕳️', rar: 4, subj: 'uchu', hp: 125, atk: 31, limited: 'last', skill: { kind: 'horizon', pow: 3, cost: 4, name: '事象の地平線' }, prof: '光さえ逃がさないブラックホールの王。仲間になってからは、その重力で敵の動きを止めてくれる。' },
   police: { name: '白バイ隊長', icon: '🏍️', rar: 4, subj: 'menkyo', hp: 135, atk: 28, limited: 'last', skill: { kind: 'traffic', pow: 2, cost: 4, name: '交通整理' }, prof: '暴走王ノーライセンスが改心した姿。今は街の安全を守っている。' },
   ryu: { name: 'リュウ', icon: '🐉', rar: 3, subj: 'all', hp: 120, atk: 30, skill: { kind: 'dmg', pow: 5, cost: 5, name: 'りゅうのいぶき' } },
 };
@@ -135,6 +137,7 @@ const SKILL_DESC = {
   triple: (k) => `次の1回の正解で、全員の攻撃が${k.pow}倍`,
   native: (k) => `${k.pow}ターンのあいだ、TOEIC の章で正解したときの攻撃が2倍`,
   speedread: () => 'その戦いのあいだ、答えの速さボーナスの上限が×1.4→×1.8に',
+  horizon: (k) => `場の敵全員に、それぞれ攻撃力×${k.pow} のダメージ（割り振らない）＋「あと◯ターンで攻撃」を1ターン遅らせる`,
   traffic: (k) => `敵全員の「あと◯ターンで攻撃」を${k.pow}ターン遅らせ、次に受けるダメージを0にする`,
   stardust: (k) => `場の敵全員に、それぞれ攻撃力×${k.pow} のダメージ（割り振らない）。かわりに仲間のHPが最大値の半分へる（倒れることもある）`,
   nuke: (k) => `場の敵全員に、それぞれ攻撃力×${k.pow} のダメージ（割り振らない）`,
@@ -230,7 +233,7 @@ const nsOf = (subj) => (/^toeic/.test(subj) ? 4 : 2);
 const bossOf = (subj) => nsOf(subj) + 1;
 const nodesOf = (subj) => Array.from({ length: bossOf(subj) }, (_, i) => i + 1);
 const statOf = (base, lv) => Math.round(base * (1 + (lv - 1) * 0.12));
-const SUBJ = [['ccpp', 'C/C++'], ['db', 'DB'], ['sd', '設計'], ['toeicL', 'TOEIC L'], ['toeic', 'TOEIC R'], ['menkyo', '免許']];
+const SUBJ = [['ccpp', 'C/C++'], ['db', 'DB'], ['sd', '設計'], ['toeicL', 'TOEIC L'], ['toeic', 'TOEIC R'], ['menkyo', '免許'], ['uchu', '宇宙']];
 // 冒険の章（科目ごと）
 const CHAPTERS = [
   { id: 'ccpp', name: 'C/C++プログラミング', sub: 'コンパイルの森', color: '#2563eb' },
@@ -239,6 +242,7 @@ const CHAPTERS = [
   { id: 'toeicL', name: 'TOEIC リスニング', sub: 'ききとりの灯台', color: '#0284c7' },
   { id: 'toeic', name: 'TOEIC リーディング', sub: 'ことばの港町', color: '#ea580c' },
   { id: 'menkyo', name: '普通免許（学科）', sub: 'ドライブの街道', color: '#16a34a' },
+  { id: 'uchu', name: '宇宙知識', sub: '星くずの航路', color: '#4338ca' },
 ];
 // 章の★集めの報酬（★はノーマル・ハード・ゲキムズの合計。p は全部の★に対する割合）
 const STAR_REW = [
@@ -250,7 +254,7 @@ const STAR_REW = [
   { p: 0.8, mat: 1, ticket: 1, label: '💎結晶＋🎟️' },
   { p: 1, title: true, mat: 2, label: '称号＋💎結晶×2' },
 ];
-const CH_TITLE = { ccpp: 'C/C++マスター', db: 'データベースマスター', sd: '設計マスター', toeicL: 'TOEICリスニングマスター', toeic: 'TOEICリーディングマスター', menkyo: '免許マスター' };
+const CH_TITLE = { ccpp: 'C/C++マスター', db: 'データベースマスター', sd: '設計マスター', toeicL: 'TOEICリスニングマスター', toeic: 'TOEICリーディングマスター', menkyo: '免許マスター', uchu: '宇宙マスター' };
 const ALL_TITLE = '秋学期の覇者';
 // 中間ボスステージ：範囲の最後の回のボスのあとに出る連戦。★3でクリアすると最後の敵が仲間になる（すべてオリジナル）
 const MID = {
@@ -290,6 +294,11 @@ const LAST = {
     { name: '暴走王〔仮免の試練〕', lecs: [1, 2, 3, 4], exam10: true, tip: '5問で4問以上正解しないと回復される' },
     { name: '暴走王〔本免の試練〕', lecs: [5, 6], tip: '本免の範囲' },
     { name: '暴走王ノーライセンス', lecs: [7], double: true, final: true, tip: '危険予測。正解でダメージ2倍' },
+  ] },
+  uchu: { title: '事象の地平線王ホライズン', art: 'horizon', hpM: 1.15, atkM: 1.7, reward: 'horizon', crown: '宇宙の覇者', desc: '星も光も飲みこむブラックホールの王。近づくほど時間がゆがむ。', phases: [
+    { name: 'ホライズン〔降着円盤〕', lecs: [1, 2], gravity: true, tip: '重力で、問題ごとに制限時間が縮んでいく' },
+    { name: 'ホライズン〔重力レンズ〕', lecs: [3, 4], gravity: true, timeCut: true, tip: '時間が縮み、まちがえるとさらに減る' },
+    { name: '事象の地平線王ホライズン', lecs: [5, 6], gravity: true, chain: true, final: true, tip: '時間が縮み続ける。3問続けて正解すると大ダメージ' },
   ] },
 };
 
@@ -355,7 +364,7 @@ export function makeRPG(ctx) {
     return ups;
   }
   // 戦闘力：HP÷2 ＋ 攻撃×5（今の科目が得意なら×1.5、全科目なら×1.2）＋ スキルの強さ
-  const SKW = { dmg: 25, heal: 120, time: 5, guard: 18, hint: 50, healguard: 160, charge: 90, nuke: 32, stardust: 30, native: 45, speedread: 40, traffic: 45, coin: 6, reflect: 40, drain: 32, memory: 45, roots: 40, halfcharge: 75, weaken: 12, dot: 30, revive: 55, expup: 8, shield: 30, rollback: 50, copy: 40, poly: 35, triple: 30, homeo: 45, inertia: 40 };
+  const SKW = { dmg: 25, heal: 120, time: 5, guard: 18, hint: 50, healguard: 160, charge: 90, nuke: 32, stardust: 30, native: 45, speedread: 40, traffic: 45, horizon: 40, coin: 6, reflect: 40, drain: 32, memory: 45, roots: 40, halfcharge: 75, weaken: 12, dot: 30, revive: 55, expup: 8, shield: 30, rollback: 50, copy: 40, poly: 35, triple: 30, homeo: 45, inertia: 40 };
   function power(id, subj = R().subj) {
     const m = member(id), k = m.skill;
     const bonus = m.bonus ? m.bonus[subj] ?? m.bonus.other : m.subj === subj ? 1.3 : m.subj === 'all' ? 1.2 : 1;
@@ -1033,7 +1042,7 @@ export function makeRPG(ctx) {
     const boss = n === bossOf(subj) || isMid || isLast;
     const E = ENEMIES[subj], D = DIFF[d];
     // 敵の強さ：章（C/C++ → DB → 設計 → TOEIC）が進むごとに3回ぶん強く（2章の最初＝1章の中盤くらい）＋その章の中の回
-    const lvIdx = ci + (isRev ? 0 : Math.max(0, CHAPTERS.findIndex((c) => c.id === subj)) * 3);
+    const lvIdx = ci + (isRev ? 0 : Math.min(5, Math.max(0, CHAPTERS.findIndex((c) => c.id === subj))) * 3); // 第7章（宇宙）は第6章（免許）と同じ段階の強さ
     const lvScale = 1 + lvIdx * 0.4 + (isLast ? 0.5 : (n - 1) * (0.3 / nsOf(subj))); // ボスはどの章も +0.3、雑魚ステージは少しずつ強く
     // 雑魚：そのステージ専用の2体を中心に、その回の雑魚・どこにでも出る雑魚から選ぶ。たまにレア（ステージ専用のレアが多め）
     const SG = STAGE[subj]?.[lec] || [];
@@ -1258,7 +1267,9 @@ export function makeRPG(ctx) {
       document.querySelector('#hk-obody')?.scrollTo({ top: 0 });
       if (st.roots > 0) applyRoots();
       st.busy = false;
-      st.left = Math.round((st.q.real ? 90 * D.time : st.limit) * (F.short ? 0.6 : 1) * st.cut) + st.bonusT; // 魔導書は短く、ノイズキングはまちがえると減る
+      let grav = 1; // ホライズン：同じ形態のあいだ、問題ごとに制限時間が6%ずつ縮む（最低55%）
+      if (F.gravity) { if (st.gfi !== st.fi) { st.gfi = st.fi; st.gn = 0; } grav = Math.max(0.55, 1 - 0.06 * st.gn++); if (st.gn > 1) pop(`🕳️ 重力で時間 ${Math.round(grav * 100)}%`, 'miss'); }
+      st.left = Math.round((st.q.real ? 90 * D.time : st.limit) * (F.short ? 0.6 : 1) * st.cut * grav) + st.bonusT; // 魔導書は短く、ノイズキングはまちがえると減る
       st.total = st.left;
       clearInterval(st.timer);
       // 音声の問題：自動で流して、流れ終わってから制限時間を動かす（聞いているあいだに答えてもよい）
@@ -1590,6 +1601,10 @@ export function makeRPG(ctx) {
           if ((st.hp <= 0 || st.active.some((i) => foes[i].cur <= 0)) && !st.busy) { st.busy = true; clearInterval(st.timer); document.querySelectorAll('#rp-q [data-c]').forEach((b) => { b.disabled = true; }); setTimeout(afterTurn, 600); } }, 450); }
       else if (k.kind === 'native') { st.native = k.pow; pop('🎧 ネイティブ！', 'info'); bgm.sfx('skill'); drawBuffs(); }
       else if (k.kind === 'speedread') { st.speedCap = Math.max(st.speedCap, 0.4 + k.pow * 0.5); pop('📕 速読！', 'info'); bgm.sfx('skill'); drawBuffs(); }
+      else if (k.kind === 'horizon') {
+        bgm.sfx('boom'); st.active.filter((i) => foes[i].cur > 0).forEach((i, j) => hitEnemy(atkOf(x) * k.pow, j ? '' : k.name, true, i));
+        st.active.forEach((i) => { if (foes[i].cd != null) foes[i].cd += 1; }); drawCd();
+        if (st.active.some((i) => foes[i].cur <= 0) && !st.busy) { st.busy = true; clearInterval(st.timer); document.querySelectorAll('#rp-q [data-c]').forEach((b) => { b.disabled = true; }); setTimeout(afterTurn, 600); } }
       else if (k.kind === 'traffic') { st.active.forEach((i) => { if (foes[i].cd != null) foes[i].cd += k.pow; }); st.nullify = 1; drawCd(); pop('🚓 交通整理！', 'info'); bgm.sfx('skill'); drawBuffs(); }
       else if (k.kind === 'homeo') { st.homeo = k.pow; pop('💚 恒常性！', 'heal'); bgm.sfx('heal'); drawBuffs(); }
       else if (k.kind === 'inertia') { st.inertia = k.pow; pop('⚙️ 慣性！', 'info'); bgm.sfx('skill'); drawBuffs(); }

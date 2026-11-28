@@ -56,4 +56,13 @@ export default [
     color: '#16a34a',
     module: './menkyo/index.js',
   },
+  {
+    id: 'uchu',
+    name: '宇宙知識',
+    short: '宇宙',
+    mark: '宇宙',
+    sub: '地球と月から宇宙開発まで ・ 4択',
+    color: '#4338ca',
+    module: './uchu/index.js',
+  },
 ];

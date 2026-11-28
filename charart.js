@@ -91,6 +91,16 @@ ${eyes(58)}
 <circle cx="60" cy="36" r="5" fill="url(#gd-kyokan)" stroke="${OL}" stroke-width="1.5"/>
 <g transform="translate(92 92) rotate(12)"><rect x="-12" y="-15" width="24" height="30" rx="3" fill="#fef3c7" stroke="${OL}" stroke-width="2"/><rect x="-6" y="-18" width="12" height="6" rx="2" fill="url(#gd-kyokan)" stroke="${OL}" stroke-width="1.5"/><path d="M-7 -5 l3 3 l5 -6 M-7 5 l3 3 l5 -6" stroke="#16a34a" stroke-width="2" fill="none"/></g>
 <g transform="translate(26 94)"><circle r="10" fill="none" stroke="url(#gd-kyokan)" stroke-width="4"/><path d="M-10 0 h20 M0 0 v10" stroke="url(#gd-kyokan)" stroke-width="3"/></g>`),
+  // 天文博士（宇宙の章の★を集めるとくる）：星柄のローブと望遠鏡
+  tenmon: wrap('tenmon', '#c7d2fe', '#3730a3', `
+<path d="M26 112 q2 -34 34 -36 q32 2 34 36z" fill="#312e81" stroke="${OL}" stroke-width="3"/>
+<g fill="#fde68a">${[[40, 96], [74, 100], [58, 108], [84, 88]].map(([x, y]) => `<path d="M${x} ${y - 4} l1.4 2.6 l2.6 1.4 l-2.6 1.4 l-1.4 2.6 l-1.4 -2.6 l-2.6 -1.4 l2.6 -1.4z"/>`).join('')}</g>
+<circle cx="60" cy="58" r="24" fill="#f5d0b0" stroke="${OL}" stroke-width="3"/>
+${eyes(58)}<circle cx="51" cy="58" r="7" fill="none" stroke="${OL}" stroke-width="2"/><circle cx="69" cy="58" r="7" fill="none" stroke="${OL}" stroke-width="2"/><path d="M58 58 h4" stroke="${OL}" stroke-width="2"/>
+<path d="M52 71 q8 5 16 0" stroke="${OL}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<path d="M60 74 q-10 10 -4 20 q4 -6 4 -10 q0 4 4 10 q6 -10 -4 -20z" fill="#f8fafc" stroke="${OL}" stroke-width="2"/>
+<path d="M34 42 l26 -30 l26 30z" fill="#4338ca" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/><circle cx="60" cy="12" r="4" fill="url(#gd-tenmon)" stroke="${OL}" stroke-width="1.5"/>
+<g transform="translate(96 74) rotate(-40)"><rect x="-6" y="-24" width="12" height="40" rx="3" fill="url(#gd-tenmon)" stroke="${OL}" stroke-width="2.5"/><rect x="-8" y="-28" width="16" height="8" rx="2" fill="#92400e" stroke="${OL}" stroke-width="2"/></g>`),
 };
 
 // ===== 中間ボスのキャラ（すべてオリジナル） =====
@@ -354,8 +364,27 @@ const police = lframe('p', '#e0f2fe', '#1d4ed8', `
 <path d="M30 40 l8 8 M130 40 l-8 8" stroke="#fef08a" stroke-width="3" stroke-linecap="round"/>`);
 
 
-export const LAST_ART = { noise, tome, biker, police };
-Object.assign(CHAR_ART, { noiseking: noise, tome, police });
+// ④ 事象の地平線王ホライズン（宇宙知識）：光の輪（降着円盤）を背負った黒い王。目だけが光る
+const horizon = lframe('h', '#c4b5fd', '#312e81', `
+<g fill="#e0e7ff">${[[22, 30], [138, 26], [30, 120], [132, 112], [60, 18], [104, 140]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.8"/>`).join('')}</g>
+<ellipse cx="80" cy="84" rx="70" ry="20" fill="none" stroke="#fb923c" stroke-width="10" opacity=".55" transform="rotate(-12 80 84)"/>
+<path d="M30 160 q4 -50 50 -56 q46 6 50 56z" fill="#0b0618" stroke="#a78bfa" stroke-width="2.5"/>
+<circle cx="80" cy="78" r="34" fill="#05020f" stroke="#fde68a" stroke-width="4"/>
+<circle cx="80" cy="78" r="40" fill="none" stroke="#fef3c7" stroke-width="2" opacity=".6"/>
+<path d="M12 98 a70 20 0 0 0 136 -28" fill="none" stroke="#fdba74" stroke-width="10" transform="rotate(-12 80 84)"/>
+<path d="M60 74 q8 -6 16 2 q-8 4 -16 -2z M100 74 q-8 -6 -16 2 q8 4 16 -2z" fill="#fde047"/><path d="M66 92 q14 8 28 0" stroke="#a78bfa" stroke-width="2.5" fill="none"/>
+${lcrown(80, 40, 0.8, 'h')}`);
+// ④' 仲間になったホライズン：光の輪がやわらかい金色に
+const horizonAlly = lframe('ha', '#e0e7ff', '#4338ca', `
+<g fill="#fff">${[[22, 30], [138, 26], [30, 120], [132, 112]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2"/>`).join('')}</g>
+<ellipse cx="80" cy="84" rx="70" ry="20" fill="none" stroke="#fde68a" stroke-width="10" opacity=".55" transform="rotate(-12 80 84)"/>
+<path d="M30 160 q4 -50 50 -56 q46 6 50 56z" fill="#1e1b4b" stroke="#c7d2fe" stroke-width="2.5"/>
+<circle cx="80" cy="78" r="34" fill="#0b0618" stroke="#fde68a" stroke-width="4"/>
+<path d="M12 98 a70 20 0 0 0 136 -28" fill="none" stroke="#fde68a" stroke-width="10" transform="rotate(-12 80 84)"/>
+<path d="M62 76 q6 -6 12 0 M86 76 q6 -6 12 0" stroke="#fef9c3" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M68 90 q12 8 24 0" stroke="#fef9c3" stroke-width="2.5" fill="none" stroke-linecap="round"/>`);
+
+export const LAST_ART = { noise, tome, biker, police, horizon };
+Object.assign(CHAR_ART, { noiseking: noise, tome, police, horizon: horizonAlly });
 
 // ===== ガチャの仲間（★〜★★★）のオリジナルイラスト（v4.13〜）。ゆるい子はゆるく、かっこいい子はかっこよく =====
 // ★：パステルの丸に黒い線のふち／★★：銀のふちとやわらかい光／★★★：金のふちと光の線（wrap）
