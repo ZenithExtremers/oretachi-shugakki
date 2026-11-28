@@ -1,0 +1,4 @@
+# テストのスクリーンショットなど（公開しない）
+undefined/
+*.png.tmp
+node_modules/
