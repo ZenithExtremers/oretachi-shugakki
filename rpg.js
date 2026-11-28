@@ -1042,7 +1042,7 @@ export function makeRPG(ctx) {
     const boss = n === bossOf(subj) || isMid || isLast;
     const E = ENEMIES[subj], D = DIFF[d];
     // 敵の強さ：章（C/C++ → DB → 設計 → TOEIC）が進むごとに3回ぶん強く（2章の最初＝1章の中盤くらい）＋その章の中の回
-    const lvIdx = ci + (isRev ? 0 : Math.min(5, Math.max(0, CHAPTERS.findIndex((c) => c.id === subj))) * 3); // 第7章（宇宙）は第6章（免許）と同じ段階の強さ
+    const lvIdx = ci + (isRev ? 0 : Math.max(0, CHAPTERS.findIndex((c) => c.id === subj)) * 3); // 後ろの章ほど強い（第7章 宇宙がいちばん強い）
     const lvScale = 1 + lvIdx * 0.4 + (isLast ? 0.5 : (n - 1) * (0.3 / nsOf(subj))); // ボスはどの章も +0.3、雑魚ステージは少しずつ強く
     // 雑魚：そのステージ専用の2体を中心に、その回の雑魚・どこにでも出る雑魚から選ぶ。たまにレア（ステージ専用のレアが多め）
     const SG = STAGE[subj]?.[lec] || [];
