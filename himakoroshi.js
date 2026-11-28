@@ -59,6 +59,21 @@ function deckCards(id) {
   return DECKS.find((d) => d.id === id)?.words || [];
 }
 function deckName(id) { return id === 'mine' ? '自分の単語' : id === 'all' ? '全部まぜる' : DECKS.find((d) => d.id === id)?.name || ''; }
+// 発音（🔊）：TOEIC の単語帳と、英語の「自分の単語」だけ。端末の読み上げ（英語）を使う。タップしたときだけ鳴る
+const TOEIC_EN = new Set(DECKS.filter((d) => /^toeic/.test(d.id)).flatMap((d) => d.words.map((w) => w[0])));
+const isEn = (c) => TOEIC_EN.has(c[0]) || (S.cards.includes(c) && /^[A-Za-z][\x20-\x7E]*$/.test(c[0]));
+let enVoice = null;
+function sayEn(text) {
+  if (!window.speechSynthesis) { toast('この端末は読み上げに対応していません'); return; }
+  try {
+    speechSynthesis.cancel();
+    if (!enVoice) { const vs = speechSynthesis.getVoices().filter((v) => /^en[-_]US/i.test(v.lang)); enVoice = vs.find((v) => /Samantha|Google|Natural|Aria|Jenny/i.test(v.name)) || vs[0] || null; }
+    const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.9; if (enVoice) u.voice = enVoice;
+    speechSynthesis.speak(u);
+  } catch {}
+}
+const sayBtn = (w, cls = '') => `<button class="hk-say ${cls}" data-say="${esc(w)}" aria-label="${esc(w)} を発音">🔊</button>`;
+document.addEventListener('click', (e) => { const b = e.target.closest('.hk-say'); if (b) { e.stopPropagation(); sayEn(b.dataset.say); } }, true);
 // 単語帳を選ぶ画面（単語クイズ・単語カード共通）
 function pickDeck(title, min, start) {
   openOv(title);
@@ -457,15 +472,16 @@ OPEN.quiz = (deck) => (deck ? quiz(deck) : pickDeck('単語クイズ', 4, quiz))
 function quiz(deck) {
   const cards = deckCards(deck);
   if (cards.length < 4) { toast('単語を4語以上登録してね'); return; }
-  openOv('単語クイズ'); let streak = 0, total = 0;
+  openOv('単語クイズ'); let streak = 0, total = 0, prev = null; // prev：さっきの英単語（あとから発音できる）
   function show() {
     if (!body()) return;
-    const pool = shuffle([...cards]); const c = pool[0]; const flip = rnd(2) === 1;
+    const pool = shuffle([...cards]); const c = pool[0]; const flip = rnd(2) === 1; const en = isEn(c);
     const q = flip ? c[1] : c[0], a = flip ? c[0] : c[1];
     // 同じ問題文の別の単語（別の単語帳の同じ用語など）は選択肢に入れない
     const opts = shuffle([a, ...[...new Set(pool.slice(1).filter((x) => (flip ? x[1] : x[0]) !== q).map((x) => (flip ? x[0] : x[1])).filter((x) => x !== a))].slice(0, 3)]);
     info(`連続${streak}`);
-    body().innerHTML = `<p class="muted small" style="margin:0">${esc(deckName(deck))}</p><div class="hk-q${q.length > 14 ? ' long' : ''}" style="font-size:28px">${esc(q)}</div><div class="hk-choices word">${opts.map((o) => `<button>${esc(o)}</button>`).join('')}</div><p class="muted small">正解 ${total}問</p>`;
+    body().innerHTML = `<p class="muted small" style="margin:0">${esc(deckName(deck))}</p><div class="hk-q${q.length > 14 ? ' long' : ''}" style="font-size:28px">${esc(q)}${en && !flip ? sayBtn(q) : ''}</div><div class="hk-choices word">${opts.map((o) => `<button>${esc(o)}</button>`).join('')}</div><p class="muted small">正解 ${total}問</p>${prev ? `<p class="hk-prev small muted">さっきの単語：<b>${esc(prev)}</b>${sayBtn(prev, 'sm')}</p>` : ''}`;
+    prev = en ? c[0] : null;
     body().querySelectorAll('.hk-choices button').forEach((b, i) => (b.onclick = () => {
       if (opts[i] === a) { streak++; total++; study(); setBest('quiz', streak); b.classList.add('ok'); setTimeout(show, 250); }
       else { streak = 0; b.classList.add('ng'); body().querySelectorAll('.hk-choices button').forEach((x, j) => { if (opts[j] === a) x.classList.add('ok'); }); setTimeout(show, 1600); }
@@ -482,7 +498,7 @@ function flash(id) {
   function show() {
     if (i >= deck.length) { resultView('単語カード', `${known}/${deck.length}`, '覚えた数', () => OPEN.flash(id)); return; }
     const c = deck[i]; info(`${i + 1}/${deck.length}`);
-    body().innerHTML = `<p class="muted small" style="margin:0">${esc(deckName(id))}</p><div class="hk-flash${(open ? c[1] : c[0]).length > 14 ? ' long' : ''}" id="hk-fc">${esc(open ? c[1] : c[0])}</div><p class="muted small">タップでめくる</p><div class="row" style="width:100%;max-width:420px"><button class="btn sub" id="hk-no">まだ</button><button class="btn" id="hk-yes">覚えた</button></div>`;
+    body().innerHTML = `<p class="muted small" style="margin:0">${esc(deckName(id))}</p><div class="hk-flash${(open ? c[1] : c[0]).length > 14 ? ' long' : ''}" id="hk-fc">${esc(open ? c[1] : c[0])}${isEn(c) ? sayBtn(c[0]) : ''}</div><p class="muted small">タップでめくる</p><div class="row" style="width:100%;max-width:420px"><button class="btn sub" id="hk-no">まだ</button><button class="btn" id="hk-yes">覚えた</button></div>`;
     $('#hk-fc').onclick = () => { open = !open; show(); };
     $('#hk-no').onclick = () => { open = false; i++; show(); };
     $('#hk-yes').onclick = () => { open = false; i++; known++; show(); };

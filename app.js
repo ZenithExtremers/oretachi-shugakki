@@ -166,7 +166,7 @@ async function viewHome() {
           <span class="rb-txt"><small>続きから</small><b>${esc(resume.title)}</b><small>${esc(resumeMeta.name)} ・ ${Object.keys(resume.answers).length}/${resume.qids.length}問</small></span>
           <span class="rb-ring" style="--p:${(Object.keys(resume.answers).length / resume.qids.length) * 100}"></span>
         </button>` : `<div class="home-hello"><img src="icons/icon-192.png" alt=""><div><b>今日もやろう。</b><small>本番と同じ形式で、テスト対策。</small></div></div>`}
-      ${todayCard(subs)}
+      ${backupBanner()}${todayCard(subs)}
       <h3 class="sec">科目</h3>
       <div class="stiles">${subs.map(tile).join('')}</div>
       <button class="hima-banner" data-act="nav" data-to="hima">
@@ -297,10 +297,18 @@ const dayKey = (t = new Date()) => `${t.getFullYear()}-${String(t.getMonth() + 1
 store.daily ||= {};      // { 'YYYY-MM-DD': { 科目id: [解いた数, 正解数] } }
 store.cram ||= {};       // { 'YYYY-MM-DD': { 科目id: { ids, done } } } 今日やる分
 store.streakGot ||= {};  // 連続学習のごほうびを受け取った記録
-function logAnswer(sid, ok) {
+function logAnswer(sid, ok, lec) {
   if (!sid) return;
   const e = (store.daily[dayKey()] ||= {}); const a = (e[sid] ||= [0, 0]); a[0]++; if (ok) a[1]++;
+  // 冒険との連動：今日その回で正解した数（5問以上で冒険のその回が攻撃×1.2）。今日の分だけ持つ
+  if (ok && lec != null) { if (store.lecToday?.d !== dayKey()) store.lecToday = { d: dayKey() }; const m = (store.lecToday[sid] ||= {}); m[lec] = (m[lec] || 0) + 1; }
   checkStreak();
+}
+// 問題 id → 回（科目ごとに一度だけ作る）
+function lecOfQ(s, qid) {
+  if (!s?.groups) return null;
+  if (!s._lecOf) { s._lecOf = {}; for (const g of s.groups) for (const q of g.questions) s._lecOf[q.id] = g.lecture; }
+  return s._lecOf[qid] ?? null;
 }
 const dayTotal = (d) => Object.values(store.daily[d] || {}).reduce((x, a) => x + a[0], 0);
 function streakNow() {
@@ -677,7 +685,7 @@ function record(q, ok) {
     else if (!st.d3 && !st.due) st.due = now + DAY3;            // はじめて正解 → 3日後にもう一度
   } else { st.w++; st.r = true; st.due = 0; }
   st.t = now;
-  logAnswer(session?.subject || cur?.id, ok);
+  logAnswer(session?.subject || cur?.id, ok, cur && cur.id === (session?.subject || cur.id) ? lecOfQ(cur, q.id) : null);
   save();
 }
 
@@ -946,6 +954,21 @@ function viewNotes() {
 }
 
 /* ---------- バックアップと引き継ぎ ---------- */
+// お知らせ：最後に書き出してから7日（まだ一度もなければ、記録をつけ始めて7日）たったらホームに帯。×で3日あとにまた出す
+const SNKEY = 'oretachi:bkSnooze';
+function backupDue() {
+  const now = Date.now(), last = +localStorage.getItem(BKEY) || 0, snooze = +localStorage.getItem(SNKEY) || 0;
+  if (snooze > now) return 0;
+  let since = last;
+  if (!since) { const ks = Object.keys(store.daily).sort(); if (!ks.length) return 0; since = new Date(ks[0] + 'T00:00:00').getTime(); }
+  const days = Math.floor((now - since) / 86400000);
+  return days >= 7 ? { days, never: !last } : 0;
+}
+function backupBanner() {
+  const b = backupDue(); if (!b) return '';
+  return `<div class="bk-banner mt"><span class="bk-ic">💾</span><span class="bk-txt"><b>バックアップしよう</b><small>${b.never ? 'まだ一度も書き出していません' : `最後に書き出してから${b.days}日`}。記録はこの端末の中だけにあります</small></span>
+    <button class="btn bk-go" data-act="backup">書き出す</button><button class="bk-x" data-act="bksnooze" aria-label="3日後にまた知らせる">×</button></div>`;
+}
 function exportBackup() {
   const data = {}; for (const k of BACKUP_KEYS) { const v = localStorage.getItem(k); if (v != null) data[k] = v; }
   const d = new Date(), ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
@@ -955,6 +978,7 @@ function exportBackup() {
   try { localStorage.setItem(BKEY, String(Date.now())); } catch {}
   toast('💾 バックアップを書き出しました（ダウンロードやファイルに保存されます）');
   if (location.hash.startsWith('#/settings')) viewSettings();
+  document.querySelector('.bk-banner')?.remove();
 }
 async function importBackup(file) {
   let obj;
@@ -1057,7 +1081,7 @@ document.addEventListener('click', async (e) => {
       const i = +el.dataset.i;
       if (lessonState.answers[i] !== undefined) return;
       lessonState.answers[i] = +el.dataset.o;
-      const lok = +el.dataset.o === l.questions[i].answer; if (lok) { sfx.ok(); rewardCorrect(`${l.id}#${i}`); } else sfx.ng(); logAnswer(s.id, lok); save();
+      const lok = +el.dataset.o === l.questions[i].answer; if (lok) { sfx.ok(); rewardCorrect(`${l.id}#${i}`); } else sfx.ng(); logAnswer(s.id, lok, l.lecture); save();
       document.getElementById('lq-' + i).outerHTML = lessonQ(l, l.questions[i], i);
       return lessonFinishCheck(s, l);
     }
@@ -1096,6 +1120,7 @@ document.addEventListener('click', async (e) => {
     case 'tall': Object.keys(s.types).forEach((k) => fieldSel.types.add(k)); return viewField(s);
     case 'tnone': fieldSel.types.clear(); return viewField(s);
     case 'backup': return exportBackup();
+    case 'bksnooze': try { localStorage.setItem(SNKEY, String(Date.now() + 3 * 86400000)); } catch {} document.querySelector('.bk-banner')?.remove(); toast('3日後にまた知らせます'); return;
     case 'restore': { const f = document.getElementById('restore-file'); if (f) { f.value = ''; f.click(); } return; }
     case 'reset':
       if (confirm('成績と間違えた問題の記録をすべて消しますか？')) { store.stats = {}; store.history = []; save(); toast('消しました'); }

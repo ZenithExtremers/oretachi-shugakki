@@ -402,6 +402,9 @@ body.hk-lock { overflow: hidden; }
 .hk-deckview .m { width: 30px; height: 30px; font-size: 11px; border-radius: 8px; }
 .hk-deckview summary small { margin-left: auto; color: var(--muted); font-weight: 400; }
 .hk-q.long { font-size: 18px !important; font-weight: 700; line-height: 1.5; }
+.hk-say { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-left: 10px; min-width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); font-size: 20px; cursor: pointer; padding: 0; }
+.hk-say.sm { min-width: 36px; height: 36px; font-size: 16px; margin-left: 6px; }
+.hk-prev { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 4px 0 0; }
 .hk-flash.long { font-size: 18px; font-weight: 700; line-height: 1.6; }
 
 /* 設定：テーマの切り替え */
@@ -491,6 +494,10 @@ img.rp-face { object-fit: cover; background: #fff; }
 .rp-sign { position: absolute; left: 50%; transform: translate(-50%, -50%); max-width: 92%; display: flex; align-items: baseline; gap: 8px; background: linear-gradient(180deg, #3b2a6e, #2a1d55); border: 1.5px solid #f5c542; border-radius: 10px; padding: 6px 14px; box-shadow: var(--shadow); white-space: nowrap; }
 .rp-sign b { color: #f5c542; }
 .rp-sign span { color: var(--text); font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
+.rp-lecb { font-style: normal; font-size: 11px; font-weight: 700; color: #cbd5e1; background: rgba(255, 255, 255, .1); border-radius: 999px; padding: 2px 7px; cursor: pointer; flex: none; }
+.rp-lecb.on { color: #1a1033; background: #f5c542; }
+.rp-day .rp-lecb { color: #6b5a2e; background: rgba(0, 0, 0, .07); }
+.rp-day .rp-lecb.on { color: #1a1033; background: #f5c542; }
 .rp-spot { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 3px; border: 0; background: none; padding: 0; cursor: pointer; color: var(--text); }
 .rp-spot .c { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 20px; color: #2a1650; background: radial-gradient(circle at 35% 30%, #fff3c4, #f5c542 60%, #c98f1a); border: 3px solid #fff3c4; box-shadow: 0 4px 0 #8a5a0c, 0 0 18px rgba(245, 197, 66, .45); }
 .rp-spot.boss .c { width: 72px; height: 72px; font-size: 38px; background: radial-gradient(circle at 35% 30%, #ff9aa9, #e11d48 65%, #7f1230); border-color: #ffd1d9; box-shadow: 0 4px 0 #4c0a1d, 0 0 22px rgba(225, 29, 72, .5); }
@@ -564,6 +571,7 @@ img.rp-face { object-fit: cover; background: #fff; }
 .rp-num.hit.big { color: #f5c542; font-size: 30px; }
 .rp-num.miss { color: #fb7185; }
 .rp-num.heal { color: #4ade80; }
+.rp-num.lecb { left: 50% !important; top: 4%; font-size: 17px; font-weight: 900; color: #93c5fd; animation-duration: 2s; }
 .rp-num.info { color: #93c5fd; font-size: 18px; }
 @keyframes rp-float { 0% { opacity: 0; transform: translate(-50%, 10px) scale(.6); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -36px) scale(1); } }
 .rp-team { display: flex; justify-content: space-around; gap: 4px; margin-top: 8px; }
@@ -1717,3 +1725,11 @@ body.rp-night.rp-day {
 /* キーボードで操作したときの目印 */
 :focus-visible { outline: 3px solid var(--brand-2); outline-offset: 2px; }
 button:focus:not(:focus-visible) { outline: none; }
+
+/* バックアップのお知らせ */
+.bk-banner { display: flex; align-items: center; gap: 10px; background: var(--card); border: 1.5px solid #f59e0b; border-radius: 14px; padding: 10px 8px 10px 12px; }
+.bk-ic { font-size: 24px; flex: none; }
+.bk-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.bk-txt small { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.bk-go { width: auto; flex: none; padding: 10px 12px; min-height: 44px; }
+.bk-x { flex: none; width: 36px; height: 44px; border: 0; background: none; color: var(--muted); font-size: 20px; cursor: pointer; }

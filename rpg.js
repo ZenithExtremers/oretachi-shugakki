@@ -317,6 +317,13 @@ export function makeRPG(ctx) {
   };
   bgm.setEnabled(R().sound === 'bgm');
   let lectures = null; // { ccpp: {1:'第1回 …'}, … }
+  // 本編との連動：今日、本編でその回を5問以上正解 → 冒険のその回（雑魚・ボス）で攻撃×1.2
+  const LEC_NEED = 5, LEC_BONUS = 1.2;
+  const lecDone = (subj, lec) => {
+    try { const t = JSON.parse(localStorage.getItem('oretachi:v1') || '{}').lecToday, d = new Date(); const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      return t && t.d === k ? t[subj]?.[lec] || 0 : 0; } catch { return 0; }
+  };
+  const lecBonus = (subj, lec) => (lecDone(subj, lec) >= LEC_NEED ? LEC_BONUS : 1);
   const heroName = () => R().heroName;
   // 主人公のスキン（レベル50ごとに増える。編成の主人公の詳細で着替える）
   const HERO_SKINS = [{ lv: 1, name: 'いつもの', src: 'icons/icon-192.png' }, { lv: 50, name: 'レッドスーツ', src: 'icons/hero-lv50.svg' }, { lv: 100, name: 'コントローラー', src: 'icons/hero-lv100.svg' }, { lv: 150, name: 'ボーダー', src: 'icons/hero-lv150.svg' }]; // src: null は準備中（絵が来たら入れる）
@@ -509,7 +516,7 @@ export function makeRPG(ctx) {
         <svg class="rp-road" viewBox="0 0 100 ${H}" preserveAspectRatio="none"><polyline points="${pts}" class="all"/>${donePts ? `<polyline points="${donePts}" class="done"/>` : ''}</svg>
         ${rows.map((x, i) => {
           const top = Y(i);
-          if (x.kind === 'sign') return `<div class="rp-sign" style="top:${top}px"><b>${esc(x.no)}</b><span>${esc(x.title)}</span></div>`;
+          if (x.kind === 'sign') { const lb = lecDone(r.subj, chapters[x.ci][0]); return `<div class="rp-sign" style="top:${top}px"><b>${esc(x.no)}</b><span>${esc(x.title)}</span><em class="rp-lecb${lb >= LEC_NEED ? ' on' : ''}" data-rp="lecb" data-n="${lb}" title="今日、本編でこの回を${LEC_NEED}問正解すると、冒険のこの回で攻撃×${LEC_BONUS}">${lb >= LEC_NEED ? `📚×${LEC_BONUS}` : `📚${lb}/${LEC_NEED}`}</em></div>`; }
           if (x.kind === 'last') { const L = LAST[r.subj], sv = starsOf(`${r.subj}-last-0`)[mapDiff]; return `<button class="rp-midspot rp-lastspot${x.done ? ' done' : ''}" style="top:${top}px" data-rp="last" ${x.open ? '' : 'disabled'}>
             <span class="c">${x.open ? LAST_ART[L.art] : '🔒'}</span><b>👑 ラスボス</b><small>${esc(L.title)}${x.done ? ` <i class="rp-stars">${starTxt(sv)}</i>` : ''}</small></button>`; }
           if (x.kind === 'mid') { const M = MID[r.subj], sv = starsOf(`${r.subj}-mid-0`)[mapDiff]; return `<button class="rp-midspot${x.done ? ' done' : ''}" style="top:${top}px" data-rp="mid" ${x.open ? '' : 'disabled'}>
@@ -541,6 +548,7 @@ export function makeRPG(ctx) {
       }
       else if (a === 'rename') openRename();
       else if (a === 'talk') toast(`${heroName()}「${pick(HLINE.map)}」`);
+      else if (a === 'lecb') toast(+b.dataset.n >= LEC_NEED ? `📚 今日、本編でこの回を${LEC_NEED}問以上正解！この回のバトルは攻撃×${LEC_BONUS}（今日だけ）` : `📚 本編でこの回をあと${LEC_NEED - b.dataset.n}問正解すると、今日はこの回のバトルで攻撃×${LEC_BONUS}`);
       else if (a === 'sound') {
         const r2 = R(); r2.sound = r2.sound === 'bgm' ? 'silent' : 'bgm'; save();
         bgm.setEnabled(r2.sound === 'bgm'); ctx.onSound?.();
@@ -1069,7 +1077,8 @@ export function makeRPG(ctx) {
     setCleanup(() => { clearInterval(st.timer); bgm.play('map'); document.body.classList.remove('rp-noscript'); window.__sayRate = window.__sayLimit = null; });
     bgm.play(boss ? 'boss' : 'battle');
 
-    const atkOf = (x) => x.atk * (x.bonus ? x.bonus[subj] ?? x.bonus.other : x.subj === subj ? 1.3 : x.subj === 'all' ? 1.2 : 1); // 得意科目 ×1.3（ノイズキングは章ごとの倍率）
+    const LB2 = isRev || isMid || isLast ? 1 : lecBonus(subj, String(lec)); // 本編の成果ボーナス
+    const atkOf = (x) => LB2 * x.atk * (x.bonus ? x.bonus[subj] ?? x.bonus.other : x.subj === subj ? 1.3 : x.subj === 'all' ? 1.2 : 1); // 得意科目 ×1.3（ノイズキングは章ごとの倍率）
     const partyAtk = () => t.reduce((a, x) => a + atkOf(x), 0);
 
     const left = () => st.active.filter((i) => foes[i].cur > 0).length + st.waves.slice(st.wave + 1).reduce((a, w) => a + w.length, 0);
@@ -1663,6 +1672,7 @@ export function makeRPG(ctx) {
     };
     if (isLast) { lastShow(LB).then(() => { if (st.over) return; layout(); hsay('last'); nextQuestion(); }); return; }
     layout();
+    if (LB2 > 1) setTimeout(() => pop(`📚 本編の成果！攻撃×${LB2}`, 'lecb'), 500);
     setTimeout(() => hsay(isRev ? 'rev' : isMid ? 'mid' : foes[0].rare ? 'rare' : boss ? 'boss' : d === 2 ? 'geki' : d === 1 ? 'hard' : 'start'), 200);
     nextQuestion();
   }
