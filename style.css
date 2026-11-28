@@ -7,6 +7,7 @@
   --brand: #1e3a8a;
   --brand-2: #2563eb;
   --brand-soft: #e0e7ff;
+  --on-brand: #fff;
   --ok: #15803d;
   --ok-soft: #dcfce7;
   --ng: #b91c1c;
@@ -37,6 +38,8 @@
     --brand: #93c5fd;
     --brand-2: #60a5fa;
     --brand-soft: #1e2a4a;
+  --on-brand: #0b1120;
+    --on-brand: #0b1120;
     --ok: #4ade80;
     --ok-soft: #12321f;
     --ng: #f87171;
@@ -56,6 +59,7 @@
   --brand: #93c5fd;
   --brand-2: #60a5fa;
   --brand-soft: #1e2a4a;
+  --on-brand: #0b1120;
   --ok: #4ade80;
   --ok-soft: #12321f;
   --ng: #f87171;
@@ -146,13 +150,13 @@ h3.sec { font-size: 13px; color: var(--muted); font-weight: 600; margin: 24px 0 
   border: 1px solid var(--line); background: var(--card); border-radius: 99px; padding: 6px 12px;
   font-size: 14px; cursor: pointer;
 }
-.chip[aria-pressed="true"] { background: var(--brand-2); border-color: var(--brand-2); color: #fff; }
+.chip[aria-pressed="true"] { background: var(--brand-2); border-color: var(--brand-2); color: var(--on-brand); }
 .chip small { opacity: .75; margin-left: 4px; }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   border: 0; border-radius: 12px; padding: 12px 18px; font-weight: 700; cursor: pointer;
-  background: var(--brand-2); color: #fff; min-height: 46px;
+  background: var(--brand-2); color: var(--on-brand); min-height: 46px;
 }
 .btn.sub { background: var(--card); color: var(--text); border: 1px solid var(--line); }
 .btn.wide { width: 100%; }
@@ -659,7 +663,7 @@ main.wrap { zoom: var(--zoom, 1); }
 .exp { font-size: 15.5px; line-height: 1.6; }
 .group-head h2 { font-size: 19px; }
 .ref-btn { flex: none; border: 1.5px solid var(--brand-2); background: var(--brand-soft); color: var(--brand); border-radius: 12px; height: 46px; padding: 0 12px; font-weight: 800; font-size: 14px; cursor: pointer; white-space: nowrap; }
-.ref-btn[aria-expanded="true"] { background: var(--brand-2); color: #fff; }
+.ref-btn[aria-expanded="true"] { background: var(--brand-2); color: var(--on-brand); }
 .sheet { position: fixed; left: 0; right: 0; bottom: calc(67px + env(safe-area-inset-bottom)); z-index: 9; max-width: 760px; margin: 0 auto; height: min(46vh, 440px); display: flex; flex-direction: column;
   background: var(--card); border: 1px solid var(--line); border-bottom: 0; border-radius: 18px 18px 0 0; box-shadow: 0 -10px 30px rgba(0, 0, 0, .25); animation: sheet-up .2s ease-out; }
 .sheet[hidden] { display: none; }
@@ -1689,7 +1693,7 @@ body.rp-night.rp-day {
 .cal-d.today { outline: 2.5px solid #f59e0b; outline-offset: -1px; }
 /* 苦手分析 */
 .wk-next { display: grid; gap: 2px; }
-.wk-next small { color: #dc2626; font-weight: 800; } .wk-next b { font-size: 16px; }
+.wk-next small { color: var(--ng); font-weight: 800; } .wk-next b { font-size: 16px; }
 .wk-row { display: grid; grid-template-columns: 7.5em 1fr 3.2em; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; }
 .wk-l { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .wk-track { height: 10px; border-radius: 6px; background: color-mix(in srgb, var(--muted) 18%, transparent); overflow: hidden; }
@@ -1703,3 +1707,13 @@ body.rp-night.rp-day {
 .wk-days span { display: grid; grid-template-rows: 1fr auto; height: 100%; align-items: end; text-align: center; }
 .wk-days i { display: block; background: #60a5fa; border-radius: 4px 4px 0 0; min-height: 2px; }
 .wk-days small { font-size: 10px; color: var(--muted); }
+/* 押しやすさ：小さかったボタンを 36px 以上に */
+.td-chip { padding: 9px 13px; }
+.td-calbtn { padding: 8px 12px; }
+.sec-row .mini-btns button { padding: 8px 14px; }
+#hk-wordlist li button { min-height: 34px; padding: 6px 12px; }
+.rp-name { min-height: 36px; }
+.hk-deck .m, .hk-deckview .m { text-shadow: 0 1px 2px rgba(0, 0, 0, .45); }
+/* キーボードで操作したときの目印 */
+:focus-visible { outline: 3px solid var(--brand-2); outline-offset: 2px; }
+button:focus:not(:focus-visible) { outline: none; }

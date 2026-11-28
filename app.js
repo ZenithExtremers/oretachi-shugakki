@@ -35,7 +35,11 @@ function applyTheme() {
   const t = store.settings.theme;
   if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
   else delete document.documentElement.dataset.theme;
+  // ブラウザのバーの色を画面の背景に合わせる
+  const dark = t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.querySelector('meta[name=theme-color]')?.setAttribute('content', dark ? '#0b1120' : '#f4f6fb');
 }
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyTheme);
 applyTheme();
 const save = () => writeJSON(KEY, store);
 let session = readJSON(SKEY, null);
@@ -195,7 +199,6 @@ function viewSubject(s) {
       <h3 class="sec">解く</h3>
       <div class="menu">
         ${s.lessons.length ? `<button class="menu-btn" data-act="nav" data-to="s/${s.id}/lessons"><span class="ic">基</span><div><b>基礎コース</b><small>説明を読んで確認問題 ・ クリア ${s.lessons.filter((l) => store.lessons?.[l.id]).length}/${s.lessons.length}</small></div></button>` : ''}
-        <button class="menu-btn" data-act="nav" data-to="s/${s.id}/stats"><span class="ic">📊</span><div><b>苦手分析</b><small>回・型ごとの正答率、最近の伸び、次にやる回</small></div></button>
         <button class="menu-btn" data-act="nav" data-to="s/${s.id}/field"><span class="ic">分</span><div><b>分野別</b><small>回・問題の型を選んで、1問ずつ解説つき</small></div></button>
         ${(s.mocks || []).map((mk, i) => `<button class="menu-btn" data-act="mock" data-i="${i}"><span class="ic">模</span><div><b>${esc(mk.name)}</b><small>${mk.note ? esc(mk.note) : '本番と同じ配分'} ・ ${mk.minutes}分</small></div></button>`).join('')}
         ${s.mock ? `<button class="menu-btn" data-act="mock"><span class="ic">模</span><div><b>${esc(s.mock.name)}</b><small>${s.mock.note ? esc(s.mock.note) : '本番と同じ配分'} ・ 最後にまとめて採点${s.mock.minutes ? ` ・ ${s.mock.minutes}分` : ''}</small></div></button>` : ''}
@@ -203,7 +206,8 @@ function viewSubject(s) {
         <button class="menu-btn" data-act="review" ${rev ? '' : 'disabled'}><span class="ic">復</span><div><b>復習</b><small>${rev ? '間違えた問題と、3日前に正解した問題。正解すると消えます' : 'まだありません'}</small></div>${rev ? `<span class="badge">${rev}</span>` : ''}</button>
       </div>
       <h3 class="sec">成績</h3>
-      <div class="card">
+      <div class="menu"><button class="menu-btn" data-act="nav" data-to="s/${s.id}/stats"><span class="ic">📊</span><div><b>苦手分析</b><small>回・型ごとの正答率、最近の伸び、次にやる回</small></div></button></div>
+      <div class="card mt">
         ${hist.length ? hist.slice(-5).reverse().map(histRow).join('') + (hist.length > 5 ? `<button class="btn sub wide mt" data-act="nav" data-to="s/${s.id}/history">すべて見る</button>` : '') : '<p class="muted small" style="margin:0">模試や本番の問題を解くと、ここに記録されます。</p>'}
       </div>
     </main>`;

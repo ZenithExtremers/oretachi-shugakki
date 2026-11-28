@@ -3,10 +3,14 @@
 // 音は鳴らさない（講義中に使うため）。
 
 import DECKS from './data/hima-words.js';
-import { makeRPG, CHARS } from './rpg.js';
 import { bgm } from './bgm.js';
-import { CHAR_ART } from './charart.js';
-import { makeHistory } from './history.js';
+// 冒険・キャラの絵・歴史ゲームは大きいので、ヒマコロシを開いたときに読み込む（本編のホームを速く）
+let makeRPG, CHARS, CHAR_ART, makeHistory;
+async function loadHeavy() {
+  if (makeRPG) return;
+  const [r, c, h] = await Promise.all([import('./rpg.js'), import('./charart.js'), import('./history.js')]);
+  ({ makeRPG, CHARS } = r); ({ CHAR_ART } = c); ({ makeHistory } = h);
+}
 
 const KEY = 'oretachi:hima';
 const DEF = {
@@ -207,8 +211,9 @@ let $root = null;
 const TABS = [['home', '🦉', 'ホーム'], ['quest', '⚔️', '冒険'], ['hist', '📜', '歴史'], ['study', '📚', '勉強'], ['game', '🎮', 'ゲーム'], ['words', '🗂️', '単語']];
 let rpg = null, hist = null;
 
-export function viewHima($app, top, api) {
+export async function viewHima($app, top, api) {
   leaveHima();
+  if (!makeRPG) { $app.innerHTML = '<main class="wrap"><p class="muted center mt">読み込み中…</p></main>'; await loadHeavy(); if (!location.hash.startsWith('#/hima')) return; }
   if (!hist) hist = makeHistory({ S, save, openOv, closeOv, body: () => body(), toast, esc, shuffle, addFood, setCleanup: (f) => { cleanup = f; } });
   if (!rpg) rpg = makeRPG({ S, save, openOv, closeOv, body: () => body(), info: (t) => info(t), toast, setCleanup: (f) => { cleanup = f; }, renderTop: () => renderTop(), esc, shuffle, rnd, owlSVG, DECKS, addFood, api, onSound: () => sndLabels() });
   $app.innerHTML = `
