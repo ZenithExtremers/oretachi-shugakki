@@ -2,7 +2,7 @@
 import SUBJECTS from './data/subjects.js';
 import NOTES from './data/patchnotes.js';
 import { sfx } from './sfx.js';
-import { viewHima, leaveHima, rewardCorrect, himaSummary, owlSVG } from './himakoroshi.js';
+import { viewHima, leaveHima, rewardCorrect, himaSummary, owlSVG, giveReward } from './himakoroshi.js';
 
 const VERSION = NOTES[0].version;
 
@@ -116,6 +116,7 @@ async function route() {
     if (page === 'field') return viewField(s);
     if (page === 'past') return viewPast(s);
     if (page === 'history') return viewHistory(s);
+    if (page === 'stats') return viewStats(s);
     if (page === 'quiz') return session && session.subject === s.id && !session.finished ? viewQuiz(s) : go('s/' + s.id);
     if (page === 'result') return session && session.subject === s.id && session.finished ? viewResult(s) : go('s/' + s.id);
     return viewSubject(s);
@@ -164,6 +165,8 @@ async function viewHome() {
         </button>` : `<div class="home-hello"><img src="icons/icon-192.png" alt=""><div><b>今日もやろう。</b><small>本番と同じ形式で、テスト対策。</small></div></div>`}
       <h3 class="sec">科目</h3>
       <div class="stiles">${subs.map(tile).join('')}</div>
+      ${cramCard(subs)}
+      ${calendarCard()}
       <p class="muted small">ほかの科目は資料がそろいしだい追加します。</p>
       <button class="hima-banner" data-act="nav" data-to="hima">
         <span class="hb-owl">${owlSVG()}</span>
@@ -196,6 +199,7 @@ function viewSubject(s) {
       <h3 class="sec">解く</h3>
       <div class="menu">
         ${s.lessons.length ? `<button class="menu-btn" data-act="nav" data-to="s/${s.id}/lessons"><span class="ic">基</span><div><b>基礎コース</b><small>説明を読んで確認問題 ・ クリア ${s.lessons.filter((l) => store.lessons?.[l.id]).length}/${s.lessons.length}</small></div></button>` : ''}
+        <button class="menu-btn" data-act="nav" data-to="s/${s.id}/stats"><span class="ic">📊</span><div><b>苦手分析</b><small>回・型ごとの正答率、最近の伸び、次にやる回</small></div></button>
         <button class="menu-btn" data-act="nav" data-to="s/${s.id}/field"><span class="ic">分</span><div><b>分野別</b><small>回・問題の型を選んで、1問ずつ解説つき</small></div></button>
         ${(s.mocks || []).map((mk, i) => `<button class="menu-btn" data-act="mock" data-i="${i}"><span class="ic">模</span><div><b>${esc(mk.name)}</b><small>${mk.note ? esc(mk.note) : '本番と同じ配分'} ・ ${mk.minutes}分</small></div></button>`).join('')}
         ${s.mock ? `<button class="menu-btn" data-act="mock"><span class="ic">模</span><div><b>${esc(s.mock.name)}</b><small>${s.mock.note ? esc(s.mock.note) : '本番と同じ配分'} ・ 最後にまとめて採点${s.mock.minutes ? ` ・ ${s.mock.minutes}分` : ''}</small></div></button>` : ''}
@@ -286,6 +290,112 @@ function accFor(s, pred) {
   let c = 0, w = 0;
   for (const g of s.groups) if (pred(g)) for (const q of g.questions) { const st = store.stats[q.id]; if (st) { c += st.c; w += st.w; } }
   return c + w ? { pct: Math.round((c / (c + w)) * 100) } : null;
+}
+
+/* ---------- 学習の記録（日ごと）・連続学習・追いこみ ---------- */
+const dayKey = (t = new Date()) => `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+store.daily ||= {};      // { 'YYYY-MM-DD': { 科目id: [解いた数, 正解数] } }
+store.cram ||= {};       // { 'YYYY-MM-DD': { 科目id: { ids, done } } } 今日やる分
+store.streakGot ||= {};  // 連続学習のごほうびを受け取った記録
+function logAnswer(sid, ok) {
+  if (!sid) return;
+  const e = (store.daily[dayKey()] ||= {}); const a = (e[sid] ||= [0, 0]); a[0]++; if (ok) a[1]++;
+  checkStreak();
+}
+const dayTotal = (d) => Object.values(store.daily[d] || {}).reduce((x, a) => x + a[0], 0);
+function streakNow() {
+  let n = 0; const t = new Date();
+  if (!dayTotal(dayKey(t))) t.setDate(t.getDate() - 1); // 今日まだなら昨日までの連続
+  while (dayTotal(dayKey(t))) { n++; t.setDate(t.getDate() - 1); }
+  return n;
+}
+const STREAK_REW = [[3, 3, 0], [7, 5, 1], [14, 10, 2], [30, 20, 3]]; // [日数, 🌰, 🎟️]
+function checkStreak() {
+  const n = streakNow(); const st = new Date(); st.setDate(st.getDate() - n + 1); const key = dayKey(st);
+  for (const [len, food, tk] of STREAK_REW) {
+    if (n < len || store.streakGot[`${key}+${len}`]) continue;
+    store.streakGot[`${key}+${len}`] = 1; giveReward(food, tk);
+    toast(`🔥 ${len}日連続！ 🌰${food}${tk ? ` と 🎟️ガチャチケット${tk}枚` : ''}`);
+  }
+}
+const daysTo = (date) => (date ? Math.ceil((new Date(date + 'T00:00:00') - new Date(new Date().toDateString())) / 86400000) : null);
+const lecLabel = (s, k) => { const v = s.lectures[k] || ''; return (v.match(/^(第\S+?回)/) || [null, v.split(/\s/)[0] || `第${k}回`])[1]; };
+// 今日やる分：まだ正解していない・間違えたままの問題を、試験日までに1周できるよう割り振る（まだの回・正答率が低い回から）
+function cramPlan(s) {
+  const days = daysTo(s.meta.examDate); if (days == null || days < 0) return null;
+  const d = dayKey(), saved = store.cram[d]?.[s.id];
+  const all = s.groups.flatMap((g) => g.questions);
+  if (!saved) {
+    const pool = all.filter((q) => { const st = store.stats[q.id]; return !st || !st.c || st.r; });
+    const src = pool.length ? pool : all;
+    const n = Math.min(30, Math.max(5, Math.ceil((pool.length || 10) / Math.max(1, days))));
+    const lacc = {}; for (const k of Object.keys(s.lectures)) { const a = accFor(s, (g) => String(g.lecture) === k); lacc[k] = a ? a.pct : -1; }
+    const pick = shuffle([...src]).sort((a, b) => (lacc[a.group.lecture] ?? 0) - (lacc[b.group.lecture] ?? 0)).slice(0, n);
+    (store.cram[d] ||= {})[s.id] = { ids: pick.map((q) => q.id), done: false };
+    for (const k of Object.keys(store.cram)) if (k < dayKey(new Date(Date.now() - 14 * 86400000))) delete store.cram[k]; // 古い記録は消す
+    save();
+  }
+  const c = store.cram[d][s.id], qs = c.ids.map((id) => s.qById[id]).filter(Boolean);
+  const lecs = [...new Set(qs.map((q) => String(q.group.lecture)))];
+  return { days, n: qs.length, qs, done: c.done, lecs: lecs.slice(0, 2).map((k) => lecLabel(s, k)).join('・') + (lecs.length > 2 ? ' ほか' : '') };
+}
+function startCram(s) {
+  const p = cramPlan(s); if (!p) return;
+  const by = new Map(); for (const q of p.qs) { if (!by.has(q.group)) by.set(q.group, []); by.get(q.group).push(q); }
+  makeSession(s, { kind: 'cram', mode: 'practice', title: `今日の追いこみ ${p.n}問`, groups: [...by].map(([g, qs]) => ({ g, qs })) });
+}
+function cramCard(subs) {
+  const rows = subs.map((s) => ({ s, p: cramPlan(s) })).filter((x) => x.p);
+  if (!rows.length) return '';
+  return `<h3 class="sec">📌 今日やる分</h3><div class="card cram">${rows.map(({ s, p }) => `
+    <div class="cram-row" style="--c:${s.meta.color}"><span class="cr-mark">${esc(s.meta.mark || '')}</span>
+      <div class="cr-txt"><b>${esc(s.meta.short || s.meta.name)}</b><small>${p.days ? `期末まで${p.days}日` : '今日が本番'} ・ ${esc(p.lecs)}</small></div>
+      ${p.done ? '<span class="cr-done">✓ 完了</span>' : `<button class="btn cr-go" data-act="cram" data-sid="${s.id}">${p.n}問</button>`}</div>`).join('')}
+    <p class="muted small" style="margin:8px 0 0">まだの回・苦手な回から、期末までに全部を1周できる量。終わると🌰3</p></div>`;
+}
+function calendarCard() {
+  const t = new Date(), y = t.getFullYear(), m = t.getMonth(), first = new Date(y, m, 1).getDay(), last = new Date(y, m + 1, 0).getDate();
+  const n = streakNow(), next = STREAK_REW.find(([len]) => len > n);
+  const cells = [];
+  for (let i = 0; i < first; i++) cells.push('<span class="cal-d emp"></span>');
+  for (let d = 1; d <= last; d++) {
+    const k = dayKey(new Date(y, m, d)), v = dayTotal(k), lv = v ? (v >= 30 ? 3 : v >= 10 ? 2 : 1) : 0;
+    cells.push(`<span class="cal-d l${lv}${d === t.getDate() ? ' today' : ''}" title="${v}問">${d}</span>`);
+  }
+  return `<h3 class="sec">📅 学習カレンダー</h3><div class="card cal">
+    <div class="cal-head"><b>🔥 ${n}日連続</b><small>${next ? `あと${next[0] - n}日で 🌰${next[1]}${next[2] ? `＋🎟️${next[2]}` : ''}` : '30日達成！'}</small><span class="muted small">${m + 1}月</span></div>
+    <div class="cal-grid">${['日', '月', '火', '水', '木', '金', '土'].map((w) => `<span class="cal-w">${w}</span>`).join('')}${cells.join('')}</div>
+    <p class="muted small" style="margin:8px 0 0">1問でも解いた日に色がつく（10問・30問でこくなる）。3・7・14・30日連続でごほうび</p></div>`;
+}
+
+/* ---------- 苦手分析 ---------- */
+function viewStats(s) {
+  const bar = (label, a, total, extra = '') => `<div class="wk-row"><span class="wk-l">${label}</span><span class="wk-track"><i class="${a == null ? '' : a < 60 ? 'bad' : a < 80 ? 'mid' : 'good'}" style="width:${a ?? 0}%"></i></span><b class="wk-v">${a == null ? 'まだ' : a + '%'}</b>${extra}</div>`;
+  const lecs = Object.keys(s.lectures).map((k) => { const qs = s.groups.filter((g) => String(g.lecture) === k).flatMap((g) => g.questions); const a = accFor(s, (g) => String(g.lecture) === k); return { k, n: qs.length, a: a ? a.pct : null }; }).filter((x) => x.n);
+  const types = Object.entries(s.types || {}).map(([k, v]) => { const a = accFor(s, (g) => g.type === k); const n = s.groups.filter((g) => g.type === k).length; return { v, n, a: a ? a.pct : null }; }).filter((x) => x.n);
+  const weakest = [...lecs].sort((a, b) => (a.a ?? -1) - (b.a ?? -1))[0];
+  const days = [...Array(14)].map((_, i) => { const t = new Date(); t.setDate(t.getDate() - 13 + i); const e = store.daily[dayKey(t)]?.[s.id] || [0, 0]; return { d: t, n: e[0], c: e[1] }; });
+  const sum = (arr) => arr.reduce((x, e) => [x[0] + e.n, x[1] + e.c], [0, 0]);
+  const [n7, c7] = sum(days.slice(7)), [n0, c0] = sum(days.slice(0, 7));
+  const p7 = n7 ? Math.round((c7 / n7) * 100) : null, p0 = n0 ? Math.round((c0 / n0) * 100) : null;
+  const mx = Math.max(1, ...days.slice(7).map((e) => e.n));
+  $app.innerHTML = `${top('苦手分析', { back: 's/' + s.id })}
+    <main class="wrap">
+      ${weakest ? `<div class="card mt wk-next"><small>次はこの回</small><b>${esc(s.lectures[weakest.k])}</b><span class="muted small">${weakest.a == null ? 'まだ解いていない' : `正答率 ${weakest.a}%`} ・ ${weakest.n}問</span>
+        <button class="btn mt" data-act="nextlec" data-k="${weakest.k}">この回を解く（解説つき）</button></div>` : ''}
+      <h3 class="sec">最近の伸び</h3>
+      <div class="card"><div class="wk-recent"><div><small>この7日</small><b>${n7}問</b><span>${p7 == null ? '—' : p7 + '%'}</span></div><div><small>その前の7日</small><b>${n0}問</b><span>${p0 == null ? '—' : p0 + '%'}</span></div>
+        <div><small>正答率の変化</small><b class="${p7 != null && p0 != null ? (p7 >= p0 ? 'up' : 'down') : ''}">${p7 != null && p0 != null ? `${p7 >= p0 ? '+' : ''}${p7 - p0}` : '—'}</b><span>ポイント</span></div></div>
+        <div class="wk-days">${days.slice(7).map((e) => `<span><i style="height:${(e.n / mx) * 100}%"></i><small>${e.d.getDate()}</small></span>`).join('')}</div></div>
+      <h3 class="sec">回ごとの正答率</h3>
+      <div class="card">${lecs.map((x) => bar(esc(lecLabel(s, x.k)), x.a, x.n)).join('')}</div>
+      ${types.length ? `<h3 class="sec">問題の型ごとの正答率</h3><div class="card">${types.map((x) => bar(esc(x.v), x.a, x.n)).join('')}</div>` : ''}
+      <p class="muted small mt">赤：60%未満 ・ 黄：80%未満 ・ 緑：80%以上 ・ グレー：まだ解いていない</p>
+    </main>`;
+}
+function startLecture(s, k) {
+  const groups = shuffle(s.groups.filter((g) => String(g.lecture) === String(k))).map((g) => ({ g, qs: g.questions }));
+  makeSession(s, { kind: 'field', mode: 'practice', title: `${lecLabel(s, k)} 苦手克服`, groups });
 }
 
 /* ---------- セッション作成 ---------- */
@@ -571,6 +681,7 @@ function record(q, ok) {
     else if (!st.d3 && !st.due) st.due = now + DAY3;            // はじめて正解 → 3日後にもう一度
   } else { st.w++; st.r = true; st.due = 0; }
   st.t = now;
+  logAnswer(session?.subject || cur?.id, ok);
   save();
 }
 
@@ -624,6 +735,7 @@ function finish(s) {
   session.finished = true;
   session.result = res;
   session.seconds = Math.floor((Date.now() - session.startedAt) / 1000);
+  if (session.kind === 'cram') { const c = store.cram[dayKey()]?.[s.id]; if (c && !c.done) { c.done = true; giveReward(3, 0); setTimeout(() => toast('📌 今日の追いこみ完了！ 🌰3'), 300); } }
   store.history.push({ subject: s.id, kind: session.kind, title: session.title, score: res.score, total: res.total, date: Date.now() });
   if (store.history.length > 200) store.history = store.history.slice(-200);
   save(); saveSession();
@@ -926,6 +1038,8 @@ document.addEventListener('click', async (e) => {
     case 'mock': return confirmReplace() && startMock(s, el.dataset.i == null ? null : +el.dataset.i);
     case 'past': return confirmReplace() && startPast(s, el.dataset.src, el.dataset.mode);
     case 'review': return confirmReplace() && startReview(s, reviewIds(s));
+    case 'cram': { const cs = await getSubject(el.dataset.sid); return cs && confirmReplace() && startCram(cs); }
+    case 'nextlec': return confirmReplace() && startLecture(s, el.dataset.k);
     case 'retrywrong': return startReview(s, session.wrong, '解き直し');
     case 'fl': case 'ft': {
       const set = act === 'fl' ? fieldSel.lectures : fieldSel.types;
@@ -946,7 +1060,7 @@ document.addEventListener('click', async (e) => {
       const i = +el.dataset.i;
       if (lessonState.answers[i] !== undefined) return;
       lessonState.answers[i] = +el.dataset.o;
-      if (+el.dataset.o === l.questions[i].answer) { sfx.ok(); rewardCorrect(`${l.id}#${i}`); } else sfx.ng();
+      const lok = +el.dataset.o === l.questions[i].answer; if (lok) { sfx.ok(); rewardCorrect(`${l.id}#${i}`); } else sfx.ng(); logAnswer(s.id, lok); save();
       document.getElementById('lq-' + i).outerHTML = lessonQ(l, l.questions[i], i);
       return lessonFinishCheck(s, l);
     }

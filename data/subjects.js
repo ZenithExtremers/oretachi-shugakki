@@ -7,6 +7,7 @@ export default [
     mark: 'C++',
     sub: '中間・期末 本番形式（5択）',
     color: '#2563eb',
+    examDate: '2027-01-15',
     module: './ccpp/index.js',
   },
   {

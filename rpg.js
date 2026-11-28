@@ -300,6 +300,7 @@ export function makeRPG(ctx) {
     const r = S.rpg;
     if (S.owl && r.owned.owl !== S.owl) r.owned.owl = S.owl; // フクロウはホームと共通
     if (!r.heroName) r.heroName = '主人公';
+    if (S.rpgTickets) { r.tickets = (r.tickets || 0) + S.rpgTickets; S.rpgTickets = 0; } // 本編の連続学習のごほうび
     if (!r.sound) r.sound = 'silent'; // 'silent' | 'bgm'（講義中に使うので最初はサイレント）
     if (!r.stars) { r.stars = {}; for (const id of Object.keys(r.clear)) r.stars[`${id}#0`] = 1; } // 前のデータのクリアは★1から
     if (!r.zukan) r.zukan = {};

@@ -84,6 +84,11 @@ export function rewardCorrect(key) {
   return true;
 }
 export const himaFood = () => S.food;
+// 本編のごほうび（追いこみ・連続学習）：🌰と、冒険のガチャチケット（冒険を開いたときに受け取る）
+export function giveReward(food = 0, tickets = 0) {
+  S.food += food; if (tickets) S.rpgTickets = (S.rpgTickets || 0) + tickets;
+  save();
+}
 // ホームに出す要約（知恵の実の数と冒険の進み具合）
 export function himaSummary() {
   const r = S.rpg;

@@ -1661,3 +1661,36 @@ body.rp-night.rp-day {
 .rp-sfoes span svg.en { width: 36px; height: 36px; }
 .rp-revic svg.en { width: 28px; height: 28px; display: block; }
 .rp-nemi svg.en { width: 52px; height: 52px; display: block; }
+/* 今日やる分（追いこみ） */
+.cram { display: grid; gap: 8px; }
+.cram-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: color-mix(in srgb, var(--c) 10%, transparent); border: 1.5px solid color-mix(in srgb, var(--c) 35%, transparent); }
+.cr-mark { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: var(--c); color: #fff; font-weight: 900; font-size: 12px; flex: none; }
+.cr-txt { flex: 1; min-width: 0; display: grid; }
+.cr-txt small { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn.cr-go { width: auto; padding: 8px 14px; min-height: 0; flex: none; background: var(--c); }
+.cr-done { color: #16a34a; font-weight: 800; font-size: 13px; flex: none; }
+/* 学習カレンダー */
+.cal-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.cal-head b { font-size: 16px; } .cal-head small { color: var(--muted); flex: 1; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-w { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; }
+.cal-d { aspect-ratio: 1; border-radius: 8px; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: color-mix(in srgb, var(--muted) 12%, transparent); color: var(--muted); }
+.cal-d.emp { background: none; }
+.cal-d.l1 { background: #bbf7d0; color: #14532d; } .cal-d.l2 { background: #4ade80; color: #14532d; } .cal-d.l3 { background: #16a34a; color: #fff; }
+.cal-d.today { outline: 2.5px solid #f59e0b; outline-offset: -1px; }
+/* 苦手分析 */
+.wk-next { display: grid; gap: 2px; }
+.wk-next small { color: #dc2626; font-weight: 800; } .wk-next b { font-size: 16px; }
+.wk-row { display: grid; grid-template-columns: 7.5em 1fr 3.2em; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; }
+.wk-l { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wk-track { height: 10px; border-radius: 6px; background: color-mix(in srgb, var(--muted) 18%, transparent); overflow: hidden; }
+.wk-track i { display: block; height: 100%; border-radius: 6px; }
+.wk-track i.bad { background: #ef4444; } .wk-track i.mid { background: #f59e0b; } .wk-track i.good { background: #22c55e; }
+.wk-v { text-align: right; font-size: 13px; }
+.wk-recent { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+.wk-recent div { display: grid; } .wk-recent small, .wk-recent span { color: var(--muted); font-size: 11.5px; } .wk-recent b { font-size: 18px; }
+.wk-recent b.up { color: #16a34a; } .wk-recent b.down { color: #dc2626; }
+.wk-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; height: 70px; margin-top: 12px; align-items: end; }
+.wk-days span { display: grid; grid-template-rows: 1fr auto; height: 100%; align-items: end; text-align: center; }
+.wk-days i { display: block; background: #60a5fa; border-radius: 4px 4px 0 0; min-height: 2px; }
+.wk-days small { font-size: 10px; color: var(--muted); }
