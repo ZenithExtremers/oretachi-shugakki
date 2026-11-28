@@ -22,6 +22,7 @@ export default [
   {
     id: 'sd',
     name: 'ソフトウェア設計',
+    short: '設計',
     mark: 'UML',
     sub: '期末確認テスト 1/7 ・ UML の図',
     examDate: '2027-01-07',

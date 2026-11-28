@@ -610,22 +610,31 @@ img.rp-face { object-fit: cover; background: #fff; }
 .rb-txt b { font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rb-txt small { opacity: .85; font-size: 12.5px; }
 .rb-ring { width: 40px; height: 40px; border-radius: 50%; flex: none; background: conic-gradient(#fff calc(var(--p) * 1%), rgba(255, 255, 255, .25) 0); -webkit-mask: radial-gradient(circle, transparent 13px, #000 14px); mask: radial-gradient(circle, transparent 13px, #000 14px); }
-.stiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.stile { display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 0 0 12px; border: 1px solid var(--line); border-radius: 18px; background: var(--card); color: var(--text); cursor: pointer; overflow: hidden; box-shadow: var(--shadow); min-width: 0; }
+.stiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stile { display: flex; flex-direction: column; gap: 3px; text-align: left; padding: 0 0 9px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--text); cursor: pointer; overflow: hidden; min-width: 0; }
 .stile:active { transform: scale(.98); }
-.stile-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 10px 12px; background: linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 60%, #000)); color: #fff; margin-bottom: 4px; }
-.stile-mark { font-weight: 900; font-size: 15px; letter-spacing: .02em; }
-.stile-days { font-size: 11px; background: rgba(255, 255, 255, .22); border-radius: 99px; padding: 2px 8px; white-space: nowrap; }
-.stile-days b { font-size: 13px; }
-.stile-name { padding: 0 12px; font-size: 15.5px; line-height: 1.35; min-height: 2.7em; }
-.stile-row { display: flex; justify-content: space-between; align-items: baseline; padding: 0 12px; font-size: 12px; color: var(--muted); }
-.stile-row b { font-size: 18px; color: var(--text); }
-.stile-bar { margin: 0 12px; height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.stile-top { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 6px 8px; background: linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 60%, #000)); color: #fff; margin-bottom: 2px; }
+.stile-mark { font-weight: 900; font-size: 12.5px; letter-spacing: .02em; }
+.stile-days { font-size: 10px; background: rgba(255, 255, 255, .22); border-radius: 99px; padding: 1px 6px; white-space: nowrap; }
+.stile-days b { font-size: 11.5px; }
+.stile-name { padding: 0 8px; font-size: 13px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stile-row { display: flex; justify-content: space-between; align-items: baseline; padding: 0 8px; font-size: 10.5px; color: var(--muted); }
+.stile-row b { font-size: 17px; color: var(--text); } .stile-row b small { font-size: 11px; }
+.stile-bar { margin: 0 8px; height: 5px; background: var(--line); border-radius: 99px; overflow: hidden; }
 .stile-bar i { display: block; height: 100%; background: var(--c); }
-.stile-sub { padding: 0 12px; font-size: 11.5px; color: var(--muted); }
-.stiles .stile:last-child:nth-child(odd) { grid-column: 1 / -1; }
-.stiles .stile:last-child:nth-child(odd) .stile-name { min-height: 0; }
-.hima-banner { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 18px; padding: 10px 14px; border: 0; border-radius: 18px; cursor: pointer; text-align: left; color: #fff;
+/* ホームの「今日」カード */
+.today { padding: 12px 14px; }
+.td-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.td-head b { font-size: 16px; } .td-head small { color: var(--muted); flex: 1; font-size: 12px; }
+.td-calbtn { border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 99px; padding: 3px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.cal-d.fut { opacity: .45; }
+.today .cal-d { aspect-ratio: auto; height: 30px; }
+.td-cram { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.td-lbl { font-size: 12.5px; font-weight: 800; margin-right: 2px; }
+.td-chip { border: 0; border-radius: 99px; padding: 5px 11px; font-size: 12px; font-weight: 800; color: #fff; background: var(--c); cursor: pointer; }
+.td-chip b { font-size: 13px; }
+.td-chip.done { background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); }
+.hima-banner { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 14px; padding: 10px 14px; border: 0; border-radius: 18px; cursor: pointer; text-align: left; color: #fff;
   background: linear-gradient(135deg, #1a1446, #2a1650 60%, #4c1d95); box-shadow: 0 6px 18px rgba(42, 22, 80, .35); }
 .hb-owl { width: 56px; height: 56px; border-radius: 16px; background: rgba(255, 255, 255, .12); display: grid; place-items: center; flex: none; }
 .hb-owl svg { width: 52px; height: 52px; }

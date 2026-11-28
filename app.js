@@ -147,11 +147,10 @@ async function viewHome() {
     const lessonsDone = s.lessons.filter((l) => store.lessons[l.id]).length;
     const days = s.meta.examDate ? Math.ceil((new Date(s.meta.examDate + 'T00:00:00') - new Date(new Date().toDateString())) / 86400000) : null;
     return `<button class="stile" data-act="nav" data-to="s/${s.id}" style="--c:${s.meta.color}">
-      <span class="stile-top"><span class="stile-mark">${esc(s.meta.mark || '')}</span>${days != null && days >= 0 ? `<span class="stile-days">${days === 0 ? '今日が本番！' : `期末まで <b>${days}</b>日`}</span>` : ''}</span>
+      <span class="stile-top"><span class="stile-mark">${esc(s.meta.mark || '')}</span>${days != null && days >= 0 ? `<span class="stile-days">${days === 0 ? '本番！' : `あと<b>${days}</b>日`}</span>` : ''}</span>
       <b class="stile-name">${esc(s.meta.short || s.meta.name)}</b>
-      <span class="stile-row"><span>正答率</span><b>${acc == null ? '—' : acc + '%'}</b></span>
+      <span class="stile-row"><b>${acc == null ? '—' : acc + '<small>%</small>'}</b><small>${tried}/${qs.length}問</small></span>
       <span class="stile-bar"><i style="width:${acc || 0}%"></i></span>
-      <span class="stile-sub"><span>問題 ${tried}/${qs.length}</span><span>基礎 ${lessonsDone}/${s.lessons.length}</span></span>
     </button>`;
   };
   $app.innerHTML = `
@@ -163,18 +162,15 @@ async function viewHome() {
           <span class="rb-txt"><small>続きから</small><b>${esc(resume.title)}</b><small>${esc(resumeMeta.name)} ・ ${Object.keys(resume.answers).length}/${resume.qids.length}問</small></span>
           <span class="rb-ring" style="--p:${(Object.keys(resume.answers).length / resume.qids.length) * 100}"></span>
         </button>` : `<div class="home-hello"><img src="icons/icon-192.png" alt=""><div><b>今日もやろう。</b><small>本番と同じ形式で、テスト対策。</small></div></div>`}
+      ${todayCard(subs)}
       <h3 class="sec">科目</h3>
       <div class="stiles">${subs.map(tile).join('')}</div>
-      ${cramCard(subs)}
-      ${calendarCard()}
-      <p class="muted small">ほかの科目は資料がそろいしだい追加します。</p>
       <button class="hima-banner" data-act="nav" data-to="hima">
         <span class="hb-owl">${owlSVG()}</span>
         <span class="hb-txt"><b>ヒマコロシ</b><small>フクロウ育成・ミニゲーム・冒険</small></span>
         <span class="hb-stats"><span>🌰 ${hs.food}</span>${hs.quest ? `<span>⚔️ ${esc(hs.quest)}</span>` : ''}</span>
       </button>
       <button class="note-row" data-act="nav" data-to="notes"><span>📝 パッチノート</span><small>v${VERSION} ・ ${fmtDate(NOTES[0].date)} 更新</small><span class="chev">${ICON.next}</span></button>
-      <p class="muted small center mt">俺たちの秋学期 v${VERSION}</p>
     </main>`;
 }
 
@@ -344,28 +340,24 @@ function startCram(s) {
   const by = new Map(); for (const q of p.qs) { if (!by.has(q.group)) by.set(q.group, []); by.get(q.group).push(q); }
   makeSession(s, { kind: 'cram', mode: 'practice', title: `今日の追いこみ ${p.n}問`, groups: [...by].map(([g, qs]) => ({ g, qs })) });
 }
-function cramCard(subs) {
-  const rows = subs.map((s) => ({ s, p: cramPlan(s) })).filter((x) => x.p);
-  if (!rows.length) return '';
-  return `<h3 class="sec">📌 今日やる分</h3><div class="card cram">${rows.map(({ s, p }) => `
-    <div class="cram-row" style="--c:${s.meta.color}"><span class="cr-mark">${esc(s.meta.mark || '')}</span>
-      <div class="cr-txt"><b>${esc(s.meta.short || s.meta.name)}</b><small>${p.days ? `期末まで${p.days}日` : '今日が本番'} ・ ${esc(p.lecs)}</small></div>
-      ${p.done ? '<span class="cr-done">✓ 完了</span>' : `<button class="btn cr-go" data-act="cram" data-sid="${s.id}">${p.n}問</button>`}</div>`).join('')}
-    <p class="muted small" style="margin:8px 0 0">まだの回・苦手な回から、期末までに全部を1周できる量。終わると🌰3</p></div>`;
-}
-function calendarCard() {
-  const t = new Date(), y = t.getFullYear(), m = t.getMonth(), first = new Date(y, m, 1).getDay(), last = new Date(y, m + 1, 0).getDate();
-  const n = streakNow(), next = STREAK_REW.find(([len]) => len > n);
-  const cells = [];
-  for (let i = 0; i < first; i++) cells.push('<span class="cal-d emp"></span>');
-  for (let d = 1; d <= last; d++) {
-    const k = dayKey(new Date(y, m, d)), v = dayTotal(k), lv = v ? (v >= 30 ? 3 : v >= 10 ? 2 : 1) : 0;
-    cells.push(`<span class="cal-d l${lv}${d === t.getDate() ? ' today' : ''}" title="${v}問">${d}</span>`);
-  }
-  return `<h3 class="sec">📅 学習カレンダー</h3><div class="card cal">
-    <div class="cal-head"><b>🔥 ${n}日連続</b><small>${next ? `あと${next[0] - n}日で 🌰${next[1]}${next[2] ? `＋🎟️${next[2]}` : ''}` : '30日達成！'}</small><span class="muted small">${m + 1}月</span></div>
-    <div class="cal-grid">${['日', '月', '火', '水', '木', '金', '土'].map((w) => `<span class="cal-w">${w}</span>`).join('')}${cells.join('')}</div>
-    <p class="muted small" style="margin:8px 0 0">1問でも解いた日に色がつく（10問・30問でこくなる）。3・7・14・30日連続でごほうび</p></div>`;
+// ホームの「今日」カード：連続日数・今週・今日やる分（月のカレンダーはたたんでおく）
+let calOpen = false;
+function todayCard(subs) {
+  const t = new Date(), n = streakNow(), next = STREAK_REW.find(([len]) => len > n);
+  const cell = (d, cls = '') => { const v = dayTotal(dayKey(d)); const lv = v ? (v >= 30 ? 3 : v >= 10 ? 2 : 1) : 0; return `<span class="cal-d l${lv}${dayKey(d) === dayKey(t) ? ' today' : ''}${cls}" title="${v}問">${d.getDate()}</span>`; };
+  const ws = new Date(t); ws.setDate(t.getDate() - t.getDay());
+  const week = [...Array(7)].map((_, i) => { const d = new Date(ws); d.setDate(ws.getDate() + i); return cell(d, d > t ? ' fut' : ''); }).join('');
+  const y = t.getFullYear(), m = t.getMonth(), first = new Date(y, m, 1).getDay(), last = new Date(y, m + 1, 0).getDate();
+  const month = [...Array(first)].map(() => '<span class="cal-d emp"></span>').join('') + [...Array(last)].map((_, i) => cell(new Date(y, m, i + 1))).join('');
+  const cram = subs.map((s) => ({ s, p: cramPlan(s) })).filter((x) => x.p);
+  return `<div class="card today mt">
+    <div class="td-head"><b>🔥 ${n}日連続</b><small>${next ? `あと${next[0] - n}日で 🌰${next[1]}${next[2] ? `＋🎟️${next[2]}` : ''}` : '30日達成！'}</small>
+      <button class="td-calbtn" data-act="calopen" aria-expanded="${calOpen}">${calOpen ? '閉じる' : `📅 ${m + 1}月`}</button></div>
+    <div class="cal-grid">${['日', '月', '火', '水', '木', '金', '土'].map((w) => `<span class="cal-w">${w}</span>`).join('')}${calOpen ? month : week}</div>
+    ${cram.length ? `<div class="td-cram"><span class="td-lbl">📌 今日やる分</span>${cram.map(({ s, p }) => p.done
+      ? `<span class="td-chip done" style="--c:${s.meta.color}">${esc(s.meta.mark || '')} ✓</span>`
+      : `<button class="td-chip" data-act="cram" data-sid="${s.id}" style="--c:${s.meta.color}" title="${esc(p.lecs)}">${esc(s.meta.mark || '')} <b>${p.n}問</b></button>`).join('')}</div>` : ''}
+  </div>`;
 }
 
 /* ---------- 苦手分析 ---------- */
@@ -1039,6 +1031,7 @@ document.addEventListener('click', async (e) => {
     case 'past': return confirmReplace() && startPast(s, el.dataset.src, el.dataset.mode);
     case 'review': return confirmReplace() && startReview(s, reviewIds(s));
     case 'cram': { const cs = await getSubject(el.dataset.sid); return cs && confirmReplace() && startCram(cs); }
+    case 'calopen': calOpen = !calOpen; return viewHome();
     case 'nextlec': return confirmReplace() && startLecture(s, el.dataset.k);
     case 'retrywrong': return startReview(s, session.wrong, '解き直し');
     case 'fl': case 'ft': {
